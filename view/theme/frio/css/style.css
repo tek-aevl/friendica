@@ -344,6 +344,8 @@ btn-eventnav:hover {
 }
 .media .media-body {
 	display: table-cell;
+	border-left: dotted;
+	padding-left: 1%;
 	width: 10000px;
 	*width: auto;
 	*zoom: 1;
