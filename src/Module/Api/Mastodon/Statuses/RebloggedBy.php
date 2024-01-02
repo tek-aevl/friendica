@@ -41,14 +41,14 @@ class RebloggedBy extends BaseApi
 		$uid = self::getCurrentUserID();
 
 		if (empty($this->parameters['id'])) {
-			DI::mstdnError()->UnprocessableEntity();
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
-		if (!$post = Post::selectOriginal(['id'], ['uri-id' => $this->parameters['id'], 'uid' => [0, $uid]])) {
-			DI::mstdnError()->RecordNotFound();
+		if (!$post = Post::selectOriginal(['uri-id'], ['uri-id' => $this->parameters['id'], 'uid' => [0, $uid]])) {
+			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}
 
-		$activities = Post::selectPosts(['author-id'], ['thr-parent-id' => $post['id'], 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => Activity::ANNOUNCE]);
+		$activities = Post::selectPosts(['author-id'], ['thr-parent-id' => $post['uri-id'], 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => Activity::ANNOUNCE]);
 
 		$accounts = [];
 
@@ -56,6 +56,6 @@ class RebloggedBy extends BaseApi
 			$accounts[] = DI::mstdnAccount()->createFromContactId($activity['author-id'], $uid);
 		}
 
-		System::jsonExit($accounts);
+		$this->jsonExit($accounts);
 	}
 }

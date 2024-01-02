@@ -23,7 +23,6 @@ namespace Friendica\Model;
 
 use BadMethodCallException;
 use Friendica\Core\Logger;
-use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -36,10 +35,10 @@ class Post
 	 *
 	 * @param integer $uri_id
 	 * @param array   $fields
-	 * @return int    ID of inserted post
+	 * @return bool   Success of the insert process
 	 * @throws \Exception
 	 */
-	public static function insert(int $uri_id, array $data = []): int
+	public static function insert(int $uri_id, array $data = []): bool
 	{
 		if (empty($uri_id)) {
 			throw new BadMethodCallException('Empty URI_id');
@@ -50,11 +49,7 @@ class Post
 		// Additionally assign the key fields
 		$fields['uri-id'] = $uri_id;
 
-		if (!DBA::insert('post', $fields, Database::INSERT_IGNORE)) {
-			return 0;
-		}
-
-		return DBA::lastInsertId();
+		return DBA::insert('post', $fields, Database::INSERT_IGNORE);
 	}
 
 	/**
@@ -77,7 +72,7 @@ class Post
 				if (array_key_exists('title', $row)) {
 					$row['title'] = '';
 				}
-				if (array_key_exists('body', $row)) {
+				if (array_key_exists('body', $row) && empty($row['body'])) {
 					$row['body'] = $row['verb'];
 				}
 				if (array_key_exists('object', $row)) {
@@ -453,12 +448,10 @@ class Post
 			AND (NOT `causer-blocked` OR `causer-id` = ? OR `causer-id` IS NULL) AND NOT `contact-blocked`
 			AND ((NOT `contact-readonly` AND NOT `contact-pending` AND (`contact-rel` IN (?, ?)))
 				OR `self` OR `contact-uid` = ?)
-			AND NOT `" . $view . "`.`uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `uid` = ? AND `hidden`)
-			AND NOT `author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND `blocked` AND `cid` = `author-id`)
-			AND NOT `owner-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND `blocked` AND `cid` = `owner-id`)
-			AND NOT `author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND `ignored` AND `cid` = `author-id`)
-			AND NOT `owner-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND `ignored` AND `cid` = `owner-id`)",
-				0, Contact::SHARING, Contact::FRIEND, 0, $uid, $uid, $uid, $uid, $uid]);
+			AND NOT EXISTS(SELECT `uri-id` FROM `post-user`    WHERE `uid` = ? AND `uri-id` = " . DBA::quoteIdentifier($view) . ".`uri-id` AND `hidden`)
+			AND NOT EXISTS(SELECT `cid`    FROM `user-contact` WHERE `uid` = ? AND `cid` IN (`author-id`, `owner-id`) AND (`blocked` OR `ignored`))
+			AND NOT EXISTS(SELECT `gsid`   FROM `user-gserver` WHERE `uid` = ? AND `gsid` IN (`author-gsid`, `owner-gsid`, `causer-gsid`) AND `ignored`)",
+				0, Contact::SHARING, Contact::FRIEND, 0, $uid, $uid, $uid]);
 
 		$select_string = implode(', ', array_map([DBA::class, 'quoteIdentifier'], $selected));
 
@@ -501,6 +494,23 @@ class Post
 	public static function selectPostsForUser(int $uid, array $selected = [], array $condition = [], array $params = [])
 	{
 		return self::selectViewForUser('post-view', $uid, $selected, $condition, $params);
+	}
+
+	/**
+	 * Select rows from the post-timeline-view view for a given user
+	 * This function is used for API calls.
+	 *
+	 * @param integer $uid       User ID
+	 * @param array   $selected  Array of selected fields, empty for all
+	 * @param array   $condition Array of fields for condition
+	 * @param array   $params    Array of several parameters
+	 *
+	 * @return boolean|object
+	 * @throws \Exception
+	 */
+	public static function selectTimelineForUser(int $uid, array $selected = [], array $condition = [], array $params = [])
+	{
+		return self::selectViewForUser('post-timeline-view', $uid, $selected, $condition, $params);
 	}
 
 	/**
@@ -600,7 +610,7 @@ class Post
 	{
 		$affected = 0;
 
-		Logger::info('Start Update', ['fields' => $fields, 'condition' => $condition, 'uid' => DI::userSession()->getLocalUserId(),'callstack' => System::callstack(10)]);
+		Logger::info('Start Update', ['fields' => $fields, 'condition' => $condition, 'uid' => DI::userSession()->getLocalUserId()]);
 
 		// Don't allow changes to fields that are responsible for the relation between the records
 		unset($fields['id']);

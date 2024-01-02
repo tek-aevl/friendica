@@ -640,10 +640,11 @@ class Network
 	 * @param string $url
 	 *
 	 * @return bool
+	 * @deprecated since 2023.09, please use BaseUrl->isLocalUrl or BaseUrl->isLocalUri instead.
 	 */
 	public static function isLocalLink(string $url): bool
 	{
-		return (strpos(Strings::normaliseLink($url), Strings::normaliseLink(DI::baseUrl())) !== false);
+		return DI::baseUrl()->isLocalUrl($url);
 	}
 
 	/**
@@ -656,5 +657,25 @@ class Network
 	{
 		$scheme = parse_url($url, PHP_URL_SCHEME);
 		return !empty($scheme) && in_array($scheme, ['http', 'https']) && parse_url($url, PHP_URL_HOST);
+	}
+
+	/**
+	 * Creates an Uri object out of a given Uri string
+	 *
+	 * @param string|null $uri
+	 * @return UriInterface|null
+	 */
+	public static function createUriFromString(string $uri = null): ?UriInterface
+	{
+		if (empty($uri)) {
+			return null;
+		}
+
+		try {
+			return new Uri($uri);
+		} catch (\Exception $e) {
+			Logger::debug('Invalid URI', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'uri' => $uri]);
+			return null;
+		}
 	}
 }

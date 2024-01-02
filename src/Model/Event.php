@@ -344,7 +344,6 @@ class Event
 		$event['id'] = $event_id;
 
 		$item['uid']           = $event['uid'];
-		$item['contact-id']    = $event['cid'];
 		$item['uri']           = $event['uri'];
 		$item['uri-id']        = ItemURI::getIdByURI($event['uri']);
 		$item['guid']          = $event['guid'];
@@ -363,11 +362,10 @@ class Event
 		$item['allow_gid']     = $event['allow_gid'];
 		$item['deny_cid']      = $event['deny_cid'];
 		$item['deny_gid']      = $event['deny_gid'];
-		$item['private']       = intval($event['private'] ?? 0);
+		$item['private']       = $event['allow_cid'] || $event['allow_gid'] || $event['deny_cid'] || $event['deny_gid'];
 		$item['visible']       = 1;
 		$item['verb']          = Activity::POST;
 		$item['object-type']   = Activity\ObjectType::EVENT;
-		$item['post-type']     = Item::PT_EVENT;
 		$item['origin']        = $event['cid'] === 0 ? 1 : 0;
 		$item['body']          = self::getBBCode($event);
 		$item['event-id']      = $event['id'];
@@ -547,13 +545,14 @@ class Event
 		// Query for the event by event id
 		$events = DBA::toArray(DBA::p(
 			"SELECT `event`.*, `post-user`.`id` AS `itemid` FROM `event`
-			LEFT JOIN `post-user` 
-				ON `post-user`.`event-id` = `event`.`id` 
+			LEFT JOIN `post-user`
+				ON `post-user`.`event-id` = `event`.`id`
 				AND `post-user`.`uid` = `event`.`uid`
 			WHERE `event`.`id` = ?
 			  AND `event`.`uid` = ?
 			  $sql_perms",
-			$event_id, $owner_uid
+			$event_id,
+			$owner_uid
 		));
 		if (empty($events)) {
 			throw new HTTPException\NotFoundException(DI::l10n()->t('Event not found.'));
@@ -616,7 +615,8 @@ class Event
 			  AND `start` <= ?
 			  $sql_perms",
 			$owner_uid,
-			$start, $start,
+			$start,
+			$start,
 			$finish
 		));
 
@@ -636,7 +636,7 @@ class Event
 	{
 		$fmt = DI::l10n()->t('l, F j');
 
-		$item = Post::selectFirst(['plink', 'author-name', 'author-network', 'author-id', 'author-avatar', 'author-link', 'private', 'uri-id'], ['id' => $event['itemid']]);
+		$item = Post::selectFirst(['plink', 'author-name', 'author-network', 'author-id', 'author-avatar', 'author-link', 'author-alias', 'private', 'uri-id'], ['id' => $event['itemid']]);
 		if (empty($item)) {
 			// Using default values when no item had been found
 			$item = ['plink' => '', 'author-name' => '', 'author-avatar' => '', 'author-link' => '', 'private' => Item::PUBLIC, 'uri-id' => ($event['uri-id'] ?? 0)];
@@ -661,9 +661,9 @@ class Event
 		$copy = null;
 		$drop = null;
 		if (DI::userSession()->getLocalUserId() && DI::userSession()->getLocalUserId() == $event['uid'] && $event['type'] == 'event') {
-			$edit = !$event['cid'] ? ['calendar/event/edit/' . $event['id'], DI::l10n()->t('Edit event')     , '', ''] : null;
-			$copy = !$event['cid'] ? ['calendar/event/copy/' . $event['id'] , DI::l10n()->t('Duplicate event'), '', ''] : null;
-			$drop =                  ['calendar/api/delete/' . $event['id'] , DI::l10n()->t('Delete event')   , '', ''];
+			$edit = !$event['cid'] ? ['calendar/event/edit/' . $event['id'], DI::l10n()->t('Edit event'), '', ''] : null;
+			$copy = !$event['cid'] ? ['calendar/event/copy/' . $event['id'], DI::l10n()->t('Duplicate event'), '', ''] : null;
+			$drop =                  ['calendar/api/delete/' . $event['id'], DI::l10n()->t('Delete event'), '', ''];
 		}
 
 		$title = BBCode::convertForUriId($event['uri-id'], Strings::escapeHtml($event['summary']));
@@ -708,7 +708,7 @@ class Event
 		}
 
 		switch ($format) {
-			// Format the exported data as a CSV file.
+				// Format the exported data as a CSV file.
 			case "csv":
 				$o .= '"Subject", "Start Date", "Start Time", "Description", "End Date", "End Time", "Location"' . PHP_EOL;
 
@@ -728,7 +728,7 @@ class Event
 				}
 				break;
 
-			// Format the exported data as a ics file.
+				// Format the exported data as a ics file.
 			case "ical":
 				$o = 'BEGIN:VCALENDAR' . PHP_EOL
 					. 'VERSION:2.0' . PHP_EOL
@@ -929,8 +929,13 @@ class Event
 		$location = self::locationToArray($item['event-location']);
 
 		// Construct the profile link (magic-auth).
-		$author       = ['uid'     => 0, 'id' => $item['author-id'],
-		                 'network' => $item['author-network'], 'url' => $item['author-link']];
+		$author       = [
+			'uid'     => 0,
+			'id'      => $item['author-id'],
+			'network' => $item['author-network'],
+			'url'     => $item['author-link'],
+			'alias'   => $item['author-alias']
+		];
 		$profile_link = Contact::magicLinkByContact($author);
 
 		$tpl    = Renderer::getMarkupTemplate('event_stream_item.tpl');
@@ -1005,7 +1010,7 @@ class Event
 			}
 		}
 
-		$location['name'] = BBCode::convert($location['name']);
+		$location['name'] = BBCode::toPlaintext($location['name'], false);
 
 		// Construct the map HTML.
 		if (isset($location['address'])) {

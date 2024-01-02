@@ -22,6 +22,7 @@
 namespace Friendica\Model;
 
 use Friendica\BaseModule;
+use Friendica\Content\Widget;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
@@ -168,13 +169,14 @@ class Circle
 	 *
 	 * Count unread items of each circle of the local user
 	 *
+	 * @param int $uid
 	 * @return array
 	 *    'id' => circle id
 	 *    'name' => circle name
 	 *    'count' => counted unseen circle items
 	 * @throws \Exception
 	 */
-	public static function countUnseen()
+	public static function countUnseen(int $uid)
 	{
 		$stmt = DBA::p("SELECT `circle`.`id`, `circle`.`name`,
 				(SELECT COUNT(*) FROM `post-user`
@@ -187,8 +189,8 @@ class Circle
 					) AS `count`
 				FROM `group` AS `circle`
 				WHERE `circle`.`uid` = ?;",
-			DI::userSession()->getLocalUserId(),
-			DI::userSession()->getLocalUserId()
+			$uid,
+			$uid
 		);
 
 		return DBA::toArray($stmt);
@@ -426,7 +428,7 @@ class Circle
 					'uid' => $uid,
 					'rel' => [Contact::FOLLOWER, Contact::FRIEND],
 					'network' => $networks,
-					'contact-type' => [Contact::TYPE_UNKNOWN, Contact::TYPE_PERSON],
+					'contact-type' => [Contact::TYPE_UNKNOWN, Contact::TYPE_PERSON, Contact::TYPE_NEWS, Contact::TYPE_ORGANISATION],
 					'archive' => false,
 					'pending' => false,
 					'blocked' => false,
@@ -481,12 +483,13 @@ class Circle
 	 * Returns a templated circle selection list
 	 *
 	 * @param int    $uid User id
-	 * @param int    $gid   An optional pre-selected circle
-	 * @param string $label An optional label of the list
+	 * @param int    $gid   A pre-selected circle
+	 * @param string $id    The id of the option group
+	 * @param string $label The label of the option group
 	 * @return string
 	 * @throws \Exception
 	 */
-	public static function getSelectorHTML(int $uid, int $gid = 0, string $label = ''): string
+	public static function getSelectorHTML(int $uid, int $gid, string $id, string $label): string
 	{
 		$display_circles = [
 			[
@@ -508,11 +511,8 @@ class Circle
 
 		Logger::info('Got circles', $display_circles);
 
-		if ($label == '') {
-			$label = DI::l10n()->t('Default privacy circle for new contacts');
-		}
-
 		$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('circle_selection.tpl'), [
+			'$id' => $id,
 			'$label' => $label,
 			'$circles' => $display_circles
 		]);
@@ -567,7 +567,12 @@ class Circle
 			}
 
 			if ($each == 'circle') {
-				$count = DBA::count('group_member', ['gid' => $circle['id']]);
+				$networks = Widget::unavailableNetworks();
+				$sql_values = array_merge([$circle['id']], $networks);
+				$condition = ["`circle-id` = ? AND NOT `contact-network` IN (" . substr(str_repeat("?, ", count($networks)), 0, -2) . ")"];
+				$condition = array_merge($condition, $sql_values);
+
+				$count = DBA::count('circle-member-view', $condition);
 				$circle_name = sprintf('%s (%d)', $circle['name'], $count);
 			} else {
 				$circle_name = $circle['name'];

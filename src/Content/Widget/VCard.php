@@ -26,9 +26,9 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\Contact;
+use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
 /**
@@ -47,12 +47,18 @@ class VCard
 	public static function getHTML(array $contact): string
 	{
 		if (!isset($contact['network']) || !isset($contact['id'])) {
-			Logger::warning('Incomplete contact', ['contact' => $contact ?? [], 'callstack' => System::callstack(20)]);
+			Logger::warning('Incomplete contact', ['contact' => $contact ?? []]);
+		}
+
+		if (!Network::isValidHttpUrl($contact['url']) && Network::isValidHttpUrl($contact['alias'])) {
+			$contact_url = $contact['alias'];
+		} else {
+			$contact_url = $contact['url'];
 		}
 
 		if ($contact['network'] != '') {
-			$network_link   = Strings::formatNetworkName($contact['network'], $contact['url']);
-			$network_avatar = ContactSelector::networkToIcon($contact['network'], $contact['url']);
+			$network_link   = Strings::formatNetworkName($contact['network'], $contact_url);
+			$network_avatar = ContactSelector::networkToIcon($contact['network'], $contact_url);
 		} else {
 			$network_link   = '';
 			$network_avatar = '';
@@ -61,6 +67,9 @@ class VCard
 		$follow_link      = '';
 		$unfollow_link    = '';
 		$wallmessage_link = '';
+		$mention_label    = '';
+		$mention_link     = '';
+		$showgroup_link   = '';
 
 		$photo   = Contact::getPhoto($contact);
 
@@ -83,21 +92,30 @@ class VCard
 
 			if (empty($contact['self']) && Protocol::supportsFollow($contact['network'])) {
 				if (in_array($rel, [Contact::SHARING, Contact::FRIEND])) {
-					$unfollow_link = 'contact/unfollow?url=' . urlencode($contact['url']) . '&auto=1';
+					$unfollow_link = 'contact/unfollow?url=' . urlencode($contact_url) . '&auto=1';
 				} elseif (!$pending) {
-					$follow_link = 'contact/follow?url=' . urlencode($contact['url']) . '&auto=1';
+					$follow_link = 'contact/follow?url=' . urlencode($contact_url) . '&auto=1';
 				}
 			}
 
 			if (in_array($rel, [Contact::FOLLOWER, Contact::FRIEND]) && Contact::canReceivePrivateMessages($contact)) {
 				$wallmessage_link = 'message/new/' . $id;
 			}
+
+			if ($contact['contact-type'] == Contact::TYPE_COMMUNITY) {
+				$mention_label  = DI::l10n()->t('Post to group');
+				$mention_link   = 'compose/0?body=!' . $contact['addr'];
+				$showgroup_link = 'network/group/' . $id;
+			} else {
+				$mention_label = DI::l10n()->t('Mention');
+				$mention_link  = 'compose/0?body=@' . $contact['addr'];
+			}
 		}
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('widget/vcard.tpl'), [
 			'$contact'          => $contact,
 			'$photo'            => $photo,
-			'$url'              => Contact::magicLinkByContact($contact, $contact['url']),
+			'$url'              => Contact::magicLinkByContact($contact, $contact_url),
 			'$about'            => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['about'] ?? ''),
 			'$xmpp'             => DI::l10n()->t('XMPP:'),
 			'$matrix'           => DI::l10n()->t('Matrix:'),
@@ -112,6 +130,10 @@ class VCard
 			'$unfollow_link'    => $unfollow_link,
 			'$wallmessage'      => DI::l10n()->t('Message'),
 			'$wallmessage_link' => $wallmessage_link,
+			'$mention'          => $mention_label,
+			'$mention_link'     => $mention_link,
+			'$showgroup'        => DI::l10n()->t('View group'),
+			'$showgroup_link'   => $showgroup_link,
 		]);
 	}
 }

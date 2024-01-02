@@ -39,11 +39,14 @@
 				<button type="button" class="btn btn-sm template-icon emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}">
 					<i class="fa fa-smile-o"></i>
 				</button>
+				<button type="button" class="btn btn-sm template-icon bold" style="cursor: pointer;" aria-label="{{$contentwarn}}" title="{{$contentwarn}}" onclick="insertFormatting('abstract',{{$id}});">
+					<i class="fa fa-eye"></i>
+				</button>
 			</span>
 			</p>
 			<div id="dropzone-{{$id}}" class="dropzone">
 				<p>
-					<textarea id="comment-edit-text-{{$id}}" class="dropzone comment-edit-text-empty form-control text-autosize" name="body" placeholder="{{$comment}}" rows="3" data-default="{{$default}}" dir="auto">{{$default}}</textarea>
+					<textarea id="comment-edit-text-{{$id}}" class="dropzone comment-edit-text-empty form-control text-autosize" name="body" placeholder="{{$comment}}" rows="8" data-default="{{$default}}" dir="auto" onkeydown="sendOnCtrlEnter(event, 'comment-edit-submit-{{$id}}')">{{$default}}</textarea>
 				</p>
 			</div>
 	{{if $qcomment}}

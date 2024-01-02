@@ -391,6 +391,7 @@ return [
 		'/event/{mode:edit|copy}/{id:\d+}'              => [Module\Calendar\Event\Form::class, [R::GET         ]],
 	],
 
+	'/channel[/{content}]'   => [Module\Conversation\Channel::class,   [R::GET]],
 	'/community[/{content}]' => [Module\Conversation\Community::class, [R::GET]],
 
 	'/compose[/{type}]'    => [Module\Item\Compose::class, [R::GET, R::POST]],
@@ -422,8 +423,8 @@ return [
 	],
 
 	'/credits'                  => [Module\Credits::class,          [R::GET]],
-	'/delegation'               => [Module\Delegation::class,       [R::GET, R::POST]],
-	'/dfrn_notify[/{nickname}]' => [Module\DFRN\Notify::class,      [R::POST]],
+	'/delegation'               => [Module\User\Delegation::class,  [R::GET, R::POST]],
+	'/dfrn_notify[/{nickname}]' => [Module\DFRN\Notify::class,      [        R::POST]],
 	'/dfrn_poll/{nickname}'     => [Module\DFRN\Poll::class,        [R::GET]],
 	'/dirfind'                  => [Module\Search\Directory::class, [R::GET]],
 	'/directory'                => [Module\Directory::class,        [R::GET]],
@@ -449,8 +450,9 @@ return [
 	'/follow_confirm'       => [Module\FollowConfirm::class,         [R::GET, R::POST]],
 	'/followers/{nickname}' => [Module\ActivityPub\Followers::class, [R::GET]],
 	'/following/{nickname}' => [Module\ActivityPub\Following::class, [R::GET]],
-	'/friendica[/json]'     => [Module\Friendica::class,             [R::GET]],
+	'/friendica[/{format:json}]' => [Module\Friendica::class,        [R::GET]],
 	'/friendica/inbox'      => [Module\ActivityPub\Inbox::class,     [R::GET, R::POST]],
+	'/friendica/outbox'     => [Module\ActivityPub\Outbox::class,    [R::GET]],
 
 	'/fsuggest/{contact:\d+}' => [Module\FriendSuggest::class,  [R::GET, R::POST]],
 
@@ -507,6 +509,9 @@ return [
 
 		'/item/delete'          => [Module\Moderation\Item\Delete::class, [R::GET, R::POST]],
 		'/item/source[/{guid}]' => [Module\Moderation\Item\Source::class, [R::GET, R::POST]],
+
+		'/report/create' => [Module\Moderation\Report\Create::class, [R::GET, R::POST]],
+		'/reports'       => [Module\Moderation\Reports::class, [R::GET, R::POST]],
 
 		'/users[/{action}/{uid}]'         => [Module\Moderation\Users\Index::class,   [R::GET, R::POST]],
 		'/users/active[/{action}/{uid}]'  => [Module\Moderation\Users\Active::class,  [R::GET, R::POST]],
@@ -637,12 +642,17 @@ return [
 	],
 
 	'/settings' => [
+		'/server' => [
+			'[/]'                  => [Module\Settings\Server\Index::class,  [R::GET, R::POST]],
+			'/{gsid:\d+}/{action}' => [Module\Settings\Server\Action::class, [R::GET, R::POST]],
+		],
 		'[/]'         => [Module\Settings\Account::class,               [R::GET, R::POST]],
 		'/account' => [
 			'[/]'     => [Module\Settings\Account::class,               [R::GET, R::POST]],
 			'/{open}' => [Module\Settings\Account::class,               [R::GET, R::POST]],
 		],
 		'/addons[/{addon}]'                => [Module\Settings\Addons::class,           [R::GET, R::POST]],
+		'/channels'                        => [Module\Settings\Channels::class,         [R::GET, R::POST]],
 		'/connectors[/{connector}]'        => [Module\Settings\Connectors::class,       [R::GET, R::POST]],
 		'/delegation[/{action}/{user_id}]' => [Module\Settings\Delegation::class,       [R::GET, R::POST]],
 		'/display'                         => [Module\Settings\Display::class,          [R::GET, R::POST]],
@@ -665,7 +675,7 @@ return [
 	],
 
 	'/network' => [
-		'[/]'                         => [Module\Conversation\Network::class, [R::GET]],
+		'[/{content}]'                => [Module\Conversation\Network::class, [R::GET]],
 		'/archive/{from:\d\d\d\d-\d\d-\d\d}[/{to:\d\d\d\d-\d\d-\d\d}]' => [Module\Conversation\Network::class, [R::GET]],
 		'/group/{contact_id:\d+}'     => [Module\Conversation\Network::class, [R::GET]],
 		'/circle/{circle_id:\d+}'     => [Module\Conversation\Network::class, [R::GET]],
@@ -680,6 +690,7 @@ return [
 	'/toggle_mobile'                 => [Module\ToggleMobile::class,          [R::GET]],
 	'/tos'                           => [Module\Tos::class,                   [R::GET]],
 
+	'/update_channel[/{content}]'    => [Module\Update\Channel::class,        [R::GET]],
 	'/update_community[/{content}]'  => [Module\Update\Community::class,      [R::GET]],
 
 	'/update_display'                => [Module\Update\Display::class, [R::GET]],

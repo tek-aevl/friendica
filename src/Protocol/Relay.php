@@ -21,7 +21,9 @@
 
 namespace Friendica\Protocol;
 
+use Friendica\Content\Smilies;
 use Friendica\Content\Text\BBCode;
+use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
@@ -33,6 +35,7 @@ use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Search;
 use Friendica\Model\Tag;
+use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 
@@ -50,15 +53,23 @@ class Relay
 	/**
 	 * Check if a post is wanted
 	 *
-	 * @param array $tags
+	 * @param array  $tags
 	 * @param string $body
-	 * @param int $authorid
+	 * @param int    $authorid
 	 * @param string $url
+	 * @param string $network
+	 * @param int    $causerid
+	 * @param array  $languages
 	 * @return boolean "true" is the post is wanted by the system
 	 */
-	public static function isSolicitedPost(array $tags, string $body, int $authorid, string $url, string $network = '', int $causerid = 0): bool
+	public static function isSolicitedPost(array $tags, string $body, int $authorid, string $url, string $network = '', int $causerid = 0, array $languages = []): bool
 	{
 		$config = DI::config();
+
+		if (Contact::hasFollowers($authorid)) {
+			Logger::info('Author has got followers on this server - accepted', ['network' => $network, 'url' => $url, 'author' => $authorid, 'tags' => $tags]);
+			return true;
+		}
 
 		$scope = $config->get('system', 'relay_scope');
 
@@ -86,23 +97,13 @@ class Relay
 
 		$body = ActivityPub\Processor::normalizeMentionLinks($body);
 
-		$systemTags = [];
-		$userTags = [];
 		$denyTags = [];
 
 		if ($scope == self::SCOPE_TAGS) {
-			$server_tags = $config->get('system', 'relay_server_tags');
-			$tagitems = explode(',', mb_strtolower($server_tags));
-			foreach ($tagitems as $tag) {
-				$systemTags[] = trim($tag, '# ');
-			}
-
-			if ($config->get('system', 'relay_user_tags')) {
-				$userTags = Search::getUserTags();
-			}
+			$tagList = self::getSubscribedTags();
+		} else {
+			$tagList  = [];
 		}
-
-		$tagList = array_unique(array_merge($systemTags, $userTags));
 
 		$deny_tags = $config->get('system', 'relay_deny_tags');
 		$tagitems = explode(',', mb_strtolower($deny_tags));
@@ -135,42 +136,84 @@ class Relay
 			}
 		}
 
-		if (!self::isWantedLanguage($body)) {
-			Logger::info('Unwanted or Undetected language found - rejected', ['network' => $network, 'url' => $url, 'causer' => $causer]);
+		if (!self::isWantedLanguage($body, 0, $authorid, $languages)) {
+			Logger::info('Unwanted or Undetected language found - rejected', ['network' => $network, 'url' => $url, 'causer' => $causer, 'tags' => $tags]);
 			return false;
 		}
 
 		if ($scope == self::SCOPE_ALL) {
-			Logger::info('Server accept all posts - accepted', ['network' => $network, 'url' => $url, 'causer' => $causer]);
+			Logger::info('Server accept all posts - accepted', ['network' => $network, 'url' => $url, 'causer' => $causer, 'tags' => $tags]);
 			return true;
 		}
 
-		Logger::info('No matching hashtags found - rejected', ['network' => $network, 'url' => $url, 'causer' => $causer]);
+		Logger::info('No matching hashtags found - rejected', ['network' => $network, 'url' => $url, 'causer' => $causer, 'tags' => $tags]);
 		return false;
+	}
+
+	/**
+	 * Get a list of subscribed tags by both the users and the tags that are defined by the admin
+	 *
+	 * @return array
+	 */
+	public static function getSubscribedTags(): array
+	{
+		$systemTags  = [];
+		$server_tags = DI::config()->get('system', 'relay_server_tags');
+
+		foreach (explode(',', mb_strtolower($server_tags)) as $tag) {
+			$systemTags[] = trim($tag, '# ');
+		}
+
+		if (DI::config()->get('system', 'relay_user_tags')) {
+			$userTags = Search::getUserTags();
+		} else {
+			$userTags = [];
+		}
+
+		return array_unique(array_merge($systemTags, $userTags));
 	}
 
 	/**
 	 * Detect the language of a post and decide if the post should be accepted
 	 *
 	 * @param string $body
+	 * @param int    $uri_id
+	 * @param int    $author_id
+	 * @param array  $languages
 	 * @return boolean
 	 */
-	public static function isWantedLanguage(string $body)
+	public static function isWantedLanguage(string $body, int $uri_id = 0, int $author_id = 0, array $languages = [])
 	{
-		$languages = [];
-		foreach (Item::getLanguageArray($body, 10) as $language => $reliability) {
-			if ($reliability > 0) {
-				$languages[] = $language;
+		$detected = [];
+		$quality  = DI::config()->get('system', 'relay_language_quality');
+		foreach (Item::getLanguageArray($body, DI::config()->get('system', 'relay_languages'), $uri_id, $author_id) as $language => $reliability) {
+			if (($reliability >= $quality) && ($quality > 0)) {
+				$detected[] = $language;
 			}
 		}
 
-		Logger::debug('Got languages', ['languages' => $languages, 'body' => $body]);
+		if (empty($languages) && empty($detected) && (empty($body) || Smilies::isEmojiPost($body))) {
+			Logger::debug('Empty body or only emojis', ['body' => $body]);
+			return true;
+		}
 
-		if (!empty($languages)) {
-			if (in_array($languages[0], DI::config()->get('system', 'relay_deny_languages'))) {
-				Logger::info('Unwanted language found', ['language' => $languages[0]]);
-				return false;
+		if (!empty($languages) || !empty($detected)) {
+			$user_languages = User::getLanguages();
+
+			foreach ($detected as $language) {
+				if (in_array($language, $user_languages)) {
+					Logger::debug('Wanted language found in detected languages', ['language' => $language, 'detected' => $detected, 'userlang' => $user_languages, 'body' => $body]);
+					return true;
+				}
 			}
+			foreach ($languages as $language) {
+				if (in_array($language, $user_languages)) {
+					Logger::debug('Wanted language found in defined languages', ['language' => $language, 'languages' => $languages, 'detected' => $detected, 'userlang' => $user_languages, 'body' => $body]);
+					return true;
+				}
+			}
+			Logger::debug('No wanted language found', ['languages' => $languages, 'detected' => $detected, 'userlang' => $user_languages, 'body' => $body]);
+			return false;
 		} elseif (DI::config()->get('system', 'relay_deny_undetected_language')) {
 			Logger::info('Undetected language found', ['body' => $body]);
 			return false;
@@ -354,7 +397,7 @@ class Relay
 	public static function getList(array $fields = []): array
 	{
 		return DBA::selectToArray('apcontact', $fields,
-			["`type` = ? AND `url` IN (SELECT `url` FROM `contact` WHERE `uid` = ? AND `rel` = ?)", 'Application', 0, Contact::FRIEND]);
+			["`type` IN (?, ?) AND `url` IN (SELECT `url` FROM `contact` WHERE `uid` = ? AND `rel` = ?)", 'Application', 'Service', 0, Contact::FRIEND]);
 	}
 
 	/**

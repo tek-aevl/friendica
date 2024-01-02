@@ -173,7 +173,7 @@ class Index extends BaseSearch
 		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
 
 		if ($tag) {
-			Logger::info('Start tag search.', ['q' => $search]);
+			Logger::info('Start tag search.', ['q' => $search, 'start' => $pager->getStart(), 'items' => $pager->getItemsPerPage(), 'last' => $last_uriid]);
 			$uriids = Tag::getURIIdListByTag($search, DI::userSession()->getLocalUserId(), $pager->getStart(), $pager->getItemsPerPage(), $last_uriid);
 			$count = Tag::countByTag($search, DI::userSession()->getLocalUserId());
 		} else {
@@ -185,7 +185,7 @@ class Index extends BaseSearch
 		if (!empty($uriids)) {
 			$condition = ["(`uid` = ? OR (`uid` = ? AND NOT `global`))", 0, DI::userSession()->getLocalUserId()];
 			$condition = DBA::mergeConditions($condition, ['uri-id' => $uriids]);
-			$params = ['order' => ['id' => true]];
+			$params = ['order' => ['uri-id' => true]];
 			$items = Post::toArray(Post::selectForUser(DI::userSession()->getLocalUserId(), Item::DISPLAY_FIELDLIST, $condition, $params));
 		}
 
@@ -213,7 +213,7 @@ class Index extends BaseSearch
 
 		Logger::info('Start Conversation.', ['q' => $search]);
 
-		$o .= DI::conversation()->create($items, Conversation::MODE_SEARCH, false, false, 'commented', DI::userSession()->getLocalUserId());
+		$o .= DI::conversation()->render($items, Conversation::MODE_SEARCH, false, false, 'commented', DI::userSession()->getLocalUserId());
 
 		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll')) {
 			$o .= HTML::scrollLoader();

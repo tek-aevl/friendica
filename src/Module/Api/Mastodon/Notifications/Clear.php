@@ -32,11 +32,11 @@ class Clear extends BaseApi
 {
 	protected function post(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
+		$this->checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
 		DI::notification()->setAllDismissedForUser($uid);
 
-		System::jsonExit([]);
+		$this->jsonExit([]);
 	}
 }

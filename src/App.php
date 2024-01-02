@@ -63,8 +63,8 @@ use Psr\Log\LoggerInterface;
 class App
 {
 	const PLATFORM = 'Friendica';
-	const CODENAME = 'Giant Rhubarb';
-	const VERSION  = '2023.09-dev';
+	const CODENAME = 'Yellow Archangel';
+	const VERSION  = '2024.03-dev';
 
 	// Allow themes to control internal parameters
 	// by changing App values in theme.php
@@ -565,6 +565,10 @@ class App
 	 */
 	public function runFrontend(App\Router $router, IManagePersonalConfigValues $pconfig, Authentication $auth, App\Page $page, Nav $nav, ModuleHTTPException $httpException, HTTPInputData $httpInput, float $start_time, array $server)
 	{
+		$requeststring = ($_SERVER['REQUEST_METHOD'] ?? '') . ' ' . ($_SERVER['REQUEST_URI'] ?? '') . ' ' . ($_SERVER['SERVER_PROTOCOL'] ?? '');
+		$this->logger->debug('Request received', ['address' => $_SERVER['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $_SERVER['HTTP_REFERER'] ?? '', 'user-agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
+		$request_start = microtime(true);
+
 		$this->profiler->set($start_time, 'start');
 		$this->profiler->set(microtime(true), 'classinit');
 
@@ -695,6 +699,9 @@ class App
 				$module = $router->getModule();
 			}
 
+			// Display can change depending on the requested language, so it shouldn't be cached whole
+			header('Vary: Accept-Language', false);
+
 			// Processes data from GET requests
 			$httpinput = $httpInput->process();
 			$input     = array_merge($httpinput['variables'], $httpinput['files'], $request ?? $_REQUEST);
@@ -703,12 +710,16 @@ class App
 			$timestamp = microtime(true);
 			$response = $module->run($httpException, $input);
 			$this->profiler->set(microtime(true) - $timestamp, 'content');
+
+			// Wrapping HTML responses in the theme template
 			if ($response->getHeaderLine(ICanCreateResponses::X_HEADER) === ICanCreateResponses::TYPE_HTML) {
-				$page->run($this, $this->baseURL, $this->args, $this->mode, $response, $this->l10n, $this->profiler, $this->config, $pconfig, $nav, $this->session->getLocalUserId());
-			} else {
-				$page->exit($response);
+				$response = $page->run($this, $this->baseURL, $this->args, $this->mode, $response, $this->l10n, $this->profiler, $this->config, $pconfig, $nav, $this->session->getLocalUserId());
 			}
+
+			$this->logger->debug('Request processed sucessfully', ['response' => $response->getStatusCode(), 'address' => $_SERVER['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $_SERVER['HTTP_REFERER'] ?? '', 'user-agent' => $_SERVER['HTTP_USER_AGENT'] ?? '', 'duration' => number_format(microtime(true) - $request_start, 3)]);
+			System::echoResponse($response);
 		} catch (HTTPException $e) {
+			$this->logger->debug('Request processed with exception', ['response' => $e->getCode(), 'address' => $_SERVER['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $_SERVER['HTTP_REFERER'] ?? '', 'user-agent' => $_SERVER['HTTP_USER_AGENT'] ?? '', 'duration' => number_format(microtime(true) - $request_start, 3)]);
 			$httpException->rawContent($e);
 		}
 		$page->logRuntime($this->config, 'runFrontend');

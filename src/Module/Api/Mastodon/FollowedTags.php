@@ -32,7 +32,7 @@ class FollowedTags extends BaseApi
 {
 	protected function rawContent(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_READ);
+		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
 		$request = $this->getRequest([
@@ -77,6 +77,6 @@ class FollowedTags extends BaseApi
 		}
 
 		self::setLinkHeader();
-		System::jsonExit($return);
+		$this->jsonExit($return);
 	}
 }

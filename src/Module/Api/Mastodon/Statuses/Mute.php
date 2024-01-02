@@ -35,24 +35,29 @@ class Mute extends BaseApi
 {
 	protected function post(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
+		$this->checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
 		if (empty($this->parameters['id'])) {
-			DI::mstdnError()->UnprocessableEntity();
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
-		$item = Post::selectOriginalForUser($uid, ['id', 'gravity'], ['uri-id' => $this->parameters['id'], 'uid' => [$uid, 0]]);
+		$item = Post::selectOriginalForUser($uid, ['uri-id', 'gravity'], ['uri-id' => $this->parameters['id'], 'uid' => [$uid, 0]]);
 		if (!DBA::isResult($item)) {
-			DI::mstdnError()->RecordNotFound();
+			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}
 
 		if ($item['gravity'] != Item::GRAVITY_PARENT) {
-			DI::mstdnError()->UnprocessableEntity(DI::l10n()->t('Only starting posts can be muted'));
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity($this->t('Only starting posts can be muted')));
 		}
 
-		Post\ThreadUser::setIgnored($item['id'], $uid, true);
+		Post\ThreadUser::setIgnored($item['uri-id'], $uid, true);
 
-		System::jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes())->toArray());
+		// @TODO Remove once mstdnStatus()->createFromUriId is fixed so that it returns posts not reshared posts if given an ID to an original post that has been reshared
+		// Introduced in this PR: https://github.com/friendica/friendica/pull/13175
+		// Issue tracking the behavior of createFromUriId: https://github.com/friendica/friendica/issues/13350
+		$isReblog = $item['uri-id'] != $this->parameters['id'];
+
+		$this->jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes(), $isReblog)->toArray());
 	}
 }

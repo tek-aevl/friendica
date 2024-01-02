@@ -21,6 +21,7 @@
 
 namespace Friendica\Worker;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Hook;
 use Friendica\Core\Logger;
 use Friendica\Core\Worker;
@@ -75,7 +76,9 @@ class Cron
 		Worker::add(Worker::PRIORITY_LOW, 'UpdateGServers');
 
 		// run the process to update server directories in the background
-		Worker::add(Worker::PRIORITY_LOW, 'UpdateServerDirectories');
+		if (DI::config()->get('system', 'poco_discovery')) {
+			Worker::add(Worker::PRIORITY_LOW, 'UpdateServerDirectories');
+		}
 
 		// Expire and remove user entries
 		Worker::add(Worker::PRIORITY_MEDIUM, 'ExpireAndRemoveUsers');
@@ -102,6 +105,9 @@ class Cron
 
 			// Clear cache entries
 			Worker::add(Worker::PRIORITY_LOW, 'ClearCache');
+
+			// Update interaction scores
+			Worker::add(Worker::PRIORITY_LOW, 'UpdateScores');
 
 			DI::keyValue()->set('last_cron_hourly', time());
 		}
@@ -140,11 +146,20 @@ class Cron
 			}
 			DBA::close($users);
 
+			// Update contact relations for our users
+			$users = DBA::select('user', ['uid'], ["`verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired` AND `uid` > ?", 0]);
+			while ($user = DBA::fetch($users)) {
+				Worker::add(Worker::PRIORITY_LOW, 'ContactDiscoveryForUser', $user['uid']);
+			}
+			DBA::close($users);
+
 			// Resubscribe to relay servers
 			Relay::reSubscribe();
 
 			// Update "blocked" status of servers
 			Worker::add(Worker::PRIORITY_LOW, 'UpdateBlockedServers');
+
+			Addon::reload();
 
 			DI::keyValue()->set('last_cron_daily', time());
 		}

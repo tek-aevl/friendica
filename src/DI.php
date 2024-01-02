@@ -22,6 +22,8 @@
 namespace Friendica;
 
 use Dice\Dice;
+use Friendica\Core\Logger\Capability\ICheckLoggerSettings;
+use Friendica\Core\Logger\Util\LoggerSettingsCheck;
 use Friendica\Core\Session\Capability\IHandleSessions;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Navigation\SystemMessages;
@@ -208,9 +210,9 @@ abstract class DI
 		return self::$dice->create(Core\Config\Util\ConfigFileManager::class);
 	}
 
-	public static function keyValue(): Core\KeyValueStorage\Capabilities\IManageKeyValuePairs
+	public static function keyValue(): Core\KeyValueStorage\Capability\IManageKeyValuePairs
 	{
-		return self::$dice->create(Core\KeyValueStorage\Capabilities\IManageKeyValuePairs::class);
+		return self::$dice->create(Core\KeyValueStorage\Capability\IManageKeyValuePairs::class);
 	}
 
 	/**
@@ -293,6 +295,11 @@ abstract class DI
 			->addRule(LoggerInterface::class, self::$dice->getRule(LoggerInterface::class))
 			->addRule('$devLogger', self::$dice->getRule('$devLogger'));
 		static::init($flushDice);
+	}
+
+	public static function logCheck(): ICheckLoggerSettings
+	{
+		return self::$dice->create(LoggerSettingsCheck::class);
 	}
 
 	/**
@@ -541,6 +548,43 @@ abstract class DI
 	}
 
 	/**
+	 * @return Content\Conversation\Factory\Timeline
+	 */
+	public static function TimelineFactory()
+	{
+		return self::$dice->create(Content\Conversation\Factory\Timeline::class);
+	}
+
+	/**
+	 * @return Content\Conversation\Factory\Community
+	 */
+	public static function CommunityFactory()
+	{
+		return self::$dice->create(Content\Conversation\Factory\Community::class);
+	}
+
+	/**
+	 * @return Content\Conversation\Factory\Channel
+	 */
+	public static function ChannelFactory()
+	{
+		return self::$dice->create(Content\Conversation\Factory\Channel::class);
+	}
+
+	public static function userDefinedChannel(): Content\Conversation\Repository\UserDefinedChannel
+	{
+		return self::$dice->create(Content\Conversation\Repository\UserDefinedChannel::class);
+	}
+
+	/**
+	 * @return Content\Conversation\Factory\Network
+	 */
+	public static function NetworkFactory()
+	{
+		return self::$dice->create(Content\Conversation\Factory\Network::class);
+	}
+
+	/**
 	 * @return Contact\Introduction\Repository\Introduction
 	 */
 	public static function intro()
@@ -665,6 +709,15 @@ abstract class DI
 	}
 
 	//
+	// "User" namespace instances
+	//
+
+	public static function userGServer(): User\Settings\Repository\UserGServer
+	{
+		return self::$dice->create(User\Settings\Repository\UserGServer::class);
+	}
+
+	//
 	// "Util" namespace instances
 	//
 
@@ -693,14 +746,6 @@ abstract class DI
 	}
 
 	/**
-	 * @return Util\FileSystem
-	 */
-	public static function fs()
-	{
-		return self::$dice->create(Util\FileSystem::class);
-	}
-
-	/**
 	 * @return Util\Profiler
 	 */
 	public static function profiler()
@@ -714,5 +759,10 @@ abstract class DI
 	public static function emailer()
 	{
 		return self::$dice->create(Util\Emailer::class);
+	}
+
+	public static function postMediaRepository(): Content\Post\Repository\PostMedia
+	{
+		return self::$dice->create(Content\Post\Repository\PostMedia::class);
 	}
 }

@@ -35,7 +35,7 @@ class Show extends BaseApi
 {
 	protected function rawContent(array $request = [])
 	{
-		BaseApi::checkAllowedScope(BaseApi::SCOPE_READ);
+		$this->checkAllowedScope(BaseApi::SCOPE_READ);
 		$uid  = BaseApi::getCurrentUserID();
 		$type = $this->getRequestValue($this->parameters, 'extension', 'json');
 
@@ -75,6 +75,6 @@ class Show extends BaseApi
 			$grps[] = ['name' => $circle['name'], 'gid' => $circle['id'], $user_element => $users];
 		}
 
-		$this->response->exit('group_update', ['group' => $grps], $this->parameters['extension'] ?? null);
+		$this->response->addFormattedContent('group_update', ['group' => $grps], $this->parameters['extension'] ?? null);
 	}
 }

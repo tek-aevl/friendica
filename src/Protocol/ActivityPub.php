@@ -23,7 +23,10 @@ namespace Friendica\Protocol;
 
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
+use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Model\APContact;
+use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\JsonLD;
@@ -59,26 +62,29 @@ use Friendica\Util\JsonLD;
 class ActivityPub
 {
 	const PUBLIC_COLLECTION = 'https://www.w3.org/ns/activitystreams#Public';
-	const CONTEXT = ['https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1',
-		['vcard' => 'http://www.w3.org/2006/vcard/ns#',
-		'dfrn' => 'http://purl.org/macgirvin/dfrn/1.0/',
-		'diaspora' => 'https://diasporafoundation.org/ns/',
-		'litepub' => 'http://litepub.social/ns#',
-		'toot' => 'http://joinmastodon.org/ns#',
-		'featured' => [
-			"@id" => "toot:featured",
-			"@type" => "@id",
-		],
-		'schema' => 'http://schema.org#',
-		'manuallyApprovesFollowers' => 'as:manuallyApprovesFollowers',
-		'sensitive' => 'as:sensitive', 'Hashtag' => 'as:Hashtag',
-		'quoteUrl' => 'as:quoteUrl',
-		'conversation' => 'ostatus:conversation',
-		'directMessage' => 'litepub:directMessage',
-		'discoverable' => 'toot:discoverable',
-		'PropertyValue' => 'schema:PropertyValue',
-		'value' => 'schema:value',
-	]];
+	const CONTEXT = [
+		'https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1',
+		[
+			'vcard' => 'http://www.w3.org/2006/vcard/ns#',
+			'dfrn' => 'http://purl.org/macgirvin/dfrn/1.0/',
+			'diaspora' => 'https://diasporafoundation.org/ns/',
+			'litepub' => 'http://litepub.social/ns#',
+			'toot' => 'http://joinmastodon.org/ns#',
+			'featured' => [
+				"@id" => "toot:featured",
+				"@type" => "@id",
+			],
+			'schema' => 'http://schema.org#',
+			'manuallyApprovesFollowers' => 'as:manuallyApprovesFollowers',
+			'sensitive' => 'as:sensitive', 'Hashtag' => 'as:Hashtag',
+			'quoteUrl' => 'as:quoteUrl',
+			'conversation' => 'ostatus:conversation',
+			'directMessage' => 'litepub:directMessage',
+			'discoverable' => 'toot:discoverable',
+			'PropertyValue' => 'schema:PropertyValue',
+			'value' => 'schema:value',
+		]
+	];
 	const ACCOUNT_TYPES = ['Person', 'Organization', 'Service', 'Group', 'Application', 'Tombstone'];
 	/**
 	 * Checks if the web request is done for the AP protocol
@@ -87,6 +93,8 @@ class ActivityPub
 	 */
 	public static function isRequest(): bool
 	{
+		header('Vary: Accept', false);
+
 		$isrequest = stristr($_SERVER['HTTP_ACCEPT'] ?? '', 'application/activity+json') ||
 			stristr($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') ||
 			stristr($_SERVER['HTTP_ACCEPT'] ?? '', 'application/ld+json');
@@ -98,24 +106,11 @@ class ActivityPub
 		return $isrequest;
 	}
 
-	/**
-	 * Fetches ActivityPub content from the given url
-	 *
-	 * @param string  $url content url
-	 * @param integer $uid User ID for the signature
-	 * @return array
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 */
-	public static function fetchContent(string $url, int $uid = 0): array
-	{
-		return HTTPSignature::fetch($url, $uid);
-	}
-
 	private static function getAccountType(array $apcontact): int
 	{
 		$accounttype = -1;
 
-		switch($apcontact['type']) {
+		switch ($apcontact['type']) {
 			case 'Person':
 				$accounttype = User::ACCOUNT_TYPE_PERSON;
 				break;
@@ -209,7 +204,7 @@ class ActivityPub
 	 */
 	public static function fetchOutbox(string $url, int $uid)
 	{
-		$data = self::fetchContent($url, $uid);
+		$data = HTTPSignature::fetch($url, $uid);
 		if (empty($data)) {
 			return;
 		}
@@ -234,13 +229,21 @@ class ActivityPub
 	/**
 	 * Fetch items from AP endpoints
 	 *
-	 * @param string $url  Address of the endpoint
-	 * @param integer $uid Optional user id
+	 * @param string $url              Address of the endpoint
+	 * @param integer $uid             Optional user id
+	 * @param integer $start_timestamp Internally used parameter to stop fetching after some time
 	 * @return array Endpoint items
 	 */
-	public static function fetchItems(string $url, int $uid = 0): array
+	public static function fetchItems(string $url, int $uid = 0, int $start_timestamp = 0): array
 	{
-		$data = self::fetchContent($url, $uid);
+		$start_timestamp = $start_timestamp ?: time();
+
+		if ((time() - $start_timestamp) > 60) {
+			Logger::info('Fetch time limit reached', ['url' => $url, 'uid' => $uid]);
+			return [];
+		}
+
+		$data = HTTPSignature::fetch($url, $uid);
 		if (empty($data)) {
 			return [];
 		}
@@ -250,13 +253,13 @@ class ActivityPub
 		} elseif (!empty($data['first']['orderedItems'])) {
 			$items = $data['first']['orderedItems'];
 		} elseif (!empty($data['first']) && is_string($data['first']) && ($data['first'] != $url)) {
-			return self::fetchItems($data['first'], $uid);
+			return self::fetchItems($data['first'], $uid, $start_timestamp);
 		} else {
 			return [];
 		}
 
 		if (!empty($data['next']) && is_string($data['next'])) {
-			$items = array_merge($items, self::fetchItems($data['next'], $uid));
+			$items = array_merge($items, self::fetchItems($data['next'], $uid, $start_timestamp));
 		}
 
 		return $items;
@@ -274,5 +277,50 @@ class ActivityPub
 	public static function isSupportedByContactUrl(string $url, $update = null): bool
 	{
 		return !empty(APContact::getByURL($url, $update));
+	}
+
+	public static function isAcceptedRequester(int $uid = 0): bool
+	{
+		$called_by = System::callstack(1);
+
+		$signer = HTTPSignature::getSigner('', $_SERVER);
+		if (!$signer) {
+			Logger::debug('No signer or invalid signature', ['uid' => $uid, 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '', 'called_by' => $called_by]);
+			return false;
+		}
+
+		$apcontact = APContact::getByURL($signer);
+		if (empty($apcontact)) {
+			Logger::info('APContact not found', ['uid' => $uid, 'handle' => $signer, 'called_by' => $called_by]);
+			return false;
+		}
+
+		if (empty($apcontact['gsid']) || empty($apcontact['baseurl'])) {
+			Logger::debug('No server found', ['uid' => $uid, 'signer' => $signer, 'called_by' => $called_by]);
+			return false;
+		}
+
+		$contact = Contact::getByURL($signer, false, ['id', 'baseurl', 'gsid']);
+		if (!empty($contact) && Contact\User::isBlocked($contact['id'], $uid)) {
+			Logger::info('Requesting contact is blocked', ['uid' => $uid, 'id' => $contact['id'], 'signer' => $signer, 'baseurl' => $contact['baseurl'], 'called_by' => $called_by]);
+			return false;
+		}
+
+		$limited = DI::config()->get('system', 'limited_servers');
+		if (!empty($limited)) {
+			$servers = explode(',', str_replace(' ', '', $limited));
+			$host = parse_url($apcontact['baseurl'], PHP_URL_HOST);
+			if (!empty($host) && in_array($host, $servers)) {
+				return false;
+			}
+		}
+
+		if (DI::userGServer()->isIgnoredByUser($uid, $apcontact['gsid'])) {
+			return false;
+		}
+
+		Logger::debug('Server is an accepted requester', ['uid' => $uid, 'id' => $apcontact['gsid'], 'url' => $apcontact['baseurl'], 'signer' => $signer, 'called_by' => $called_by]);
+
+		return true;
 	}
 }

@@ -25,7 +25,6 @@ use Friendica\Content\PageInfo;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\Markdown;
 use Friendica\Core\Protocol;
-use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -49,16 +48,17 @@ class Statuses extends BaseApi
 {
 	public function put(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
+		$this->checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
 		$request = $this->getRequest([
-			'status'         => '',    // Text content of the status. If media_ids is provided, this becomes optional. Attaching a poll is optional while status is provided.
-			'media_ids'      => [],    // Array of Attachment ids to be attached as media. If provided, status becomes optional, and poll cannot be used.
-			'in_reply_to_id' => 0,     // ID of the status being replied to, if status is a reply
-			'spoiler_text'   => '',    // Text to be shown as a warning or subject before the actual content. Statuses are generally collapsed behind this field.
-			'language'       => '',    // ISO 639 language code for this status.
-			'friendica'      => [],
+			'status'           => '',    // Text content of the status. If media_ids is provided, this becomes optional. Attaching a poll is optional while status is provided.
+			'media_ids'        => [],    // Array of Attachment ids to be attached as media. If provided, status becomes optional, and poll cannot be used.
+			'in_reply_to_id'   => 0,     // ID of the status being replied to, if status is a reply
+			'spoiler_text'     => '',    // Text to be shown as a warning or subject before the actual content. Statuses are generally collapsed behind this field.
+			'language'         => '',    // ISO 639 language code for this status.
+			'media_attributes' => [],
+			'friendica'        => [],
 		], $request);
 
 		$owner = User::getOwnerDataById($uid);
@@ -76,16 +76,9 @@ class Statuses extends BaseApi
 			throw new HTTPException\NotFoundException('Item with URI ID ' . $this->parameters['id'] . ' not found for user ' . $uid . '.');
 		}
 
-		// The imput is defined as text. So we can use Markdown for some enhancements
-		$body = Markdown::toBBCode($request['status']);
-
-		if (DI::pConfig()->get($uid, 'system', 'api_auto_attach', false) && preg_match("/\[url=[^\[\]]*\](.*)\[\/url\]\z/ism", $body, $matches)) {
-			$body = preg_replace("/\[url=[^\[\]]*\].*\[\/url\]\z/ism", PageInfo::getFooterFromUrl($matches[1]), $body);
-		}
-
 		$item['title']      = '';
 		$item['uid']        = $post['uid'];
-		$item['body']       = $body;
+		$item['body']       = $this->formatStatus($request['status'], $uid);
 		$item['network']    = $post['network'];
 		$item['gravity']    = $post['gravity'];
 		$item['verb']       = $post['verb'];
@@ -128,6 +121,12 @@ class Statuses extends BaseApi
 		$media_ids      = [];
 		$existing_media = array_column(Post\Media::getByURIId($post['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE]), 'id');
 
+		foreach ($request['media_attributes'] as $attributes) {
+			if (!empty($attributes['id']) && in_array($attributes['id'], $existing_media)) {
+				Post\Media::updateById(['description' => $attributes['description'] ?? null], $attributes['id']);
+			}
+		}
+
 		foreach ($request['media_ids'] as $media) {
 			if (!in_array($media, $existing_media)) {
 				$media_ids[] = $media;
@@ -166,12 +165,12 @@ class Statuses extends BaseApi
 
 		Item::updateDisplayCache($post['uri-id']);
 
-		System::jsonExit(DI::mstdnStatus()->createFromUriId($post['uri-id'], $uid, self::appSupportsQuotes()));
+		$this->jsonExit(DI::mstdnStatus()->createFromUriId($post['uri-id'], $uid, self::appSupportsQuotes()));
 	}
 
 	protected function post(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
+		$this->checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
 		$request = $this->getRequest([
@@ -190,13 +189,6 @@ class Statuses extends BaseApi
 
 		$owner = User::getOwnerDataById($uid);
 
-		// The imput is defined as text. So we can use Markdown for some enhancements
-		$body = Markdown::toBBCode($request['status']);
-
-		if (DI::pConfig()->get($uid, 'system', 'api_auto_attach', false) && preg_match("/\[url=[^\[\]]*\](.*)\[\/url\]\z/ism", $body, $matches)) {
-			$body = preg_replace("/\[url=[^\[\]]*\].*\[\/url\]\z/ism", PageInfo::getFooterFromUrl($matches[1]), $body);
-		}
-
 		$item               = [];
 		$item['network']    = Protocol::DFRN;
 		$item['uid']        = $uid;
@@ -204,8 +196,9 @@ class Statuses extends BaseApi
 		$item['contact-id'] = $owner['id'];
 		$item['author-id']  = $item['owner-id'] = Contact::getPublicIdByUserId($uid);
 		$item['title']      = '';
-		$item['body']       = $body;
+		$item['body']       = $this->formatStatus($request['status'], $uid);
 		$item['app']        = $this->getApp();
+		$item['visibility'] = $request['visibility'];
 
 		switch ($request['visibility']) {
 			case 'public':
@@ -223,6 +216,18 @@ class Statuses extends BaseApi
 				$item['private']   = Item::UNLISTED;
 				break;
 			case 'private':
+				if ($request['in_reply_to_id']) {
+					$parent_item = Post::selectFirst(Item::ITEM_FIELDLIST, ['uri-id' => $request['in_reply_to_id'], 'uid' => $uid, 'private' => Item::PRIVATE]);
+					if (!empty($parent_item)) {
+						$item['allow_cid'] = $parent_item['allow_cid'];
+						$item['allow_gid'] = $parent_item['allow_gid'];
+						$item['deny_cid']  = $parent_item['deny_cid'];
+						$item['deny_gid']  = $parent_item['deny_gid'];
+						$item['private']   = $parent_item['private'];
+						break;
+					}
+				}
+
 				if (!empty($owner['allow_cid'] . $owner['allow_gid'] . $owner['deny_cid'] . $owner['deny_gid'])) {
 					$item['allow_cid'] = $owner['allow_cid'];
 					$item['allow_gid'] = $owner['allow_gid'];
@@ -277,7 +282,7 @@ class Statuses extends BaseApi
 			$item['gravity']     = Item::GRAVITY_COMMENT;
 			$item['object-type'] = Activity\ObjectType::COMMENT;
 		} else {
-			self::checkThrottleLimit();
+			$this->checkThrottleLimit();
 
 			$item['gravity']     = Item::GRAVITY_PARENT;
 			$item['object-type'] = Activity\ObjectType::NOTE;
@@ -311,41 +316,41 @@ class Statuses extends BaseApi
 			$item['uri'] = Item::newURI($item['guid']);
 			$id = Post\Delayed::add($item['uri'], $item, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED, DateTimeFormat::utc($request['scheduled_at']));
 			if (empty($id)) {
-				DI::mstdnError()->InternalError();
+				$this->logAndJsonError(500, $this->errorFactory->InternalError());
 			}
-			System::jsonExit(DI::mstdnScheduledStatus()->createFromDelayedPostId($id, $uid)->toArray());
+			$this->jsonExit(DI::mstdnScheduledStatus()->createFromDelayedPostId($id, $uid)->toArray());
 		}
 
 		$id = Item::insert($item, true);
 		if (!empty($id)) {
 			$item = Post::selectFirst(['uri-id'], ['id' => $id]);
 			if (!empty($item['uri-id'])) {
-				System::jsonExit(DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, self::appSupportsQuotes()));
+				$this->jsonExit(DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, self::appSupportsQuotes()));
 			}
 		}
 
-		DI::mstdnError()->InternalError();
+		$this->logAndJsonError(500, $this->errorFactory->InternalError());
 	}
 
 	protected function delete(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_READ);
+		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
 		if (empty($this->parameters['id'])) {
-			DI::mstdnError()->UnprocessableEntity();
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
 		$item = Post::selectFirstForUser($uid, ['id'], ['uri-id' => $this->parameters['id'], 'uid' => $uid]);
 		if (empty($item['id'])) {
-			DI::mstdnError()->RecordNotFound();
+			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}
 
 		if (!Item::markForDeletionById($item['id'])) {
-			DI::mstdnError()->RecordNotFound();
+			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}
 
-		System::jsonExit([]);
+		$this->jsonExit([]);
 	}
 
 	/**
@@ -356,10 +361,10 @@ class Statuses extends BaseApi
 		$uid = self::getCurrentUserID();
 
 		if (empty($this->parameters['id'])) {
-			DI::mstdnError()->UnprocessableEntity();
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
-		System::jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes(), false));
+		$this->jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes(), false));
 	}
 
 	private function getApp(): string
@@ -414,5 +419,29 @@ class Statuses extends BaseApi
 			$item['attachments'][] = $attachment;
 		}
 		return $item;
+	}
+
+	/**
+	 * Format the status via Markdown and a link description if enabled for this user
+	 *
+	 * @param string $status
+	 * @param integer $uid
+	 * @return string
+	 */
+	private function formatStatus(string $status, int $uid): string
+	{
+		// The input is defined as text. So we can use Markdown for some enhancements
+		$status = Markdown::toBBCode($status);
+
+		if (!DI::pConfig()->get($uid, 'system', 'api_auto_attach', false)) {
+			return $status;
+		}
+
+		$status = BBCode::expandVideoLinks($status);
+		if (preg_match("/\[url=[^\[\]]*\](.*)\[\/url\]\z/ism", $status, $matches)) {
+			$status = preg_replace("/\[url=[^\[\]]*\].*\[\/url\]\z/ism", PageInfo::getFooterFromUrl($matches[1]), $status);
+		}
+
+		return $status;
 	}
 }

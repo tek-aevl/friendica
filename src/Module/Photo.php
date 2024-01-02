@@ -22,6 +22,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\Contact\Header;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
@@ -76,7 +77,7 @@ class Photo extends BaseApi
 			throw new NotModifiedException();
 		}
 
-		Profile::addVisitorCookieForHTTPSigner();
+		Profile::addVisitorCookieForHTTPSigner($this->server);
 
 		$customsize = 0;
 		$square_resize = true;
@@ -482,6 +483,6 @@ class Photo extends BaseApi
 		if (!empty($photo)) {
 			return $photo;
 		}
-		return MPhoto::createPhotoForImageData(file_get_contents(DI::basePath() . '/images/friendica-banner.jpg'));
+		return MPhoto::createPhotoForImageData(file_get_contents(DI::basePath() . (new Header(DI::config()))->getMastodonBannerPath()));
 	}
 }

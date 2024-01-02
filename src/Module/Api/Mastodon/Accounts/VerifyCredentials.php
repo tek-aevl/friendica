@@ -37,7 +37,7 @@ class VerifyCredentials extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_READ);
+		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
 		$self = User::getOwnerDataById($uid);
@@ -52,6 +52,6 @@ class VerifyCredentials extends BaseApi
 
 		// @todo Support the source property,
 		$account = DI::mstdnAccount()->createFromContactId($cdata['user'], $uid);
-		$this->response->exitWithJson($account->toArray());
+		$this->response->addJsonContent($account->toArray());
 	}
 }

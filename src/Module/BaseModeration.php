@@ -82,12 +82,12 @@ abstract class BaseModeration extends BaseModule
 			}
 		}
 
-		if (!$this->app->isSiteAdmin()) {
-			throw new HTTPException\ForbiddenException($this->t('You don\'t have access to administration pages.'));
+		if (!$this->session->isModerator()) {
+			throw new HTTPException\ForbiddenException($this->t('You don\'t have access to moderation pages.'));
 		}
 
 		if ($this->session->getSubManagedUserId()) {
-			throw new HTTPException\ForbiddenException($this->t('Submanaged account can\'t access the administration pages. Please log back in as the main account.'));
+			throw new HTTPException\ForbiddenException($this->t('Submanaged account can\'t access the moderation pages. Please log back in as the main account.'));
 		}
 	}
 
@@ -107,6 +107,7 @@ abstract class BaseModeration extends BaseModule
 		$aside_sub = [
 			'information' => [$this->t('Information'), [
 				'overview' => ['moderation', $this->t('Overview'), 'overview'],
+				'reports'  => ['moderation/reports', $this->t('Reports'), 'overview'],
 			]],
 			'configuration' => [$this->t('Configuration'), [
 				'users' => ['moderation/users', $this->t('Users'), 'users'],

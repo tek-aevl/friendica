@@ -33,7 +33,7 @@ class Filters extends BaseApi
 {
 	protected function post(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
+		$this->checkAllowedScope(self::SCOPE_WRITE);
 
 		$this->response->unsupported(Router::POST, $request);
 	}
@@ -43,8 +43,8 @@ class Filters extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_READ);
+		$this->checkAllowedScope(self::SCOPE_READ);
 
-		System::jsonExit([]);
+		$this->jsonExit([]);
 	}
 }

@@ -104,7 +104,7 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 	}
 
 	$post['edit'] = $post;
-	$post['file'] = Post\Category::getTextByURIId($post['uri-id'], $post['uid']);	
+	$post['file'] = Post\Category::getTextByURIId($post['uri-id'], $post['uid']);
 
 	Post\Media::deleteByURIId($post['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HTML]);
 	$post = item_process($post, $request, $preview, $return_path);
@@ -221,6 +221,10 @@ function item_insert(int $uid, array $request, bool $preview, string $return_pat
 
 	DI::contentItem()->postProcessPost($post, $recipients);
 
+	if (($post['private'] == Item::PRIVATE) && ($post['thr-parent-id'] != $post['uri-id'])) {
+		DI::contentItem()->copyPermissions($post['thr-parent-id'], $post['uri-id'], $post['parent-uri-id']);
+	}
+
 	Logger::debug('post_complete');
 
 	item_post_return(DI::baseUrl(), $return_path);
@@ -266,6 +270,7 @@ function item_process(array $post, array $request, bool $preview, string $return
 		$post['uri-id']         = -1;
 		$post['author-network'] = Protocol::DFRN;
 		$post['author-updated'] = '';
+		$post['author-alias']   = '';
 		$post['author-gsid']    = 0;
 		$post['author-uri-id']  = ItemURI::getIdByURI($post['author-link']);
 		$post['owner-updated']  = '';
@@ -274,7 +279,7 @@ function item_process(array $post, array $request, bool $preview, string $return
 		$post['body']           = BBCode::removeSharedData(Item::setHashtags($post['body']));
 		$post['writable']       = true;
 
-		$o = DI::conversation()->create([$post], Conversation::MODE_SEARCH, false, true);
+		$o = DI::conversation()->render([$post], Conversation::MODE_SEARCH, false, true);
 
 		System::jsonExit(['preview' => $o]);
 	}
@@ -340,7 +345,7 @@ function item_content(App $a)
 
 	$args = DI::args();
 
-	if (!$args->has(3)) {
+	if (!$args->has(2)) {
 		throw new HTTPException\BadRequestException();
 	}
 

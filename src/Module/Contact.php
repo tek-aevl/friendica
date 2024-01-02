@@ -29,7 +29,6 @@ use Friendica\Content\Widget;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
-use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -140,7 +139,7 @@ class Contact extends BaseModule
 			try {
 				UpdateContact::add(Worker::PRIORITY_HIGH, $contact_id);
 			} catch (\InvalidArgumentException $e) {
-				Logger::notice($e->getMessage(), ['contact' => $contact, 'callstack' => System::callstack()]);
+				Logger::notice($e->getMessage(), ['contact' => $contact]);
 			}
 		}
 	}
@@ -219,8 +218,7 @@ class Contact extends BaseModule
 		DI::page()['aside'] .= $vcard_widget . $findpeople_widget . $follow_widget . $rel_widget . $circles_widget . $networks_widget . $account_widget;
 
 		$tpl = Renderer::getMarkupTemplate('contacts-head.tpl');
-		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
-		]);
+		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, []);
 
 		$o = '';
 		Nav::setSelected('contact');
@@ -412,20 +410,41 @@ class Contact extends BaseModule
 		$tabs_html = Renderer::replaceMacros($tabs_tpl, ['$tabs' => $tabs]);
 
 		switch ($rel) {
-			case 'followers': $header = DI::l10n()->t('Followers'); break;
-			case 'following': $header = DI::l10n()->t('Following'); break;
-			case 'mutuals':   $header = DI::l10n()->t('Mutual friends'); break;
-			case 'nothing':   $header = DI::l10n()->t('No relationship'); break;
-			default:          $header = DI::l10n()->t('Contacts');
+			case 'followers':
+				$header = DI::l10n()->t('Followers');
+				break;
+			case 'following':
+				$header = DI::l10n()->t('Following');
+				break;
+			case 'mutuals':
+				$header = DI::l10n()->t('Mutual friends');
+				break;
+			case 'nothing':
+				$header = DI::l10n()->t('No relationship');
+				break;
+			default:
+				$header = DI::l10n()->t('Contacts');
 		}
 
 		switch ($type) {
-			case 'pending':	  $header .= ' - ' . DI::l10n()->t('Pending'); break;
-			case 'blocked':	  $header .= ' - ' . DI::l10n()->t('Blocked'); break;
-			case 'hidden':    $header .= ' - ' . DI::l10n()->t('Hidden'); break;
-			case 'ignored':   $header .= ' - ' . DI::l10n()->t('Ignored'); break;
-			case 'collapsed': $header .= ' - ' . DI::l10n()->t('Collapsed'); break;
-			case 'archived':  $header .= ' - ' . DI::l10n()->t('Archived'); break;
+			case 'pending':
+				$header .= ' - ' . DI::l10n()->t('Pending');
+				break;
+			case 'blocked':
+				$header .= ' - ' . DI::l10n()->t('Blocked');
+				break;
+			case 'hidden':
+				$header .= ' - ' . DI::l10n()->t('Hidden');
+				break;
+			case 'ignored':
+				$header .= ' - ' . DI::l10n()->t('Ignored');
+				break;
+			case 'collapsed':
+				$header .= ' - ' . DI::l10n()->t('Collapsed');
+				break;
+			case 'archived':
+				$header .= ' - ' . DI::l10n()->t('Archived');
+				break;
 		}
 
 		$header .= $nets ? ' - ' . ContactSelector::networkToName($nets) : '';
@@ -512,7 +531,8 @@ class Contact extends BaseModule
 				'id'    => 'media-tab',
 				'accesskey' => 'd',
 			],
-			['label' => DI::l10n()->t('Contacts'),
+			[
+				'label' => DI::l10n()->t('Contacts'),
 				'url'   => 'contact/' . $pcid . '/contacts',
 				'sel'   => (($active_tab == self::TAB_CONTACTS) ? 'active' : ''),
 				'title' => DI::l10n()->t('View all known contacts'),
@@ -522,7 +542,8 @@ class Contact extends BaseModule
 		];
 
 		if (!empty($contact['network']) && in_array($contact['network'], [Protocol::FEED, Protocol::MAIL]) && ($cid != $pcid)) {
-			$tabs[] = ['label' => DI::l10n()->t('Advanced'),
+			$tabs[] = [
+				'label' => DI::l10n()->t('Advanced'),
 				'url'   => 'contact/' . $cid . '/advanced/',
 				'sel'   => (($active_tab == self::TAB_ADVANCED) ? 'active' : ''),
 				'title' => DI::l10n()->t('Advanced Contact Settings'),

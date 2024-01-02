@@ -33,7 +33,7 @@ class Lists extends ContactEndpoint
 {
 	protected function rawContent(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_READ);
+		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = BaseApi::getCurrentUserID();
 
 		// Expected value for user_id parameter: public/user contact id
@@ -84,6 +84,6 @@ class Lists extends ContactEndpoint
 
 		self::setLinkHeader();
 
-		$this->response->exit('lists', ['lists' => $return]);
+		$this->response->addFormattedContent('lists', ['lists' => $return]);
 	}
 }

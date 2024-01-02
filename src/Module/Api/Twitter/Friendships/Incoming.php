@@ -32,7 +32,7 @@ class Incoming extends ContactEndpoint
 {
 	protected function rawContent(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_READ);
+		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = BaseApi::getCurrentUserID();
 
 		// Expected value for user_id parameter: public/user contact id
@@ -82,6 +82,6 @@ class Incoming extends ContactEndpoint
 
 		$this->response->setHeader(self::getLinkHeader());
 
-		$this->response->exit('incoming', ['incoming' => $return]);
+		$this->response->addFormattedContent('incoming', ['incoming' => $return]);
 	}
 }

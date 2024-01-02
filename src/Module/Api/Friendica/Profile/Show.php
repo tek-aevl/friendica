@@ -36,7 +36,7 @@ class Show extends BaseApi
 {
 	protected function rawContent(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_READ);
+		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
 		// retrieve general information about profiles for user
@@ -62,7 +62,7 @@ class Show extends BaseApi
 			'profiles' => $profiles
 		];
 
-		$this->response->exit('friendica_profiles', ['$result' => $result], $this->parameters['extension'] ?? null);
+		$this->response->addFormattedContent('friendica_profiles', ['$result' => $result], $this->parameters['extension'] ?? null);
 	}
 
 	/**
@@ -78,7 +78,7 @@ class Show extends BaseApi
 		foreach ($profileFields as $profileField) {
 			$custom_fields[] = [
 				'label' => $profileField->label,
-				'value' => BBCode::convert($profileField->value, false, BBCode::TWITTER_API),
+				'value' => BBCode::convertForUriId($profileField->uriId, $profileField->value, BBCode::TWITTER_API),
 			];
 		}
 

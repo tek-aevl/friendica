@@ -28,8 +28,6 @@ use Friendica\Content\Nav;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Core\System;
-use Friendica\Module\Security\Login;
 use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
@@ -124,6 +122,13 @@ class BaseSettings extends BaseModule
 		];
 
 		$tabs[] = [
+			'label'     => $this->t('Channels'),
+			'url'       => 'settings/channels',
+			'selected'  => static::class == Settings\Channels::class ? 'active' : '',
+			'accesskey' => '',
+		];
+
+		$tabs[] = [
 			'label'     => $this->t('Social Networks'),
 			'url'       => 'settings/connectors',
 			'selected'  => static::class == Settings\Connectors::class ? 'active' : '',
@@ -149,6 +154,13 @@ class BaseSettings extends BaseModule
 			'url'       => 'settings/oauth',
 			'selected'  => static::class == Settings\OAuth::class ? 'active' : '',
 			'accesskey' => 'b',
+		];
+
+		$tabs[] = [
+			'label'     => $this->t('Remote servers'),
+			'url'       => 'settings/server',
+			'selected'  => static::class == Settings\Server\Index::class ? 'active' : '',
+			'accesskey' => 's',
 		];
 
 		$tabs[] = [

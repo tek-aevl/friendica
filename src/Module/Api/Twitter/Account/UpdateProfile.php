@@ -34,7 +34,7 @@ class UpdateProfile extends BaseApi
 {
 	protected function post(array $request = [])
 	{
-		BaseApi::checkAllowedScope(BaseApi::SCOPE_WRITE);
+		$this->checkAllowedScope(BaseApi::SCOPE_WRITE);
 		$uid = BaseApi::getCurrentUserID();
 
 		$api_user = DI::twitterUser()->createFromUserId($uid, true)->toArray();
@@ -66,6 +66,6 @@ class UpdateProfile extends BaseApi
 		// "uid" is only needed for some internal stuff, so remove it from here
 		unset($user_info['uid']);
 
-		$this->response->exit('user', ['user' => $user_info], $this->parameters['extension'] ?? null);
+		$this->response->addFormattedContent('user', ['user' => $user_info], $this->parameters['extension'] ?? null);
 	}
 }

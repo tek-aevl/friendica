@@ -22,6 +22,7 @@
 namespace Friendica\Model;
 
 use Friendica\App;
+use Friendica\App\Mode;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Widget\ContactBlock;
 use Friendica\Core\Cache\Enum\Duration;
@@ -37,6 +38,7 @@ use Friendica\DI;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPException;
+use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Diaspora;
 use Friendica\Security\PermissionSet\Entity\PermissionSet;
@@ -93,10 +95,11 @@ class Profile
 	/**
 	 * Update a profile entry and distribute the changes if needed
 	 *
-	 * @param array $fields Profile fields to update
-	 * @param integer $uid User id
+	 * @param array   $fields Profile fields to update
+	 * @param integer $uid    User id
 	 *
 	 * @return boolean Whether update was successful
+	 * @throws \Exception
 	 */
 	public static function update(array $fields, int $uid): bool
 	{
@@ -114,10 +117,6 @@ class Profile
 		$owner = User::getOwnerDataById($uid);
 		if (empty($owner)) {
 			return false;
-		}
-
-		if ($old_owner['name'] != $owner['name']) {
-			User::update(['username' => $owner['name']], $uid);
 		}
 
 		$profile_fields = ['postal-code', 'dob', 'prv_keywords', 'homepage'];
@@ -230,7 +229,7 @@ class Profile
 
 		// System user, aborting
 		if ($profile['uid'] === 0) {
-			DI::logger()->warning('System user found in Profile::load', ['nickname' => $nickname, 'callstack' => System::callstack(20)]);
+			DI::logger()->warning('System user found in Profile::load', ['nickname' => $nickname]);
 			throw new HTTPException\NotFoundException(DI::l10n()->t('User not found.'));
 		}
 
@@ -309,7 +308,12 @@ class Profile
 
 		$profile_url = $profile['url'];
 
-		$cid = $profile['id'];
+		$contact = Contact::selectFirst(['id'], ['uri-id' => $profile['uri-id'], 'uid' => 0]);
+		if (!$contact) {
+			return $o;
+		}
+
+		$cid = $contact['id'];
 
 		$follow_link = null;
 		$unfollow_link = null;
@@ -452,7 +456,19 @@ class Profile
 		$p['url'] = Contact::magicLinkById($cid, $profile['url']);
 
 		if (!isset($profile['hidewall'])) {
-			Logger::warning('Missing hidewall key in profile array', ['profile' => $profile, 'callstack' => System::callstack(10)]);
+			Logger::warning('Missing hidewall key in profile array', ['profile' => $profile]);
+		}
+
+		if ($profile['account-type'] == Contact::TYPE_COMMUNITY) {
+			$mention_label = DI::l10n()->t('Post to group');
+			$mention_url   = 'compose/0?body=!' . $profile['addr'];
+			$network_label = DI::l10n()->t('View group');
+			$network_url   = 'network/group/' . $cid;
+		} else {
+			$mention_label = DI::l10n()->t('Mention');
+			$mention_url   = 'compose/0?body=@' . $profile['addr'];
+			$network_label = DI::l10n()->t('Network Posts');
+			$network_url   = 'contact/' . $cid . '/conversations';
 		}
 
 		$tpl = Renderer::getMarkupTemplate('profile/vcard.tpl');
@@ -478,6 +494,10 @@ class Profile
 			'$updated' => $updated,
 			'$diaspora' => $diaspora,
 			'$contact_block' => $contact_block,
+			'$mention_label' => $mention_label,
+			'$mention_url' => $mention_url,
+			'$network_label' => $network_label,
+			'$network_url' => $network_url,
 		]);
 
 		$arr = ['profile' => &$profile, 'entry' => &$o];
@@ -488,29 +508,39 @@ class Profile
 	}
 
 	/**
+	 * Check if the event list should be displayed
+	 *
+	 * @param integer $uid
+	 * @param Mode $mode
+	 * @return boolean
+	 */
+	public static function shouldDisplayEventList(int $uid, Mode $mode): bool
+	{
+		if (empty($uid) || $mode->isMobile()) {
+			return false;
+		}
+
+		if (!DI::pConfig()->get($uid, 'system', 'display_eventlist', true)) {
+			return false;
+		}
+
+		return !DI::config()->get('theme', 'hide_eventlist');
+	}
+
+	/**
 	 * Returns the upcoming birthdays of contacts of the current user as HTML content
+	 * @param int $uid  User Id
 	 *
 	 * @return string The upcoming birthdays (HTML)
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws HTTPException\ServiceUnavailableException
 	 * @throws \ImagickException
 	 */
-	public static function getBirthdays(): string
+	public static function getBirthdays(int $uid): string
 	{
-		if (!DI::userSession()->getLocalUserId() || DI::mode()->isMobile() || DI::mode()->isMobile()) {
-			return '';
-		}
-
-		/*
-		* $mobile_detect = new Mobile_Detect();
-		* $is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
-		* 		if ($is_mobile)
-		* 			return $o;
-		*/
-
 		$bd_short = DI::l10n()->t('F d');
 
-		$cacheKey = 'get_birthdays:' . DI::userSession()->getLocalUserId();
+		$cacheKey = 'get_birthdays:' . $uid;
 		$events   = DI::cache()->get($cacheKey);
 		if (is_null($events)) {
 			$result = DBA::p(
@@ -527,7 +557,7 @@ class Profile
 				ORDER BY `start`",
 				Contact::SHARING,
 				Contact::FRIEND,
-				DI::userSession()->getLocalUserId(),
+				$uid,
 				DateTimeFormat::utc('now + 6 days'),
 				DateTimeFormat::utcNow()
 			);
@@ -591,30 +621,18 @@ class Profile
 
 	/**
 	 * Renders HTML for event reminder (e.g. contact birthdays
+	 * @param int $uid  User Id
+	 * @param int $pcid Public Contact Id
 	 *
 	 * @return string Rendered HTML
 	 */
-	public static function getEventsReminderHTML(): string
+	public static function getEventsReminderHTML(int $uid, int $pcid): string
 	{
-		$a = DI::app();
-		$o = '';
-
-		if (!DI::userSession()->getLocalUserId() || DI::mode()->isMobile() || DI::mode()->isMobile()) {
-			return $o;
-		}
-
-		/*
-		* 	$mobile_detect = new Mobile_Detect();
-		* 		$is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
-		* 		if ($is_mobile)
-		* 			return $o;
-		*/
-
 		$bd_format = DI::l10n()->t('g A l F d'); // 8 AM Friday January 18
 		$classtoday = '';
 
 		$condition = ["`uid` = ? AND `type` != 'birthday' AND `start` < ? AND `start` >= ?",
-			DI::userSession()->getLocalUserId(), DateTimeFormat::utc('now + 7 days'), DateTimeFormat::utc('now - 1 days')];
+			$uid, DateTimeFormat::utc('now + 7 days'), DateTimeFormat::utc('now - 1 days')];
 		$s = DBA::select('event', [], $condition, ['order' => ['start']]);
 
 		$r = [];
@@ -624,7 +642,7 @@ class Profile
 			$total = 0;
 
 			while ($rr = DBA::fetch($s)) {
-				$condition = ['parent-uri' => $rr['uri'], 'uid' => $rr['uid'], 'author-id' => DI::userSession()->getPublicContactId(),
+				$condition = ['parent-uri' => $rr['uri'], 'uid' => $rr['uid'], 'author-id' => $pcid,
 					'vid' => [Verb::getID(Activity::ATTEND), Verb::getID(Activity::ATTENDMAYBE)],
 					'visible' => true, 'deleted' => false];
 				if (!Post::exists($condition)) {
@@ -640,13 +658,13 @@ class Profile
 					$istoday = true;
 				}
 
-				$title = strip_tags(html_entity_decode(BBCode::convertForUriId($rr['uri-id'], $rr['summary']), ENT_QUOTES, 'UTF-8'));
+				$title = BBCode::toPlaintext($rr['summary'], false);
 
 				if (strlen($title) > 35) {
 					$title = substr($title, 0, 32) . '... ';
 				}
 
-				$description = substr(strip_tags(BBCode::convertForUriId($rr['uri-id'], $rr['desc'])), 0, 32) . '... ';
+				$description = BBCode::toPlaintext($rr['desc'], false) . '... ';
 				if (!$description) {
 					$description = DI::l10n()->t('[No description]');
 				}
@@ -815,12 +833,14 @@ class Profile
 
 	/**
 	 * Set the visitor cookies (see remote_user()) for signed HTTP requests
-	 (
+	 *
+	 * @param array $server The content of the $_SERVER superglobal
 	 * @return array Visitor contact array
+	 * @throws InternalServerErrorException
 	 */
-	public static function addVisitorCookieForHTTPSigner(): array
+	public static function addVisitorCookieForHTTPSigner(array $server): array
 	{
-		$requester = HTTPSignature::getSigner('', $_SERVER);
+		$requester = HTTPSignature::getSigner('', $server);
 		if (empty($requester)) {
 			return [];
 		}
@@ -942,7 +962,7 @@ class Profile
 		if (!empty($search)) {
 			$publish = (DI::config()->get('system', 'publish_all') ? '' : "AND `publish` ");
 			$searchTerm = '%' . $search . '%';
-			$condition = ["NOT `blocked` AND NOT `account_removed`
+			$condition = ["`verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`
 				$publish
 				AND ((`name` LIKE ?) OR
 				(`nickname` LIKE ?) OR
@@ -955,7 +975,7 @@ class Profile
 				$searchTerm, $searchTerm, $searchTerm, $searchTerm,
 				$searchTerm, $searchTerm, $searchTerm, $searchTerm];
 		} else {
-			$condition = ['blocked' => false, 'account_removed' => false];
+			$condition = ['verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false];
 			if (!DI::config()->get('system', 'publish_all')) {
 				$condition['publish'] = true;
 			}
