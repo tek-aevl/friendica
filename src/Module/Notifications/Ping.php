@@ -52,6 +52,7 @@ use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
+use Friendica\Util\Strings;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Log\LoggerInterface;
 
@@ -151,10 +152,10 @@ class Ping extends BaseModule
 				}
 			}
 
-			$compute_circle_counts = $this->config->get('system','compute_group_counts') ?? $this->config->get('system','compute_circle_counts');
+			$compute_circle_counts = $this->config->get('system','compute_circle_counts');
 			if ($network_count && $compute_circle_counts) {
 				// Find out how unseen network posts are spread across circles
-				foreach (Circle::countUnseen() as $circle_count) {
+				foreach (Circle::countUnseen($this->session->getLocalUserId()) as $circle_count) {
 					if ($circle_count['count'] > 0) {
 						$circles_unseen[] = $circle_count;
 					}
@@ -174,7 +175,7 @@ class Ping extends BaseModule
 			$myurl      = $this->session->getMyUrl();
 			$mail_count = $this->database->count('mail', ["`uid` = ? AND NOT `seen` AND `from-url` != ?", $this->session->getLocalUserId(), $myurl]);
 
-			if (intval($this->config->get('config', 'register_policy')) === Register::APPROVE && $this->app->isSiteAdmin()) {
+			if (intval($this->config->get('config', 'register_policy')) === Register::APPROVE && $this->session->isSiteAdmin()) {
 				$registrations = \Friendica\Model\Register::getPending();
 				$register_count = count($registrations);
 			}
@@ -296,15 +297,15 @@ class Ping extends BaseModule
 		$data['notifications'] = $navNotifications;
 
 		$data['sysmsgs'] = [
-			'notice' => $this->systemMessages->flushNotices(),
-			'info'   => $this->systemMessages->flushInfos(),
+			'notice' => array_map([Strings::class, 'escapeHtml'], $this->systemMessages->flushNotices()),
+			'info'   => array_map([Strings::class, 'escapeHtml'], $this->systemMessages->flushInfos()),
 		];
 
 		if (isset($_GET['callback'])) {
 			// JSONP support
-			System::httpExit($_GET['callback'] . '(' . json_encode(['result' => $data]) . ')', Response::TYPE_BLANK, 'application/javascript');
+			$this->httpExit($_GET['callback'] . '(' . json_encode(['result' => $data]) . ')', Response::TYPE_BLANK, 'application/javascript');
 		} else {
-			System::jsonExit(['result' => $data]);
+			$this->jsonExit(['result' => $data]);
 		}
 	}
 }

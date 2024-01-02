@@ -34,7 +34,7 @@ class Lookup extends BaseApi
 {
 	protected function rawContent(array $request = [])
 	{
-		BaseApi::checkAllowedScope(BaseApi::SCOPE_READ);
+		$this->checkAllowedScope(BaseApi::SCOPE_READ);
 		$uid = BaseApi::getCurrentUserID();
 
 		$users = [];
@@ -51,6 +51,6 @@ class Lookup extends BaseApi
 			throw new NotFoundException();
 		}
 
-		$this->response->exit('users', ['user' => $users], $this->parameters['extension'] ?? null);
+		$this->response->addFormattedContent('users', ['user' => $users], $this->parameters['extension'] ?? null);
 	}
 }

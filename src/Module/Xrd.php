@@ -38,6 +38,8 @@ class Xrd extends BaseModule
 {
 	protected function rawContent(array $request = [])
 	{
+		header('Vary: Accept', false);
+
 		// @TODO: Replace with parameter from router
 		if (DI::args()->getArgv()[0] == 'xrd') {
 			if (empty($_GET['uri'])) {
@@ -79,6 +81,8 @@ class Xrd extends BaseModule
 			DI::logger()->notice('Invalid host name for xrd query',['host' => $host, 'uri' => $uri]);
 			throw new NotFoundException('Invalid host name for xrd query: ' . $host);
 		}
+
+		header('Vary: Accept', false);
 
 		if ($name == User::getActorName()) {
 			$owner = User::getSystemAccount();
@@ -152,7 +156,7 @@ class Xrd extends BaseModule
 			]
 		];
 		header('Access-Control-Allow-Origin: *');
-		System::jsonExit($json, 'application/jrd+json; charset=utf-8');
+		$this->jsonExit($json, 'application/jrd+json; charset=utf-8');
 	}
 
 	private function printJSON(string $alias, array $owner, array $avatar)
@@ -229,7 +233,7 @@ class Xrd extends BaseModule
 		];
 
 		header('Access-Control-Allow-Origin: *');
-		System::jsonExit($json, 'application/jrd+json; charset=utf-8');
+		$this->jsonExit($json, 'application/jrd+json; charset=utf-8');
 	}
 
 	private function printXML(string $alias, array $owner, array $avatar)
@@ -326,7 +330,6 @@ class Xrd extends BaseModule
 		]);
 
 		header('Access-Control-Allow-Origin: *');
-
-		System::httpExit($xmlString, Response::TYPE_XML, 'application/xrd+xml');
+		$this->httpExit($xmlString, Response::TYPE_XML, 'application/xrd+xml');
 	}
 }

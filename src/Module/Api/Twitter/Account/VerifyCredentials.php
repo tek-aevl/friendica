@@ -34,7 +34,7 @@ class VerifyCredentials extends BaseApi
 {
 	protected function rawContent(array $request = [])
 	{
-		BaseApi::checkAllowedScope(BaseApi::SCOPE_READ);
+		$this->checkAllowedScope(BaseApi::SCOPE_READ);
 		$uid = BaseApi::getCurrentUserID();
 
 		$skip_status = $this->getRequestValue($request, 'skip_status', false);
@@ -47,6 +47,6 @@ class VerifyCredentials extends BaseApi
 		// "uid" is only needed for some internal stuff, so remove it from here
 		unset($user_info['uid']);
 
-		$this->response->exit('user', ['user' => $user_info], $this->parameters['extension'] ?? null);
+		$this->response->addFormattedContent('user', ['user' => $user_info], $this->parameters['extension'] ?? null);
 	}
 }

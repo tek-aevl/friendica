@@ -34,7 +34,7 @@ class Destroy extends BaseApi
 {
 	protected function post(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
+		$this->checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
 		$id = $this->getRequestValue($request, 'id', 0);
@@ -52,6 +52,6 @@ class Destroy extends BaseApi
 
 		$status_info = DI::twitterStatus()->createFromUriId($id, $uid)->toArray();
 
-		$this->response->exit('status', ['status' => $status_info], $this->parameters['extension'] ?? null);
+		$this->response->addFormattedContent('status', ['status' => $status_info], $this->parameters['extension'] ?? null);
 	}
 }

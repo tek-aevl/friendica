@@ -37,7 +37,7 @@ class Search extends BaseApi
 {
 	protected function rawContent(array $request = [])
 	{
-		BaseApi::checkAllowedScope(BaseApi::SCOPE_READ);
+		$this->checkAllowedScope(BaseApi::SCOPE_READ);
 		$uid = BaseApi::getCurrentUserID();
 
 		$userlist = [];
@@ -69,6 +69,6 @@ class Search extends BaseApi
 			throw new BadRequestException('No search term specified.');
 		}
 
-		$this->response->exit('users', $userlist, $this->parameters['extension'] ?? null);
+		$this->response->addFormattedContent('users', $userlist, $this->parameters['extension'] ?? null);
 	}
 }

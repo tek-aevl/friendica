@@ -60,7 +60,10 @@ if (!file_exists('index.php') && (sizeof($_SERVER['argv']) != 0)) {
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 $dice = (new Dice())->addRules(include __DIR__ . '/../static/dependencies.config.php');
-$dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['daemon']]);
+/** @var \Friendica\Core\Addon\Capability\ICanLoadAddons $addonLoader */
+$addonLoader = $dice->create(\Friendica\Core\Addon\Capability\ICanLoadAddons::class);
+$dice = $dice->addRules($addonLoader->getActiveAddonConfig('dependencies'));
+$dice = $dice->addRule(LoggerInterface::class, ['constructParams' => [Logger\Capability\LogChannel::DAEMON]]);
 
 DI::init($dice);
 \Friendica\Core\Logger\Handler\ErrorHandler::register($dice->create(\Psr\Log\LoggerInterface::class));
@@ -160,9 +163,14 @@ if (!$foreground) {
 		exit(1);
 	} elseif ($pid) {
 		// The parent process continues here
+		if (!file_put_contents($pidfile, $pid)) {
+			echo "Pid file wasn't written.\n";
+			Logger::warning('Could not store pid file');
+			posix_kill($pid, SIGTERM);
+			exit(1);
+		}
 		echo 'Child process started with pid ' . $pid . ".\n";
 		Logger::notice('Child process started', ['pid' => $pid]);
-		file_put_contents($pidfile, $pid);
 		exit(0);
 	}
 

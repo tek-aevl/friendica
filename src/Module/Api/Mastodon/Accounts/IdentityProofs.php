@@ -34,8 +34,8 @@ class IdentityProofs extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_READ);
+		$this->checkAllowedScope(self::SCOPE_READ);
 
-		System::jsonExit([]);
+		$this->jsonExit([]);
 	}
 }

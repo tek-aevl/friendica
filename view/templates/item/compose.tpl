@@ -47,11 +47,14 @@
 					<button id="button_emojipicker" type="button" class="btn btn-sm template-icon emojis" aria-label="{{$l10n.edemojis}}" title="{{$l10n.edemojis}}" tabindex="14">
 						<i class="fa fa-smile-o"></i>
 					</button>
+					<button type="button" class="btn btn-sm template-icon bb-url" aria-label="{{$l10n.contentwarn}}" title="{{$l10n.contentwarn}}" onclick="insertFormatting('abstract',{{$id}});" tabindex="9">
+						<i class="fa fa-eye"></i>
+					</button>
 				</span>
 			</p>
 			<div id="dropzone-{{$id}}" class="dropzone" style="overflow:scroll">
 				<p>
-					<textarea id="comment-edit-text-{{$id}}" class="comment-edit-text form-control text-autosize" name="body" placeholder="{{$l10n.default}}" rows="7" tabindex="3" dir="auto" dir="auto">{{$body}}</textarea>
+					<textarea id="comment-edit-text-{{$id}}" class="comment-edit-text form-control text-autosize" name="body" placeholder="{{$l10n.default}}" rows="7" tabindex="3" dir="auto" dir="auto" onkeydown="sendOnCtrlEnter(event, 'comment-edit-submit-{{$id}}')">{{$body}}</textarea>
 				</p>
 			</div>
 			<p class="comment-edit-submit-wrapper">

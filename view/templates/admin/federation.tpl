@@ -1,4 +1,4 @@
-<script src="{{$baseurl}}/view/asset/Chart-js/dist/Chart.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script src="{{$baseurl}}/view/asset/Chart-js/dist/Chart.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
 <div id="adminpage">
 	<h1>{{$title}} - {{$page}}</h1>
 
@@ -57,7 +57,7 @@
 		{{if $c[0]['total'] > 0}}
 		<tr>
 			<th>{{$c[0]['platform']}}</th>
-			<th><strong>{{$c[0]['total']}}</strong></td>
+			<th><strong>{{$c[0]['total']}}</strong></th>
 			<td>{{$c[0]['network']}}</td>
 		</tr>
 		<tr>

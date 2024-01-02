@@ -21,6 +21,7 @@
 
 namespace Friendica\Object;
 
+use Friendica\Content\Conversation;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\DI;
@@ -73,24 +74,19 @@ class Thread
 		$a = DI::app();
 
 		switch ($mode) {
-			case 'network':
-			case 'notes':
+			case Conversation::MODE_NETWORK:
+			case Conversation::MODE_NOTES:
 				$this->profile_owner = DI::userSession()->getLocalUserId();
 				$this->writable = true;
 				break;
-			case 'profile':
+			case Conversation::MODE_PROFILE:
+			case Conversation::MODE_DISPLAY:
 				$this->profile_owner = $a->getProfileOwner();
 				$this->writable = Security::canWriteToUserWall($this->profile_owner) || $writable;
 				break;
-			case 'display':
-				$this->profile_owner = $a->getProfileOwner();
-				$this->writable = Security::canWriteToUserWall($this->profile_owner) || $writable;
-				break;
-			case 'community':
-				$this->profile_owner = 0;
-				$this->writable = $writable;
-				break;
-			case 'contacts':
+			case Conversation::MODE_CHANNEL:
+			case Conversation::MODE_COMMUNITY:
+			case Conversation::MODE_CONTACTS:
 				$this->profile_owner = 0;
 				$this->writable = $writable;
 				break;
@@ -190,13 +186,13 @@ class Thread
 	 * We should find a way to avoid using those arguments (at least most of them)
 	 *
 	 * @param array $conv_responses data
-	 * @param string $formSecurityToken A security Token to avoid CSF attacks
+	 * @param string $formSecurityToken A 'contact_action' form security token
 	 *
 	 * @return mixed The data requested on success
 	 *               false on failure
 	 * @throws \Exception
 	 */
-	public function getTemplateData($conv_responses, string $formSecurityToken)
+	public function getTemplateData(array $conv_responses, string $formSecurityToken)
 	{
 		$result = [];
 

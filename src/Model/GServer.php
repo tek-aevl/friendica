@@ -26,7 +26,6 @@ use DOMXPath;
 use Exception;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
-use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -82,8 +81,8 @@ class GServer
 	const DETECT_MASTODON_API = 16;
 	const DETECT_STATUS_PHP = 17; // Nextcloud
 	const DETECT_V1_CONFIG = 18;
-	const DETECT_PUMPIO = 19; // Deprecated
 	const DETECT_SYSTEM_ACTOR = 20; // Mistpark, Osada, Roadhouse, Zap
+	const DETECT_THREADS = 21;
 
 	// Standardized endpoints
 	const DETECT_STATISTICS_JSON = 100;
@@ -126,7 +125,7 @@ class GServer
 
 		$gserver = DBA::selectFirst('gserver', ['id'], ['nurl' => Strings::normaliseLink($url)]);
 		if (DBA::isResult($gserver)) {
-			Logger::debug('Got ID for URL', ['id' => $gserver['id'], 'url' => $url, 'callstack' => System::callstack(20)]);
+			Logger::debug('Got ID for URL', ['id' => $gserver['id'], 'url' => $url]);
 
 			if (Network::isUrlBlocked($url)) {
 				self::setBlockedById($gserver['id']);
@@ -241,7 +240,7 @@ class GServer
 		} elseif (!empty($contact['baseurl'])) {
 			$server = $contact['baseurl'];
 		} elseif ($contact['network'] == Protocol::DIASPORA) {
-			$parts = parse_url($contact['url']);
+			$parts = (array)parse_url($contact['url']);
 			unset($parts['path']);
 			$server = (string)Uri::fromParts($parts);
 		} else {
@@ -590,7 +589,7 @@ class GServer
 			if ((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) && (parse_url($url, PHP_URL_PATH) != parse_url($valid_url, PHP_URL_PATH)) &&
 				(parse_url($url, PHP_URL_PATH) == '')) {
 				Logger::debug('Found redirect. Mark old entry as failure and redirect to the basepath.', ['old' => $url, 'new' => $valid_url]);
-				$parts = parse_url($valid_url);
+				$parts = (array)parse_url($valid_url);
 				unset($parts['path']);
 				$valid_url = (string)Uri::fromParts($parts);
 
@@ -618,10 +617,14 @@ class GServer
 			return false;
 		}
 
-		$serverdata = self::parseNodeinfo210($curlResult);
-		if (empty($serverdata)) {
-			$curlResult = DI::httpClient()->get($url . '/.well-known/nodeinfo', HttpClientAccept::JSON);
-			$serverdata = self::fetchNodeinfo($url, $curlResult);
+		if (!empty($network) && !in_array($network, Protocol::NATIVE_SUPPORT)) {
+			$serverdata = ['detection-method' => self::DETECT_MANUAL, 'network' => $network, 'platform' => '', 'version' => '', 'site_name' => '', 'info' => ''];
+		} else {
+			$serverdata = self::parseNodeinfo210($curlResult);
+			if (empty($serverdata)) {
+				$curlResult = DI::httpClient()->get($url . '/.well-known/nodeinfo', HttpClientAccept::JSON);
+				$serverdata = self::fetchNodeinfo($url, $curlResult);
+			}
 		}
 
 		if ($only_nodeinfo && empty($serverdata)) {
@@ -669,6 +672,12 @@ class GServer
 					return false;
 				}
 
+				if (in_array($url, ['https://www.threads.net', 'https://threads.net'])) {
+					$serverdata['detection-method'] = self::DETECT_THREADS;
+					$serverdata['network']          = Protocol::ACTIVITYPUB;
+					$serverdata['platform']         = 'threads';
+				}
+		
 				if (($serverdata['network'] == Protocol::PHANTOM) || in_array($serverdata['detection-method'], self::DETECT_UNSPECIFIC)) {
 					$serverdata = self::detectMastodonAlikes($url, $serverdata);
 				}
@@ -1264,9 +1273,13 @@ class GServer
 
 		if (!empty($nodeinfo['protocols'])) {
 			$protocols = [];
-			foreach ($nodeinfo['protocols'] as $protocol) {
-				if (is_string($protocol)) {
-					$protocols[$protocol] = true;
+			if (is_string($nodeinfo['protocols'])) {
+				$protocols[$nodeinfo['protocols']] = true;
+			} else {
+				foreach ($nodeinfo['protocols'] as $protocol) {
+					if (is_string($protocol)) {
+						$protocols[$protocol] = true;
+					}
 				}
 			}
 
@@ -1365,9 +1378,13 @@ class GServer
 
 		if (!empty($nodeinfo['protocols'])) {
 			$protocols = [];
-			foreach ($nodeinfo['protocols'] as $protocol) {
-				if (is_string($protocol)) {
-					$protocols[$protocol] = true;
+			if (is_string($nodeinfo['protocols'])) {
+				$protocols[$nodeinfo['protocols']] = true;
+			} else {
+				foreach ($nodeinfo['protocols'] as $protocol) {
+					if (is_string($protocol)) {
+						$protocols[$protocol] = true;
+					}
 				}
 			}
 
@@ -2371,16 +2388,16 @@ class GServer
 	 */
 	public static function discover()
 	{
+		if (!DI::config('system', 'discover_servers')) {
+			return;
+		}
+
 		// Update the server list
 		self::discoverFederation();
 
 		$no_of_queries = 5;
 
 		$requery_days = intval(DI::config()->get('system', 'poco_requery_days'));
-
-		if ($requery_days == 0) {
-			$requery_days = 7;
-		}
 
 		$last_update = date('c', time() - (60 * 60 * 24 * $requery_days));
 
@@ -2515,7 +2532,7 @@ class GServer
 			}
 		}
 
-		Logger::info('Protocol for server', ['protocol' => $protocol, 'old' => $old, 'id' => $gsid, 'url' => $gserver['url'], 'callstack' => System::callstack(20)]);
+		Logger::info('Protocol for server', ['protocol' => $protocol, 'old' => $old, 'id' => $gsid, 'url' => $gserver['url']]);
 		self::update(['protocol' => $protocol], ['id' => $gsid]);
 	}
 

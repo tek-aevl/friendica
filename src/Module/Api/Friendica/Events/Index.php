@@ -34,7 +34,7 @@ class Index extends BaseApi
 {
 	protected function rawContent(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_READ);
+		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
 		$request = $this->getRequest([
@@ -69,6 +69,6 @@ class Index extends BaseApi
 			];
 		}
 
-		$this->response->exit('events', ['events' => $items], $this->parameters['extension'] ?? null);
+		$this->response->addFormattedContent('events', ['events' => $items], $this->parameters['extension'] ?? null);
 	}
 }

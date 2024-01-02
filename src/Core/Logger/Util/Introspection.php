@@ -22,7 +22,8 @@
 namespace Friendica\Core\Logger\Util;
 
 use Friendica\App\Request;
-use Friendica\Core\Logger\Capabilities\IHaveCallIntrospections;
+use Friendica\Core\Logger\Capability\IHaveCallIntrospections;
+use Friendica\Core\System;
 
 /**
  * Get Introspection information about the current call
@@ -86,6 +87,7 @@ class Introspection implements IHaveCallIntrospections
 			'line'       => $trace[$i - 1]['line'] ?? null,
 			'function'   => $trace[$i]['function'] ?? null,
 			'request-id' => $this->requestId,
+			'stack'      => System::callstack(15, 0, true, ['Friendica\Core\Logger\Type\StreamLogger', 'Friendica\Core\Logger\Type\AbstractLogger', 'Friendica\Core\Logger\Type\WorkerLogger', 'Friendica\Core\Logger']),
 		];
 	}
 

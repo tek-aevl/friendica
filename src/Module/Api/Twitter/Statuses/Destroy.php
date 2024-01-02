@@ -37,7 +37,7 @@ class Destroy extends BaseApi
 {
 	protected function post(array $request = [])
 	{
-		BaseApi::checkAllowedScope(BaseApi::SCOPE_READ);
+		$this->checkAllowedScope(BaseApi::SCOPE_READ);
 		$uid = BaseApi::getCurrentUserID();
 
 		$id = $this->getRequestValue($request, 'id', 0);
@@ -59,6 +59,6 @@ class Destroy extends BaseApi
 
 		Item::deleteForUser(['id' => $post['id']], $uid);
 
-		$this->response->exit('status', ['status' => $ret], $this->parameters['extension'] ?? null, Contact::getPublicIdByUserId($uid));
+		$this->response->addFormattedContent('status', ['status' => $ret], $this->parameters['extension'] ?? null, Contact::getPublicIdByUserId($uid));
 	}
 }

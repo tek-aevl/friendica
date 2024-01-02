@@ -249,17 +249,19 @@ class Images
 			return [];
 		}
 
-		if ($data) {
-			$image = new Image($img_str);
-
-			if ($image->isValid()) {
-				$data['blurhash'] = $image->getBlurHash();
-			}
-
-			$data['size'] = $filesize;
+		if (!$data) {
+			return [];
 		}
 
-		return is_array($data) ? $data : [];
+		$image = new Image($img_str);
+
+		if ($image->isValid()) {
+			$data['blurhash'] = $image->getBlurHash();
+		}
+
+		$data['size'] = $filesize;
+
+		return $data;
 	}
 
 	/**
@@ -351,5 +353,16 @@ class Images
 		}
 
 		return '[img=' . $photo . ']' . $description . '[/img]';
+	}
+
+	/**
+	 * Get the maximum possible upload size in bytes
+	 *
+	 * @return integer
+	 */
+	public static function getMaxUploadBytes(): int
+	{
+		$upload_size = ini_get('upload_max_filesize') ?: DI::config()->get('system', 'maximagesize');
+		return Strings::getBytesFromShorthand($upload_size);
 	}
 }

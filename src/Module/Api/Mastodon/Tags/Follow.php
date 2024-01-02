@@ -33,11 +33,11 @@ class Follow extends BaseApi
 {
 	protected function post(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
+		$this->checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
 		if (empty($this->parameters['hashtag'])) {
-			DI::mstdnError()->UnprocessableEntity();
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
 		$fields = ['uid' => $uid, 'term' => '#' . ltrim($this->parameters['hashtag'], '#')];
@@ -46,6 +46,6 @@ class Follow extends BaseApi
 		}
 
 		$hashtag = new \Friendica\Object\Api\Mastodon\Tag($this->baseUrl, ['name' => ltrim($this->parameters['hashtag'])], [], true);
-		System::jsonExit($hashtag->toArray());
+		$this->jsonExit($hashtag->toArray());
 	}
 }

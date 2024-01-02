@@ -37,7 +37,7 @@ class Upload extends BaseApi
 {
 	protected function post(array $request = [])
 	{
-		BaseApi::checkAllowedScope(BaseApi::SCOPE_WRITE);
+		$this->checkAllowedScope(BaseApi::SCOPE_WRITE);
 		$uid = BaseApi::getCurrentUserID();
 
 		if (empty($_FILES['media'])) {
@@ -65,6 +65,6 @@ class Upload extends BaseApi
 
 		Logger::info('Media uploaded', ['return' => $returndata]);
 
-		$this->response->exit('media', ['media' => $returndata], $this->parameters['extension'] ?? null);
+		$this->response->addFormattedContent('media', ['media' => $returndata], $this->parameters['extension'] ?? null);
 	}
 }

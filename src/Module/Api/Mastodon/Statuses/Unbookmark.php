@@ -35,36 +35,41 @@ class Unbookmark extends BaseApi
 {
 	protected function post(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
+		$this->checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
 		if (empty($this->parameters['id'])) {
-			DI::mstdnError()->UnprocessableEntity();
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
-		$item = Post::selectOriginal(['uid', 'id', 'gravity'], ['uri-id' => $this->parameters['id'], 'uid' => [$uid, 0]], ['order' => ['uid' => true]]);
+		$item = Post::selectOriginal(['uid', 'id', 'uri-id', 'gravity'], ['uri-id' => $this->parameters['id'], 'uid' => [$uid, 0]], ['order' => ['uid' => true]]);
 		if (!DBA::isResult($item)) {
-			DI::mstdnError()->RecordNotFound();
+			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}
 
 		if ($item['gravity'] != Item::GRAVITY_PARENT) {
-			DI::mstdnError()->UnprocessableEntity(DI::l10n()->t('Only starting posts can be unbookmarked'));
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity($this->t('Only starting posts can be unbookmarked')));
 		}
 
 		if ($item['uid'] == 0) {
-			$stored = Item::storeForUserByUriId($item['id'], $uid, ['post-reason' => Item::PR_ACTIVITY]);
+			$stored = Item::storeForUserByUriId($item['uri-id'], $uid, ['post-reason' => Item::PR_ACTIVITY]);
 			if (!empty($stored)) {
 				$item = Post::selectFirst(['id', 'gravity'], ['id' => $stored]);
 				if (!DBA::isResult($item)) {
-					DI::mstdnError()->RecordNotFound();
+					$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 				}
 			} else {
-				DI::mstdnError()->RecordNotFound();
+				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 			}
 		}
 
 		Item::update(['starred' => false], ['id' => $item['id']]);
 
-		System::jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes())->toArray());
+		// @TODO Remove once mstdnStatus()->createFromUriId is fixed so that it returns posts not reshared posts if given an ID to an original post that has been reshared
+		// Introduced in this PR: https://github.com/friendica/friendica/pull/13175
+		// Issue tracking the behavior of createFromUriId: https://github.com/friendica/friendica/issues/13350
+		$isReblog = $item['uri-id'] != $this->parameters['id'];
+
+		$this->jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes(), $isReblog)->toArray());
 	}
 }

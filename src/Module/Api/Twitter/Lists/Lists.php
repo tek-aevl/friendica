@@ -33,11 +33,11 @@ class Lists extends BaseApi
 {
 	protected function rawContent(array $request = [])
 	{
-		BaseApi::checkAllowedScope(BaseApi::SCOPE_READ);
+		$this->checkAllowedScope(BaseApi::SCOPE_READ);
 		$uid = BaseApi::getCurrentUserID();
 
 		// This is a dummy endpoint
 		$ret = [];
-		$this->response->exit('statuses', ["lists_list" => $ret], $this->parameters['extension'] ?? null, Contact::getPublicIdByUserId($uid));
+		$this->response->addFormattedContent('statuses', ["lists_list" => $ret], $this->parameters['extension'] ?? null, Contact::getPublicIdByUserId($uid));
 	}
 }

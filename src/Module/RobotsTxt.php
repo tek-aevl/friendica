@@ -38,6 +38,8 @@ class RobotsTxt extends BaseModule
 			'/search',
 			'/help',
 			'/proxy',
+			'/photo',
+			'/avatar',
 		];
 
 		header('Content-Type: text/plain');
@@ -45,6 +47,19 @@ class RobotsTxt extends BaseModule
 		foreach ($allDisallowed as $disallowed) {
 			echo 'Disallow: ' . $disallowed . PHP_EOL;
 		}
+
+		echo PHP_EOL;
+		echo 'User-agent: ChatGPT-User' . PHP_EOL;
+		echo 'Disallow: /' . PHP_EOL;
+
+		echo PHP_EOL;
+		echo 'User-agent: Google-Extended' . PHP_EOL;
+		echo 'Disallow: /' . PHP_EOL;
+
+		echo PHP_EOL;
+		echo 'User-agent: GPTBot' . PHP_EOL;
+		echo 'Disallow: /' . PHP_EOL;
+
 		System::exit();
 	}
 }

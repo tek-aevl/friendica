@@ -43,7 +43,7 @@ class Search extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_READ);
+		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
 		$request = $this->getRequest([
@@ -60,7 +60,7 @@ class Search extends BaseApi
 		], $request);
 
 		if (empty($request['q'])) {
-			DI::mstdnError()->UnprocessableEntity();
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
 		$limit = min($request['limit'], 40);
@@ -91,7 +91,7 @@ class Search extends BaseApi
 			$result['hashtags'] = self::searchHashtags($request['q'], $request['exclude_unreviewed'], $limit, $request['offset'], $this->parameters['version']);
 		}
 
-		System::jsonExit($result);
+		$this->jsonExit($result);
 	}
 
 	/**
@@ -115,7 +115,7 @@ class Search extends BaseApi
 		}
 
 		$accounts = [];
-		foreach (Contact::searchByName($q, '', $following ? $uid : 0, false, $limit, $offset) as $contact) {
+		foreach (Contact::searchByName($q, '', false, $following ? $uid : 0, $limit, $offset) as $contact) {
 			$accounts[] = DI::mstdnAccount()->createFromContactId($contact['id'], $uid);
 		}
 

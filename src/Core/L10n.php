@@ -308,13 +308,13 @@ class L10n
 	 *
 	 * @param string $singular
 	 * @param string $plural
-	 * @param int    $count
+	 * @param float  $count
 	 * @param array  $vars Variables to interpolate in the translation string
 	 *
 	 * @return string
 	 * @throws \Exception
 	 */
-	public function tt(string $singular, string $plural, int $count, ...$vars): string
+	public function tt(string $singular, string $plural, float $count, ...$vars): string
 	{
 		$s = null;
 
@@ -361,9 +361,9 @@ class L10n
 	 *
 	 * @return bool
 	 */
-	private function stringPluralSelectDefault(int $n): bool
+	private function stringPluralSelectDefault(float $n): bool
 	{
-		return $n != 1;
+		return intval($n) != 1;
 	}
 
 	/**
@@ -378,7 +378,7 @@ class L10n
 	 *
 	 * @return array
 	 */
-	public static function getAvailableLanguages(): array
+	public function getAvailableLanguages(): array
 	{
 		$langs              = [];
 		$strings_file_paths = glob('view/lang/*/strings.php');
@@ -394,6 +394,92 @@ class L10n
 			}
 		}
 		return $langs;
+	}
+
+	/**
+	 * Get language codes that are detectable by our language detection routines.
+	 * Languages are excluded that aren't used often and that tend to false detections.
+	 * The listed codes are a collection of both the official ISO 639-1 codes and
+	 * the codes that are used by our built-in language detection routine.
+	 * When the detection is done, the result only consists of the official ISO 639-1 codes.
+	 *
+	 * @return array
+	 */
+	public function getDetectableLanguages(): array
+	{
+		$additional_langs = [
+			'af', 'az', 'az-Cyrl', 'az-Latn', 'be', 'bn', 'bs', 'bs-Cyrl', 'bs-Latn',
+			'cy', 'da', 'el', 'el-monoton', 'el-polyton', 'en', 'eu', 'fa', 'fi',
+			'ga', 'gl', 'gu', 'he', 'hi', 'hr', 'hy', 'id', 'in', 'iu', 'iw', 'jv', 'jw',
+			'ka', 'km', 'ko', 'lt', 'lv', 'mo', 'ms', 'ms-Arab', 'ms-Latn', 'nb', 'nn', 'no',
+			'pt', 'pt-PT', 'pt-BR', 'ro', 'sa', 'sk', 'sl', 'sq', 'sr', 'sr-Cyrl', 'sr-Latn', 'sw',
+			'ta', 'th', 'tl', 'tr', 'ug', 'uk', 'uz', 'vi', 'zh', 'zh-Hant', 'zh-Hans',
+		];
+
+		if (in_array('cld2', get_loaded_extensions())) {
+			$additional_langs = array_merge($additional_langs,
+				['dv', 'kn', 'lo', 'ml', 'or', 'pa', 'sd', 'si', 'te', 'yi']);
+		}
+
+		$langs = array_merge($additional_langs, array_keys($this->getAvailableLanguages()));
+		sort($langs);
+		return $langs;
+	}
+
+	/**
+	 * Return a list of supported languages with their two byte language codes.
+	 *
+	 * @param bool $international If set to true, additionally the international language name is returned as well.
+	 * @return array
+	 */
+	public function getLanguageCodes(bool $international = false): array
+	{
+		$iso639 = new \Matriphe\ISO639\ISO639;
+
+		$languages = [];
+
+		foreach ($this->getDetectableLanguages() as $code) {
+			$code     = $this->toISO6391($code);
+			$native   = $iso639->nativeByCode1($code);
+			$language = $iso639->languageByCode1($code);
+			if ($native != $language && $international) {
+				$languages[$code] = $this->t('%s (%s)', $native, $language);
+			} else {
+				$languages[$code] = $native;
+			}
+		}
+
+		return $languages;
+	}
+
+	/**
+	 * Convert the language code to ISO639-1
+	 * It also converts old codes to their new counterparts.
+	 *
+	 * @param string $code
+	 * @return string
+	 */
+	public function toISO6391(string $code): string
+	{
+		if ((strlen($code) > 2) && (substr($code, 2, 1) == '-')) {
+			$code = substr($code, 0, 2);
+		}
+		if (in_array($code, ['nb', 'nn'])) {
+			$code = 'no';
+		}
+		if ($code == 'in') {
+			$code = 'id';
+		}
+		if ($code == 'iw') {
+			$code = 'he';
+		}
+		if ($code == 'jw') {
+			$code = 'jv';
+		}
+		if ($code == 'mo') {
+			$code = 'ro';
+		}
+		return $code;
 	}
 
 	/**

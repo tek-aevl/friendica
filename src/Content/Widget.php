@@ -102,7 +102,7 @@ class Widget
 	public static function unavailableNetworks(): array
 	{
 		// Always hide content from these networks
-		$networks = [Protocol::PHANTOM, Protocol::FACEBOOK, Protocol::APPNET, Protocol::ZOT];
+		$networks = [Protocol::PHANTOM, Protocol::FACEBOOK, Protocol::APPNET, Protocol::TWITTER, Protocol::ZOT];
 
 		if (!Addon::isEnabled("discourse")) {
 			$networks[] = Protocol::DISCOURSE;
@@ -114,10 +114,6 @@ class Widget
 
 		if (!Addon::isEnabled("pumpio")) {
 			$networks[] = Protocol::PUMPIO;
-		}
-
-		if (!Addon::isEnabled("twitter")) {
-			$networks[] = Protocol::TWITTER;
 		}
 
 		if (!Addon::isEnabled("tumblr")) {
@@ -476,7 +472,6 @@ class Widget
 			$nextday = substr($nextday, 4);
 			$dnow = substr($dnow, 0, 8) . '01';
 			$dthen = substr($dthen, 0, 8) . '01';
-			
 
 			/*
 			 * Starting with the current month, get the first and last days of every
@@ -496,7 +491,6 @@ class Widget
 
 				$ret[$dyear][] = [$str, $end_month, $start_month];
 				$dnow = DateTimeFormat::utc($dnow . ' -1 month', 'Y-m-d');
-				
 			}
 		}
 
@@ -508,7 +502,7 @@ class Widget
 		$cutoff_year = intval(DateTimeFormat::localNow('Y')) - $visible_years;
 		$cutoff = array_key_exists($cutoff_year, $ret);
 
-		$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('widget/posted_date.tpl'),[
+		$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('widget/posted_date.tpl'), [
 			'$title' => DI::l10n()->t('Archives'),
 			'$size' => $visible_years,
 			'$cutoff_year' => $cutoff_year,
@@ -543,7 +537,63 @@ class Widget
 			['ref' => 'community', 'name' => DI::l10n()->t('Groups')],
 		];
 
-		return self::filter('accounttype', DI::l10n()->t('Account Types'), '',
-			DI::l10n()->t('All'), $base, $accounts, $accounttype);
+		return self::filter(
+			'accounttype',
+			DI::l10n()->t('Account Types'),
+			'',
+			DI::l10n()->t('All'),
+			$base,
+			$accounts,
+			$accounttype
+		);
+	}
+
+	/**
+	 * Get a list of all channels
+	 *
+	 * @param string $base
+	 * @param string $channelname
+	 * @param integer $uid
+	 * @return string
+	 */
+	public static function channels(string $base, string $channelname, int $uid): string
+	{
+		$channels = [];
+
+		$enabled = DI::pConfig()->get($uid, 'system', 'enabled_timelines', []);
+
+		foreach (DI::NetworkFactory()->getTimelines('') as $channel) {
+			if (empty($enabled) || in_array($channel->code, $enabled)) {
+				$channels[] = ['ref' => $channel->code, 'name' => $channel->label];
+			}
+		}
+
+		foreach (DI::ChannelFactory()->getTimelines($uid) as $channel) {
+			if (empty($enabled) || in_array($channel->code, $enabled)) {
+				$channels[] = ['ref' => $channel->code, 'name' => $channel->label];
+			}
+		}
+
+		foreach (DI::userDefinedChannel()->selectByUid($uid) as $channel) {
+			if (empty($enabled) || in_array($channel->code, $enabled)) {
+				$channels[] = ['ref' => $channel->code, 'name' => $channel->label];
+			}
+		}
+
+		foreach (DI::CommunityFactory()->getTimelines(true) as $community) {
+			if (empty($enabled) || in_array($community->code, $enabled)) {
+				$channels[] = ['ref' => $community->code, 'name' => $community->label];
+			}
+		}
+
+		return self::filter(
+			'channel',
+			DI::l10n()->t('Channels'),
+			'',
+			'',
+			$base,
+			$channels,
+			$channelname
+		);
 	}
 }

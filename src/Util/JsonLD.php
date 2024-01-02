@@ -46,6 +46,12 @@ class JsonLD
 			case 'https://w3id.org/security/v1':
 				$url = DI::basePath() . '/static/security-v1.jsonld';
 				break;
+			case 'https://w3id.org/security/data-integrity/v1':
+				$url = DI::basePath() . '/static/security-data-integrity-v1.jsonld';
+				break;
+			case 'https://w3id.org/security/multikey/v1':
+				$url = DI::basePath() . '/static/security-multikey-v1.jsonld';
+				break;
 			case 'https://w3id.org/identity/v1':
 				$url = DI::basePath() . '/static/identity-v1.jsonld';
 				break;
@@ -54,6 +60,12 @@ class JsonLD
 				break;
 			case 'https://funkwhale.audio/ns':
 				$url = DI::basePath() . '/static/funkwhale.audio.jsonld';
+				break;
+			case 'http://schema.org':
+				$url = DI::basePath() . '/static/schema.jsonld';
+				break;
+			case 'http://joinmastodon.org/ns':
+				$url = DI::basePath() . '/static/joinmastodon.jsonld';
 				break;
 			default:
 				switch (parse_url($url, PHP_URL_PATH)) {
@@ -159,6 +171,7 @@ class JsonLD
 			'mobilizon' => (object)['@id' => 'https://joinmobilizon.org/ns#', '@type' => '@id'],
 			'fedibird' => (object)['@id' => 'http://fedibird.com/ns#', '@type' => '@id'],
 			'misskey' => (object)['@id' => 'https://misskey-hub.net/ns#', '@type' => '@id'],
+			'pixelfed' => (object)['@id' => 'http://pixelfed.org/ns#', '@type' => '@id'],
 		];
 
 		$orig_json = $json;
@@ -176,12 +189,6 @@ class JsonLD
 			// See issue https://github.com/nextcloud/social/issues/330
 			if (!in_array('https://w3id.org/security/v1', $json['@context'])) {
 				$json['@context'][] = 'https://w3id.org/security/v1';
-			}
-
-			// Issue 12419: Workaround for GoToSocial
-			$pos = array_search('http://joinmastodon.org/ns', $json['@context']);
-			if (is_int($pos)) {
-				$json['@context'][$pos] = ['toot' => 'http://joinmastodon.org/ns#'];
 			}
 		}
 
@@ -202,7 +209,7 @@ class JsonLD
 			Logger::notice('compacting error', ['msg' => $e->getMessage(), 'previous' => $e->getPrevious(), 'line' => $e->getLine()]);
 			if ($logfailed && DI::config()->get('debug', 'ap_log_failure')) {
 				$tempfile = tempnam(System::getTempPath(), 'failed-jsonld');
-				file_put_contents($tempfile, json_encode(['json' => $orig_json, 'callstack' => System::callstack(20), 'msg' => $e->getMessage(), 'previous' => $e->getPrevious()], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+				file_put_contents($tempfile, json_encode(['json' => $orig_json, 'msg' => $e->getMessage(), 'previous' => $e->getPrevious()], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 				Logger::notice('Failed message stored', ['file' => $tempfile]);
 			}
 		}

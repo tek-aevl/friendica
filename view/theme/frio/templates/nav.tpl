@@ -54,6 +54,15 @@
 										class="nav-network-badge badge nav-notification"></span></a>
 							</li>
 						{{/if}}
+
+						{{if $nav.channel}}
+							<li class="nav-segment">
+								<a accesskey="l" class="nav-menu {{$sel.channel}}" href="{{$nav.channel.0}}"
+									data-toggle="tooltip" aria-label="{{$nav.channel.3}}" title="{{$nav.channel.3}}"><i
+										class="fa fa-lg fa-newspaper-o fa-fw" aria-hidden="true"></i></a>
+							</li>
+						{{/if}}
+
 						{{if $nav.home}}
 							<li class="nav-segment">
 								<a accesskey="p" class="nav-menu {{$sel.home}}" href="{{$nav.home.0}}" data-toggle="tooltip"
@@ -274,8 +283,14 @@
 											</a>
 										</li>
 									{{/if}}
+									<li role="presentation" class="divider"></li>
+									<li role="presentation">
+										<a role="menuitem" id="nav-about-link" class="nav-link {{$nav.about.2}}"
+											href="{{$nav.about.0}}" title="{{$nav.about.3}}">
+											<i class="fa fa-info fa-fw" aria-hidden="true"></i> {{$nav.about.1}}
+										</a>
+									</li>
 									{{if $nav.tos}}
-										<li role="presentation" class="divider"></li>
 										<li role="presentation">
 											<a role="menuitem" id="nav-tos-link" class="nav-link {{$nav.tos.2}}"
 												href="{{$nav.tos.0}}" title="{{$nav.tos.3}}"><i class="fa fa-file-text"
@@ -401,6 +416,14 @@
 									</a>
 								</li>
 							{{/if}}
+							<li role="presentation" class="divider"></li>
+							<li role="presentation" class="list-group-item">
+								<a role="menuitem" class="nav-link {{$nav.about.2}}"
+								   href="{{$nav.about.0}}" title="{{$nav.about.3}}">
+									<i class="fa fa-info fa-fw" aria-hidden="true"></i> {{$nav.about.1}}
+								</a>
+							</li>
+							<li role="presentation" class="divider"></li>
 							{{if $nav.logout}}
 								<li role="presentation" class="list-group-item">
 									<a role="menuitem"

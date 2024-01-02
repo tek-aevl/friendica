@@ -36,17 +36,17 @@ class Tags extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		self::checkAllowedScope(self::SCOPE_READ);
+		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
 		if (empty($this->parameters['hashtag'])) {
-			DI::mstdnError()->UnprocessableEntity();
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
 		$tag       = ltrim($this->parameters['hashtag'], '#');
 		$following = DBA::exists('search', ['uid' => $uid, 'term' => '#' . $tag]);
 
 		$hashtag = new \Friendica\Object\Api\Mastodon\Tag($this->baseUrl, ['name' => $tag], [], $following);
-		System::jsonExit($hashtag->toArray());
+		$this->jsonExit($hashtag->toArray());
 	}
 }
