@@ -815,6 +815,25 @@ class GServer
 		}
 
 		// Count the number of known contacts from this server
+		self::countNumberOfKnownContacts((int) $id, $serverdata);
+
+		if (in_array($serverdata['network'], [Protocol::DFRN, Protocol::DIASPORA])) {
+			self::discoverRelay($url);
+		}
+
+		if (!empty($systemactor)) {
+			$contact = Contact::getByURL($systemactor, true, ['gsid', 'baseurl', 'id', 'network', 'url', 'name']);
+			Logger::debug('Fetched system actor',  ['url' => $url, 'gsid' => $id, 'contact' => $contact]);
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Count the number of known contacts from this server
+	 */
+	private static function countNumberOfKnownContacts(int $id, array $serverdata): void
+	{
 		if (!empty($id) && !in_array($serverdata['network'], [Protocol::PHANTOM, Protocol::FEED])) {
 			$apcontacts = DBA::count('apcontact', ['gsid' => $id]);
 			$contacts = DBA::count('contact', ['uid' => 0, 'gsid' => $id, 'failed' => false]);
@@ -840,17 +859,6 @@ class GServer
 				}
 			}
 		}
-
-		if (in_array($serverdata['network'], [Protocol::DFRN, Protocol::DIASPORA])) {
-			self::discoverRelay($url);
-		}
-
-		if (!empty($systemactor)) {
-			$contact = Contact::getByURL($systemactor, true, ['gsid', 'baseurl', 'id', 'network', 'url', 'name']);
-			Logger::debug('Fetched system actor',  ['url' => $url, 'gsid' => $id, 'contact' => $contact]);
-		}
-
-		return $ret;
 	}
 
 	/**
