@@ -207,6 +207,15 @@ class APContact
 			return $fetched_contact;
 		}
 
+		return self::compactProfile($apcontact, $compacted, $url, $fetched_contact, $webfinger, $local_owner);
+	}
+
+	/**
+	 * @param array|bool $fetched_contact
+	 * @param array|bool $local_owner
+	 */
+	private static function compactProfile(array $apcontact, array $compacted, string $url, $fetched_contact, bool $webfinger, $local_owner): array
+	{
 		$apcontact['url'] = $compacted['@id'];
 		$apcontact['uuid'] = JsonLD::fetchElement($compacted, 'diaspora:guid', '@value');
 		$apcontact['type'] = str_replace('as:', '', JsonLD::fetchElement($compacted, '@type'));
