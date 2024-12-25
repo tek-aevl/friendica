@@ -106,4 +106,4 @@ jobs:
         uses: "ramsey/composer-install@v2"
 
       - name: Run PHPMD
-        run: vendor/bin/phpmd src/ github .phpmd-ruleset.xml
+        run: vendor/bin/phpmd src/ text .phpmd-ruleset.xml --color
