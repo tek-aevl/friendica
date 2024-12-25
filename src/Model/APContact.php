@@ -164,6 +164,8 @@ class APContact
 			DI::cache()->set($cachekey, System::callstack(20), Duration::FIVE_MINUTES);
 		}
 
+		$local_owner = [];
+
 		if (DI::baseUrl()->isLocalUrl($url) && ($local_uid = User::getIdForURL($url))) {
 			try {
 				$data = Transmitter::getProfile($local_uid);
