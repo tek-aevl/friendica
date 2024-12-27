@@ -129,7 +129,26 @@ final class ATProtocol
 		}
 
 		$data = $this->get($pds . '/xrpc/' . $url, [HttpClientOptions::HEADERS => $headers]);
-		$this->pConfig->set($uid, 'bluesky', 'status', is_null($data) ? self::STATUS_API_FAIL : self::STATUS_SUCCESS);
+
+		if ($data === null) {
+			$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_API_FAIL);
+
+			return null;
+		}
+
+		if (!empty($data->code) && ($data->code < 200 || $data->code >= 400)) {
+			if (!empty($data->message)) {
+				$this->pConfig->set($uid, 'bluesky', 'status-message', $data->message);
+			} elseif (!empty($data->code)) {
+				$this->pConfig->set($uid, 'bluesky', 'status-message', 'Error Code: ' . $data->code);
+			}
+
+			return $data;
+		}
+
+		$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_SUCCESS);
+		$this->pConfig->set($uid, 'bluesky', 'status-message', '');
+
 		return $data;
 	}
 
@@ -155,6 +174,9 @@ final class ATProtocol
 			if (!$data) {
 				return null;
 			}
+			$data->code = $curlResult->getReturnCode();
+		} elseif (($curlResult->getReturnCode() < 200) || ($curlResult->getReturnCode() >= 400)) {
+			$this->logger->notice('Unexpected return code', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
 			$data->code = $curlResult->getReturnCode();
 		}
 
@@ -197,14 +219,17 @@ final class ATProtocol
 		} catch (\Exception $e) {
 			$this->logger->notice('Exception on post', ['exception' => $e]);
 			$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_API_FAIL);
+			$this->pConfig->set($uid, 'bluesky', 'status-message', $e->getMessage());
 			return null;
 		}
 
-		$data = json_decode($curlResult->getBodyString());
+		$data = json_decode($curlResult->getBodyString(), false);
+
 		if (!$curlResult->isSuccess()) {
 			$this->logger->notice('API Error', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
 			if (!$data) {
 				$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_API_FAIL);
+
 				return null;
 			}
 			$data->code = $curlResult->getReturnCode();
@@ -212,8 +237,14 @@ final class ATProtocol
 
 		if (!empty($data->code) && ($data->code >= 200) && ($data->code < 400)) {
 			$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_SUCCESS);
+			$this->pConfig->set($uid, 'bluesky', 'status-message', '');
 		} else {
 			$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_API_FAIL);
+			if (!empty($data->message)) {
+				$this->pConfig->set($uid, 'bluesky', 'status-message', $data->message);
+			} elseif (!empty($data->code)) {
+				$this->pConfig->set($uid, 'bluesky', 'status-message', 'Error Code: ' . $data->code);
+			}
 		}
 		return $data;
 	}
@@ -501,10 +532,6 @@ final class ATProtocol
 		$data = $this->post($uid, '/xrpc/com.atproto.server.refreshSession', '', ['Authorization' => ['Bearer ' . $token]]);
 		if (empty($data) || empty($data->accessJwt)) {
 			$this->logger->debug('Refresh failed', ['return' => $data]);
-			$password = $this->pConfig->get($uid, 'bluesky', 'password');
-			if (!empty($password)) {
-				return $this->createUserToken($uid, $password);
-			}
 			$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_TOKEN_FAIL);
 			return '';
 		}
@@ -541,6 +568,7 @@ final class ATProtocol
 		$this->pConfig->set($uid, 'bluesky', 'refresh_token', $data->refreshJwt);
 		$this->pConfig->set($uid, 'bluesky', 'token_created', time());
 		$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_TOKEN_OK);
+		$this->pConfig->set($uid, 'bluesky', 'status-message', '');
 		return $data->accessJwt;
 	}
 }

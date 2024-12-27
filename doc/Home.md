@@ -31,7 +31,7 @@ Help
 * [Install](help/Install)
 * [Update](help/Update)
 * [Settings & Admin Panel](help/Settings)
-* [Installing Connectors (Twitter/GNU Social)](help/Installing-Connectors)
+* [Installing Connectors](help/Installing-Connectors)
 * [Install an ejabberd server (XMPP chat) with synchronized credentials](help/install-ejabberd)
 * [Using SSL with Friendica](help/SSL)
 * [Config values that can only be set in config/local.config.php](help/Config)

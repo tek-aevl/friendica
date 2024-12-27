@@ -23,12 +23,14 @@ use Friendica\Database\Definition\ViewDefinition;
 use Friendica\Module\Maintenance;
 use Friendica\Security\Authentication;
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Core\Logger\Capability\LogChannel;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ATProtocol\DID;
+use Friendica\Security\ExAuth;
 use Friendica\Security\OpenWebAuth;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\HTTPInputData;
@@ -121,6 +123,18 @@ class App
 
 	public function processRequest(ServerRequestInterface $request, float $start_time): void
 	{
+		$this->setupContainerForAddons();
+
+		$this->container = $this->container->addRule(Mode::class, [
+			'call' => [
+				['determineRunMode', [false, $request->getServerParams()], Dice::CHAIN_CALL],
+			],
+		]);
+
+		$this->setupLegacyServiceLocator();
+
+		$this->registerErrorHandler();
+
 		$this->requestId = $this->container->create(Request::class)->getRequestId();
 		$this->auth      = $this->container->create(Authentication::class);
 		$this->config    = $this->container->create(IManageConfigValues::class);
@@ -150,6 +164,48 @@ class App
 			$start_time,
 			$request->getServerParams()
 		);
+	}
+
+	public function processEjabberd(): void
+	{
+		$this->setupContainerForAddons();
+
+		$this->container = $this->container->addRule(LoggerInterface::class,[
+			'constructParams' => [LogChannel::AUTH_JABBERED],
+		]);
+
+		$this->setupLegacyServiceLocator();
+
+		$this->registerErrorHandler();
+
+		// Check the database structure and possibly fixes it
+		\Friendica\Core\Update::check(\Friendica\DI::basePath(), true);
+
+		$appMode = $this->container->create(Mode::class);
+
+		if ($appMode->isNormal()) {
+			/** @var ExAuth $oAuth */
+			$oAuth = $this->container->create(ExAuth::class);
+			$oAuth->readStdin();
+		}
+	}
+
+	private function setupContainerForAddons(): void
+	{
+		/** @var \Friendica\Core\Addon\Capability\ICanLoadAddons $addonLoader */
+		$addonLoader = $this->container->create(\Friendica\Core\Addon\Capability\ICanLoadAddons::class);
+
+		$this->container = $this->container->addRules($addonLoader->getActiveAddonConfig('dependencies'));
+	}
+
+	private function setupLegacyServiceLocator(): void
+	{
+		\Friendica\DI::init($this->container);
+	}
+
+	private function registerErrorHandler(): void
+	{
+		\Friendica\Core\Logger\Handler\ErrorHandler::register($this->container->create(LoggerInterface::class));
 	}
 
 	/**

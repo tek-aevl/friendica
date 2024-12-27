@@ -24,11 +24,13 @@ use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Friendica\Protocol\ActivityPub;
+use Friendica\Protocol\ATProtocol;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
+use GuzzleHttp\Psr7\Uri;
 
 /**
  * Class Media
@@ -237,7 +239,7 @@ class Media
 			$media = self::addAccount($media);
 		}
 
-		if (in_array($media['type'], [self::ACTIVITY, self::LD, self::JSON])) {
+		if (in_array($media['type'], [self::ACTIVITY, self::LD, self::JSON]) || self::isFederatedServer($media['url'])) {
 			$media = self::addActivity($media);
 		}
 
@@ -246,6 +248,20 @@ class Media
 		}
 
 		return $media;
+	}
+
+	private static function isFederatedServer(string $url): bool
+	{
+		$baseurl = Network::getBaseUrl(new Uri($url));
+		if (empty($baseurl)) {
+			return false;
+		}
+
+		if (Strings::compareLink($baseurl, ATProtocol::WEB)) {
+			return true;
+		}
+
+		return DBA::exists('gserver', ['nurl' => Strings::normaliseLink($baseurl), 'network' => Protocol::FEDERATED]);
 	}
 
 	private static function addPreviewData(array $media): array

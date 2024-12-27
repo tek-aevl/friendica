@@ -604,7 +604,7 @@ Hook data:
 
 ### follow
 
-Called before adding a new contact for a user to handle non-native network remote contact (like Twitter).
+Called before adding a new contact for a user to handle non-native network remote contact (like Bluesky).
 
 Hook data:
 
@@ -613,7 +613,7 @@ Hook data:
 
 ### unfollow
 
-Called when unfollowing a remote contact on a non-native network (like Twitter)
+Called when unfollowing a remote contact on a non-native network (like Bluesky)
 
 Hook data:
 - **contact** (input): the target public contact (uid = 0) array.
@@ -622,7 +622,7 @@ Hook data:
 
 ### revoke_follow
 
-Called when making a remote contact on a non-native network (like Twitter) unfollow you.
+Called when making a remote contact on a non-native network (like Bluesky) unfollow you.
 
 Hook data:
 - **contact** (input): the target public contact (uid = 0) array.
@@ -631,7 +631,7 @@ Hook data:
 
 ### block
 
-Called when blocking a remote contact on a non-native network (like Twitter).
+Called when blocking a remote contact on a non-native network (like Bluesky).
 
 Hook data:
 - **contact** (input): the remote contact (uid = 0) array.
@@ -640,7 +640,7 @@ Hook data:
 
 ### unblock
 
-Called when unblocking a remote contact on a non-native network (like Twitter).
+Called when unblocking a remote contact on a non-native network (like Bluesky).
 
 Hook data:
 - **contact** (input): the remote contact (uid = 0) array.

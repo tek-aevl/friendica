@@ -1,89 +1,34 @@
-Installing Connectors (Twitter/GNU Social)
+Installing Connectors
 ==================================================
 
 * [Home](help)
 
+Friendica uses add-ons to connect to some networks, such as Tumblr or Bluesky.
 
-Friendica uses addons to provide connectivity to some networks, such as Twitter.
+All of these add-ons require an account on the target network.
+In addition, you (or usually the server administrator) will need to obtain an API key to allow authenticated access to your Friendica server.
 
-There is also a addon to post through to an existing account on a GNU Social service.
-You only need this to post to an already existing GNU Social account, but not to communicate with GNU Social members in general.
-
-All three addons require an account on the target network.
-In addition you (or typically the server administrator) will need to obtain an API key to provide authenticated access to your Friendica server.
-
-Site Configuration
+Site configuration
 ---
 
-Addons must be installed by the site administrator before they can be used.
-This is accomplished through the site administration panel.
+Addons need to be installed by the site administrator before they can be used.
+This is done through the site administration panel.
 
-Each of the connectors also requires an "API key" from the service you wish to connect with.
-Some addons allow you to enter this information in the site administration pages, while others may require you to edit your configuration file (config/local.config.php).
-The ways to obtain these keys vary between the services, but they all require an existing account on the target service.
-Once installed, these API keys can usually be shared by all site members.
+Some of the connectors also require an "API key" from the service you wish to connect to.
+For Tumblr, this information can be found in the site administration pages, while for Twitter (X) each user has to create their own API key.
+Other connectors, such as Bluesky, don't require an API key at all.
 
-The details of configuring each service follow (much of this information comes directly from the addon source files):
+You can find more information about specific requirements on each addon's settings page, either on the admin page or the user page.
 
-Twitter Addon for Friendica
+Bluesky Jetstream
 ---
 
-* Author: Tobias Diekershoff
-* tobias.diekershoff@gmx.net
-* License: 3-clause BSD license
+To further improve connectivity to Bluesky, Admins can choose to enable 'Jetstream' connectivity.
+Jetstream is a service that connects to the Bluesky firehose.
+With Jetstream, messages arrive in real time rather than having to be polled.
+It also enables real-time processing of blocks or tracking activities performed by the user via the Bluesky website or application.
 
-### Configuration
-To use this addon you need a OAuth Consumer key pair (key & secret).
-You can get it from [Twitter](https://twitter.com/apps).
+To enable Jetstream processing, run `bin/jetstream.php' from the command line.
+You will need to define the process id file in local.config.php in the 'jetstream' section using the key 'pidfile'.
 
-Register your Friendica site as "Client" application with "Read & Write" access.
-We do not need "Twitter as login".
-When you've registered the app you get a key pair with an OAuth Consumer key and a secret key for your application/site.
-Add this key pair to your config/local.config.php:
-
-	[twitter]
-	consumerkey = your consumer_key here
-	consumersecret = your consumer_secret here
-
-After this, your users can configure their Twitter account settings from "Settings -> Connector Settings".
-
-### More documentation
-
-Find the author's documentation here: [http://diekershoff.homeunix.net/redmine/wiki/friendikaplugin/Twitter_Plugin](http://diekershoff.homeunix.net/redmine/wiki/friendikaplugin/Twitter_Plugin)
-
-
-GNU Social Addon for Friendica
----
-
-* Author: Tobias Diekershoff
-* tobias.diekershoff@gmx.net
-* License: 3-clause BSD license
-
-### Configuration
-
-When the addon is activated the user has to acquire the following in order to connect to the GNU Social account of choice.
-
-* The base URL for the GNU Social API, for quitter.se this is https://quitter.se/api/
-* OAuth Consumer key & secret
-
-To get the OAuth Consumer key pair the user has to
-
-1 ask her Friendica admin if a pair already exists or
-2 has to register the Friendica server as a client application on the GNU Social server.
-
-This can be done from the account settings under "Settings -> Connections -> Register an OAuth client application -> Register a new application" on the GNU Social server.
-
-During the registration of the OAuth client remember the following:
-
-* Application names must be unique on the GNU Social site, so we recommend a Name of 'friendica-nnnn', replace 'nnnn' with a random number or your website name.
-* there is no callback url
-* register a desktop client
-* with read & write access
-* the Source URL should be the URL of your Friendica server
-
-After the required credentials for the application are stored in the configuration you have to actually connect your Friendica account with GNU Social.
-This is done from the Settings -> Connector Settings page.
-Follow the Sign in with GNU Social button, allow access and then copy the security code into the box provided.
-Friendica will then try to acquire the final OAuth credentials from the API.
-
-If successful, the addon settings will allow you to select to post your public messages to your GNU Social account (have a look behind the little lock symbol beneath the status "editor" on your Home or Network pages).
+To keep track of the messages processed and the drift (the time difference between the date of the message and the date the system processed that message), some fields are added to the statistics endpoint.

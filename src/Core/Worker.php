@@ -558,15 +558,17 @@ class Worker
 		if ($method_call) {
 			try {
 				call_user_func_array(sprintf('Friendica\Worker\%s::execute', $funcname), $argv);
-			} catch (\TypeError $e) {
-				// No need to defer a worker queue entry if the arguments are invalid
-				Logger::notice('Wrong worker arguments', ['class' => $funcname, 'argv' => $argv, 'queue' => $queue, 'message' => $e->getMessage()]);
 			} catch (\Throwable $e) {
-				Logger::error('Uncaught exception in worker execution', ['class' => get_class($e), 'message' => $e->getMessage(), 'code' => $e->getCode(), 'file' => $e->getFile() . ':' . $e->getLine(), 'trace' => $e->getTraceAsString(), 'previous' => $e->getPrevious()]);
+				Logger::error('Uncaught exception in worker method execution', ['class' => get_class($e), 'message' => $e->getMessage(), 'code' => $e->getCode(), 'file' => $e->getFile() . ':' . $e->getLine(), 'trace' => $e->getTraceAsString(), 'previous' => $e->getPrevious()]);
 				Worker::defer();
 			}
 		} else {
-			$funcname($argv, count($argv));
+			try {
+				$funcname($argv, count($argv));
+			} catch (\Throwable $e) {
+				Logger::error('Uncaught exception in worker execution', ['message' => $e->getMessage(), 'code' => $e->getCode(), 'file' => $e->getFile() . ':' . $e->getLine(), 'trace' => $e->getTraceAsString(), 'previous' => $e->getPrevious()]);
+				Worker::defer();
+			}
 		}
 
 		Logger::disableWorker();

@@ -127,7 +127,6 @@ class JsonLD
 				$messages[] = $currentException->getMessage();
 			} while ($currentException = $currentException->getPrevious());
 
-			Logger::warning('JsonLD normalize error');
 			Logger::notice('JsonLD normalize error', ['messages' => $messages]);
 			Logger::info('JsonLD normalize error', ['trace' => $e->getTraceAsString()]);
 			Logger::debug('JsonLD normalize error', ['jsonobj' => $jsonobj]);

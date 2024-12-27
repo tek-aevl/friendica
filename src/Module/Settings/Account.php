@@ -9,7 +9,6 @@ namespace Friendica\Module\Settings;
 
 use Exception;
 use Friendica\Core\ACL;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Core\Worker;
@@ -25,7 +24,6 @@ use Friendica\Module\BaseSettings;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Delivery;
-use Friendica\Util\Network;
 use Friendica\Util\Temporal;
 
 class Account extends BaseSettings
@@ -322,42 +320,6 @@ class Account extends BaseSettings
 			DI::baseUrl()->redirect($redirectUrl);
 		}
 
-		// Import Contacts from CSV file
-		if (!empty($request['importcontact-submit'])) {
-			if (isset($_FILES['importcontact-filename'])) {
-				// was there an error
-				if ($_FILES['importcontact-filename']['error'] > 0) {
-					Logger::notice('Contact CSV file upload error', ['error' => $_FILES['importcontact-filename']['error']]);
-					DI::sysmsg()->addNotice(DI::l10n()->t('Contact CSV file upload error'));
-				} else {
-					$csvArray = array_map('str_getcsv', file($_FILES['importcontact-filename']['tmp_name']));
-					Logger::notice('Import started', ['lines' => count($csvArray)]);
-					// import contacts
-					foreach ($csvArray as $csvRow) {
-						// The 1st row may, or may not contain the headers of the table
-						// We expect the 1st field of the row to contain either the URL
-						// or the handle of the account, therefore we check for either
-						// "http" or "@" to be present in the string.
-						// All other fields from the row will be ignored
-						if ((strpos($csvRow[0], '@') !== false) || Network::isValidHttpUrl($csvRow[0])) {
-							Worker::add(Worker::PRIORITY_MEDIUM, 'AddContact', DI::userSession()->getLocalUserId(), trim($csvRow[0], '@'));
-						} else {
-							Logger::notice('Invalid account', ['url' => $csvRow[0]]);
-						}
-					}
-					Logger::notice('Import done');
-
-					DI::sysmsg()->addInfo(DI::l10n()->t('Importing Contacts done'));
-					// delete temp file
-					unlink($_FILES['importcontact-filename']['tmp_name']);
-				}
-			} else {
-				Logger::notice('Import triggered, but no import file was found.');
-			}
-
-			DI::baseUrl()->redirect($redirectUrl);
-		}
-
 		if (!empty($request['relocate-submit'])) {
 			Worker::add(Worker::PRIORITY_HIGH, 'Notifier', Delivery::RELOCATION, DI::userSession()->getLocalUserId());
 			DI::sysmsg()->addInfo(DI::l10n()->t("Relocate message has been send to your contacts"));
@@ -632,11 +594,6 @@ class Account extends BaseSettings
 			'$h_advn'     => DI::l10n()->t('Advanced Account/Page Type Settings'),
 			'$h_descadvn' => DI::l10n()->t('Change the behaviour of this account for special situations'),
 			'$pagetype'   => $pagetype,
-
-			'$importcontact'         => DI::l10n()->t('Import Contacts'),
-			'$importcontact_text'    => DI::l10n()->t('Upload a CSV file that contains the handle of your followed accounts in the first column you exported from the old account.'),
-			'$importcontact_button'  => DI::l10n()->t('Upload File'),
-			'$importcontact_maxsize' => DI::config()->get('system', 'max_csv_file_size', 30720),
 
 			'$relocate'        => DI::l10n()->t('Relocate'),
 			'$relocate_text'   => DI::l10n()->t("If you have moved this profile from another server, and some of your contacts don't receive your updates, try pushing this button."),

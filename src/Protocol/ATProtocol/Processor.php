@@ -1,5 +1,5 @@
-#!/usr/bin/env php
 <?php
+
 /**
  * Copyright (C) 2010-2024, the Friendica project
  * SPDX-FileCopyrightText: 2010-2024 the Friendica project
@@ -178,7 +178,7 @@ class Processor
 			if ($id) {
 				$this->logger->info('Post inserted', ['id' => $id, 'guid' => $item['guid']]);
 			} elseif (Post::exists(['uid' => $uid, 'uri-id' => $item['uri-id']])) {
-				$this->logger->warning('Post was found', ['guid' => $item['guid'], 'uri' => $item['uri']]);
+				$this->logger->notice('Post was found', ['guid' => $item['guid'], 'uri' => $item['uri']]);
 			} else {
 				$this->logger->warning('Post was not inserted', ['guid' => $item['guid'], 'uri' => $item['uri']]);
 			}
@@ -208,7 +208,7 @@ class Processor
 			if ($id) {
 				$this->logger->info('Repost inserted', ['id' => $id]);
 			} elseif (Post::exists(['uid' => $uid, 'uri-id' => $item['uri-id']])) {
-				$this->logger->warning('Repost was found', ['uri' => $item['uri']]);
+				$this->logger->notice('Repost was found', ['uri' => $item['uri']]);
 			} else {
 				$this->logger->warning('Repost was not inserted', ['uri' => $item['uri']]);
 			}
@@ -237,7 +237,7 @@ class Processor
 			if ($id) {
 				$this->logger->info('Like inserted', ['id' => $id]);
 			} elseif (Post::exists(['uid' => $uid, 'uri-id' => $item['uri-id']])) {
-				$this->logger->warning('Like was found', ['uri' => $item['uri']]);
+				$this->logger->notice('Like was found', ['uri' => $item['uri']]);
 			} else {
 				$this->logger->warning('Like was not inserted', ['uri' => $item['uri']]);
 			}
@@ -317,7 +317,7 @@ class Processor
 		if ($id) {
 			$this->logger->info('Fetched post inserted', ['id' => $id, 'guid' => $item['guid']]);
 		} elseif (Post::exists(['uid' => $uid, 'uri-id' => $item['uri-id']])) {
-			$this->logger->warning('Fetched post was found', ['guid' => $item['guid'], 'uri' => $item['uri']]);
+			$this->logger->notice('Fetched post was found', ['guid' => $item['guid'], 'uri' => $item['uri']]);
 		} else {
 			$this->logger->warning('Fetched post was not inserted', ['guid' => $item['guid'], 'uri' => $item['uri']]);
 		}

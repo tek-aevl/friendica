@@ -39,8 +39,6 @@
 					{{include file="field_checkbox.tpl" field=$api_auto_attach}}
 
 					{{include file="field_select.tpl" field=$article_mode}}
-
-					{{include file="field_input.tpl" field=$legacy_contact}}					
 				</div>
 				<div class="panel-footer">
 					<button type="submit" id="general-submit" name="general-submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>

@@ -246,28 +246,6 @@
 				</div>
 			</form>
 
-			{{* Import contacts CSV *}}
-			<form action="settings/account/importcontact" method="post" autocomplete="off" class="panel" enctype="multipart/form-data">
-				<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="importcontact-settings">
-					<h2>
-						<button class="btn-link accordion-toggle{{if $open !== 'importcontact'}} collapsed{{/if}}" data-toggle="collapse" data-parent="#settings" href="#importcontact-settings-collapse" aria-expanded="false" aria-controls="importcontact-settings-collapse">
-							{{$importcontact}}
-						</button>
-					</h2>
-				</div>
-				<div id="importcontact-settings-collapse" class="panel-collapse collapse{{if $open == 'importcontact'}} in{{/if}}" role="tabpanel" aria-labelledby="importcontact-settings">
-					<div class="panel-body">
-						<div id="importcontact-relocate-desc">{{$importcontact_text}}</div>
-						<input type="hidden" name="MAX_FILE_SIZE" value="{{$importcontact_maxsize}}" />
-						<input type="file" name="importcontact-filename" />
-					</div>
-					<div class="panel-footer">
-						<button type="submit" name="importcontact-submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
-					</div>
-				</div>
-			</form>
-
 			{{* The relocate setting section *}}
 			<form action="settings/account/relocate" method="post" autocomplete="off" class="panel">
 				<input type="hidden" name="form_security_token" value="{{$form_security_token}}">

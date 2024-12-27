@@ -18,15 +18,7 @@ require __DIR__ . '/vendor/autoload.php';
 $request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
 
 $dice = (new Dice())->addRules(include __DIR__ . '/static/dependencies.config.php');
-/** @var \Friendica\Core\Addon\Capability\ICanLoadAddons $addonLoader */
-$addonLoader = $dice->create(\Friendica\Core\Addon\Capability\ICanLoadAddons::class);
-$dice = $dice->addRules($addonLoader->getActiveAddonConfig('dependencies'));
-$dice = $dice->addRule(Friendica\App\Mode::class, ['call' => [['determineRunMode', [false, $request->getServerParams()], Dice::CHAIN_CALL]]]);
 
-\Friendica\DI::init($dice);
+$app = \Friendica\App::fromDice($dice);
 
-\Friendica\Core\Logger\Handler\ErrorHandler::register($dice->create(\Psr\Log\LoggerInterface::class));
-
-$a = \Friendica\App::fromDice($dice);
-
-$a->processRequest($request, $start_time);
+$app->processRequest($request, $start_time);

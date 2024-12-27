@@ -4,15 +4,10 @@ Konnektoren (Connectors)
 * [Zur Startseite der Hilfe](help)
 
 Konnektoren erlauben es Dir, Dich mit anderen sozialen Netzwerken zu verbinden. 
-Konnektoren werden nur bei bestehenden Twitter und GNU Social-Accounts benötigt. 
+Mit diesen Konnektoren kannst Du z.B. zu Bluesky, Tumblr oder Twitter posten.
+Für Bluesky und Tumblr gibt es eine bidirektionale Verbindung, d.h. du kannst Friendica nutzen, um deine Timeline von diesen Diensten zu lesen.  
 Außerdem gibt es einen Konnektor, um Deinen Email-Posteingang zu nutzen.
-Wenn Du keinen eigenen Knoten betreibst und wissen willst, ob der server Deiner Wahl diese Konnektoren installiert hat, kannst Du Dich darüber auf der Seite '&lt;domain_des_friendica-servers&gt;/friendica' informieren.
-
-Sind die Netzwerk-Konnektoren auf Deinem System installiert sind, kannst Du mit den folgenden Links die Einstellungsseiten besuchen und für Deinen Account konfigurieren:
-
-* [Twitter](/settings/connectors)
-* [GNU Social](/settings/connectors)
-* [Email](/settings/connectors)
+Wenn Du keinen eigenen Knoten betreibst und wissen willst, ob der Server Deiner Wahl diese Konnektoren installiert hat, kannst Du Dich darüber auf der Seite '&lt;domain_des_friendica-servers&gt;/friendica' informieren.
 
 Anleitung, um sich mit Personen in bestimmten Netzwerken zu verbinden
 ==========================================================
@@ -34,14 +29,6 @@ Du hast keine Möglichkeit, diesen Kontakten zu antworten.
 
 Das erlaubt Dir, Dich mit Millionen von Seiten im Internet zu _verbinden_. 
 Alles, was dafür nötig ist, ist dass die Seite einen Feed im RSS- oder Atom Syndication-Format nutzt und welches einen Autoren und ein Bild zur Seite liefert. 
-
-
-**Twitter**
-
-Um einem Twitter-Nutzer zu folgen, trage die URL der Hauptseite des Twitter-Accounts auf Deiner ["Kontakte"-Seite](contacts) in das Feld "Neuen Kontakt hinzufügen" ein. 
-Um zu antworten, musst Du den Twitter-Konnektor installieren und über Deinen eigenen Status-Editor antworten. 
-Beginne Deine Nachricht mit @twitternutzer, ersetze das aber durch den richtigen Twitter-Namen.
-
 
 **Email**
 

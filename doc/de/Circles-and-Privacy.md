@@ -97,13 +97,6 @@ Wir nehmen hingegen Privatsphäre ernst und agieren nicht wie andere Netzwerke, 
 Dein Profil und deine "Wall" sollen vielleicht auch von Freunden anderer Netzwerke besucht werden können.
 Wenn du diese Seiten allerdings für Webbesucher sperrst, die Friendica nicht kennt, kann das auch Freunde anderer Netzwerke blockieren.
 
-Das kann möglicherweise ungewollte Ergebnisse produzieren, wenn du lange Statusbeiträge z.B. für Twitter oder Facebook schreibst.
-Wenn Friendica einen Beitrag an diese Netzwerke schickt und nur eine bestimmte Nachrichtenlänge erlaubt ist, dann verkürzen wir diesen und erstellen einen Link, der zum Originalbeitrag führt.
-Der Originallink führt zurück zu deinem Friendica-Profil.
-Da Friendica nicht bestätigen kann, um wen es sich handelt, kann es passieren, dass diese Leute den Beitrag nicht komplett lesen können.
-
-Für Leute, die davon betroffen sind, schlagen wir vor, eine Zusammenfassung in Twitter-Länge zu erstellen mit mehr Details für Freunde, die den ganzen Beitrag sehen können.
-
 Dein Profil oder deine gesamte Friendica-Seite zu blockieren, hat außerdem ernsthafte Einflüsse auf deine Kommunikation mit GNU Social-Nutzern.
 Diese Netzwerke kommunizieren mit anderen über öffentliche Protokolle, die nicht authentifiziert werden.
 Um deine Beiträge zu sehen, müssen diese Netzwerke deine Beiträge als "unbekannte Webbesucher" ansehen.

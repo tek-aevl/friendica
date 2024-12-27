@@ -152,6 +152,13 @@ class BaseSettings extends BaseModule
 		];
 
 		$tabs[] = [
+			'label'     => $this->t('Import Contacts'),
+			'url'       => 'settings/importcontacts',
+			'selected'  => static::class == Settings\UserExport::class ? 'active' : '',
+			'accesskey' => '',
+		];
+
+		$tabs[] = [
 			'label'     => $this->t('Export personal data'),
 			'url'       => 'settings/userexport',
 			'selected'  => static::class == Settings\UserExport::class ? 'active' : '',

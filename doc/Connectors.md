@@ -4,14 +4,9 @@ Connectors
 * [Home](help)
 
 Connectors allow you to connect with external social networks and services.
-They are only required for posting to existing accounts on Twitter or GNU Social.
+They are only required for posting to existing accounts on for example Bluesky, Tumblr or Twitter.
+For Bluesky and Tumblr you can also enable a bidirectional synchronisation, so that you can use Friendica to read your timeline from Tumblr or Bluesky.
 There is also a connector for accessing your email INBOX.
-
-If the following network connectors are installed on your system, select the following links to visit the appropriate settings page and configure them for your account:
-
-* [Twitter](/settings/addons)
-* [GNU Social](/settings/addons)
-* [Email](/settings)
 
 Instructions For Connecting To People On Specific Services
 ==========================================================
@@ -36,14 +31,6 @@ PLease note that you will not be able to reply to these contacts.
 
 This feed reader feature will allow you to _connect_ with millions of pages on the internet.
 All that the pages need to have is a discoverable feed using either the RSS or Atom syndication format, and which provides an author name and a site image in a form which we can extract. 
-
-Twitter
----
-
-To follow a Twitter member, the Twitter-Connector (Addon) needs to be configured on your node.
-If this is the case put the URL of the Twitter member's main page into the Connect box on your [Contacts](contacts) page.
-To reply, you must have the Twitter connector installed, and reply using your own status editor.
-Begin the message with @twitterperson replacing with the Twitter username.
 
 Email
 ---

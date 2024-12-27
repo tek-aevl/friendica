@@ -1,5 +1,5 @@
-#!/usr/bin/env php
 <?php
+
 /**
  * Copyright (C) 2010-2024, the Friendica project
  * SPDX-FileCopyrightText: 2010-2024 the Friendica project

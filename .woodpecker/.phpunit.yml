@@ -94,9 +94,9 @@ steps:
         - friendica/friendica
     commands:
       - codecov -R '.' -Z -f 'clover.xml'
-    secrets:
-      - source: codecov-token
-        target: codecov_token
+    environment:
+      CODECOV_TOKEN:
+        from_secret: codecov-token
 
 services:
   mariadb:

@@ -11,8 +11,7 @@ To export the list of accounts that you follow, go to the [Settings Export perso
 
 ## Import of followed Contacts
 
-To import contacts from a CSV file, go to the [Settings page](settings).
-At the bottom of the *account settings* page you'll find the *import contacts* section.
+To import contacts from a CSV file, go to the [import contacts](settings/importcontacts).
 Upload the CSV file there.
 
 ### Supported File Format

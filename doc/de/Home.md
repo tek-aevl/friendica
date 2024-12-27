@@ -32,7 +32,7 @@ Hilfe
 * [Update](help/Update) (EN)
 * [Konfigurationen & Admin-Panel](help/Settings)
 * [Addons](help/Addons)
-* [Konnektoren (Connectors) installieren (Twitter/GNU Social)](help/Installing-Connectors)
+* [Konnektoren (Connectors) installieren](help/Installing-Connectors)
 * [Installation eines ejabberd Servers (XMPP-Chat) mit synchronisierten Anmeldedaten](help/install-ejabberd) (EN)
 * [Betreibe deine Seite mit einem SSL-Zertifikat](help/SSL)
 * [Konfigurationswerte, die nur in der config/local.config.php gesetzt werden können](help/Config) (EN)

@@ -95,14 +95,6 @@ However we take privacy seriously and don't behave like some networks that __pre
 Your profile and "wall" may also be visited by your friends from other networks, and you can block access to these by web visitors that Friendica doesn't know.
 Be aware that this could include some of your friends on other networks.
 
-This may produce undesired results when posting a long status message to (for instance) Twitter.
-When Friendica sends a post to these networks which exceeds the service length limit, we truncate it and provide a link to the original.
-The original is a link back to your Friendica profile.
-As Friendica cannot prove who they are, it may not be possible for these people to view your post in full.
-
-For people in this situation we would recommend providing a "Twitter-length" summary, with more detail for friends that can see the post in full.
-You can do so by including the BBCode tag *abstract* in your posting.
-
 Blocking your profile or entire Friendica site from unknown web visitors also has serious implications for communicating with GNU Social members.
 These networks communicate with others via public protocols that are not authenticated.
 In order to view your posts, these networks have to access them as an "unknown web visitor".

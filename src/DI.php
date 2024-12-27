@@ -14,6 +14,7 @@ use Friendica\Core\Session\Capability\IHandleSessions;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Protocol\ATProtocol;
+use Friendica\Util\BasePath;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -70,16 +71,6 @@ abstract class DI
 	//
 	// common instances
 	//
-
-	/**
-	 * @deprecated 2024.12 use DI::appHelper() instead
-	 *
-	 * @return App
-	 */
-	public static function app()
-	{
-		return self::$dice->create(App::class);
-	}
 
 	public static function appHelper(): AppHelper
 	{
@@ -756,7 +747,10 @@ abstract class DI
 	 */
 	public static function basePath()
 	{
-		return self::$dice->create('$basepath');
+		/** @var BasePath */
+		$basePath = self::$dice->create(BasePath::class);
+
+		return $basePath->getPath();
 	}
 
 	/**

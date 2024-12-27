@@ -1,85 +1,33 @@
-Konnektoren installieren (Twitter/GNU Social)
+Konnektoren installieren
 ==================================================
 
 * [Zur Startseite der Hilfe](help)
 
-Friendica nutzt Erweiterung, um die Verbindung zu anderen Netzwerken wie Twitter oder App.net zu gewährleisten.
+Friendica verwendet Konnektoren, um sich mit einigen Netzwerken zu verbinden, wie Tumblr oder Bluesky.
 
-Es gibt außerdem ein Erweiterung, um über einen bestehenden GNU Social-Account diesen Service zu nutzen.
-Du brauchst dieses Erweiterung aber nicht, um mit GNU Social-Mitgliedern von Friendica aus zu kommunizieren - es sei denn, du wünschst es, über einen existierenden Account einen Beitrag zu schreiben.
-
-Alle drei Erweiterung benötigen einen Account im gewünschten Netzwerk.
-Zusätzlich musst du (bzw. der Administrator der Seite) einen API-Schlüssel holen, um einen authentifizierten Zugriff zu deinem Friendica-Server herstellen zu lassen.
-
+Alle diese Konnektoren erfordern einen Account im Zielnetzwerk.
+Außerdem musst du (oder die Server-Administration) in der Regel einen API-Schlüssel erhalten, um die Verbindung zu ermöglichen.
 
 **Seitenkonfiguration**
 
-Erweiterung müssen vom Administrator installiert werden, bevor sie genutzt werden können.
-Dieses kann über das Administrationsmenü erstellt werden.
+Konnektoren müssen von der Server-Administration installiert werden, bevor sie verwendet werden können.
+Dies geschieht über die Server-Verwaltung.
 
-Jeder der Konnektoren benötigt zudem einen API-Schlüssel vom Service, der verbunden werden soll.
-Einige Erweiterung erlaube es, diese Informationen auf den Administrationsseiten einzustellen, wohingegen andere eine direkte Bearbeitung der Konfigurationsdatei "config/local.config.php" erfordern.
-Der Weg, um diese Schlüssel zu erhalten, variiert stark, jedoch brauchen fast alle einen bestehenden Account im gewünschten Service.
-Einmal installiert, können diese Schlüssel von allen Seitennutzern genutzt werden.
+Einige der Konnektoren erfordern auch einen „API-Schlüssel“ des Dienstes, mit dem du dich verbinden möchtest.
+Für Tumblr findet man diese Informationen auf den Seiten der Server-Verwaltung, während für Twitter (X) jede Person einen eigenen API-Schlüssel erstellen muss.
+Andere Konnektoren, wie Bluesky, benötigen überhaupt keinen API-Schlüssel.
 
-Im Folgenden findest du die Einstellungen für die verschiedenen Services (viele dieser Informationen kommen direkt aus den Quelldateien der Erweiterung):
+Weitere Informationen zu den spezifischen Anforderungen findest du auf der Einstellungsseite des jeweiligen Addons, entweder auf der Verwaltungsseite oder auf der Benutzerseite.
 
+Bluesky Jetstream
+---
 
-**Twitter Erweiterung für Friendica**
+Um die Konnektivität mit Bluesky weiter zu verbessern, kann die „Jetstream“-Konnektivität aktiviert werden.
+Jetstream ist ein Dienst, der sich mit dem Bluesky-Firehose verbindet.
+Mit Jetstream kommen die Nachrichten in Echtzeit an und müssen nicht erst abgefragt werden.
+Es ermöglicht auch die Echtzeitverarbeitung von Blöcken oder Tracking-Aktivitäten, die über die Bluesky-Website oder -Anwendung durchgeführt werden.
 
-* Author: Tobias Diekershoff
-* tobias.diekershoff@gmx.net
+Um die Jetstream-Verarbeitung zu aktivieren, führe `bin/jetstream.php' über die Befehlszeile aus.
+Du musst vorher die Prozess-ID-Datei in local.config.php im Abschnitt „jetstream“ mit dem Schlüssel „pidfile“ definieren.
 
-* License:3-clause BSD license
-
-Konfiguration:
-Um dieses Erweiterung zu nutzen, benötigst du einen OAuth Consumer-Schlüsselpaar (Schlüssel und Geheimnis), das du auf der Seite [https://twitter.com/apps](https://twitter.com/apps) erhalten kannst
-
-Registriere deine Friendica-Seite als "Client"-Anwendung mit "Read&Write"-Zugriff. Wir benötigen "Twitter als Login" nicht. Sobald du deine Anwendung installiert hast, erhältst du das Schlüsselpaar für deine Seite.
-
-Trage dieses Schlüsselpaar in deine globale "config/local.config.php"-Datei ein.
-
-```
-[twitter]
-consumerkey = your consumer_key here
-consumersecret = your consumer_secret here
-```
-
-Anschließend kann der Nutzer deiner Seite die Twitter-Einstellungen selbst eintragen: "Einstellungen -> Connector Einstellungen".
-
-
-**GNU Social Erweiterung für Friendica**
-
-* Author: Tobias Diekershoff
-* tobias.diekershoff@gmx.net
-
-* License:3-clause BSD license
-
-Konfiguration
-
-Wenn das Addon aktiv ist, muss der Nutzer die folgenden Einstellungen vornehmen, um sich mit dem GNU Social-Account seiner Wahl zu verbinden.
-
-* Die Basis-URL des GNU Social-API; für quitter.se ist es https://quitter.se/api/
-* OAuth Consumer key & Geheimnis
-
-Um das OAuth-Schlüsselpaar zu erhalten, muss der Nutzer
-
-(a) seinen Friendica-Admin fragen, ob bereits ein Schlüsselpaar existiert oder
-(b) einen Friendica-Server als Anwendung auf dem GNU Social-Server anmelden.
-
-Dies kann über Einstellungen --> Connections --> "Register an OAuth client application" -> "Register a new application" auf dem GNU Social-Server durchgeführt werden.
-
-Während der Registrierung des OAuth-Clients ist Folgendes zu beachten:
-
-* Der Anwendungsname muss auf der GNU Social-Seite einzigartig sein, daher empfehlen wir einen Namen wie "friendica-nnnn", ersetze dabei "nnnn" mit einer frei gewählten Nummer oder deinem Webseitennamen.
-* es gibt keine Callback-URL
-* Registriere einen Desktop-Client
-* stelle Lese- und Schreibrechte ein
-* die Quell-URL sollte die URL deines Friendica-Servers sein
-
-Sobald die benötigten Daten gespeichert sind, musst du deinen Friendica-Account mit GNU Social verbinden.
-Das kannst du über Einstellungen --> Connector-Einstellungen durchführen.
-Folge dem "Einloggen mit GNU Social"-Button, erlaube den Zugriff und kopiere den Sicherheitscode in die entsprechende Box.
-Friendica wird dann versuchen, die abschließende OAuth-Einstellungen über die API zu beziehen.
-
-Wenn es geklappt hat, kannst du in den Einstellungen festlegen, ob deine öffentlichen Nachrichten automatisch in deinem GNU Social-Account erscheinen soll (achte hierbei auf das kleine Schloss-Symbol im Status-Editor)
+Um die verarbeiteten Nachrichten und die Drift (die Zeitdifferenz zwischen dem Datum der Nachricht und dem Datum, an dem das System diese Nachricht verarbeitet hat) zu verfolgen, wurden dem Statistik-Endpunkt einige Felder hinzugefügt.

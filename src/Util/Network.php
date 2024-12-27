@@ -682,4 +682,19 @@ class Network
 
 		return (string)Uri::fromParts($parts);
 	}
+
+	/**
+	 * Get base url without a path, fragment or query
+	 *
+	 * @param UriInterface $uri
+	 * @return string baseurl
+	 */
+	public static function getBaseUrl(UriInterface $uri): string
+	{
+		return $uri
+			->withUserInfo('')
+			->withQuery('')
+			->withFragment('')
+			->withPath('');
+	}
 }

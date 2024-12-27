@@ -622,6 +622,7 @@ return [
 		'/delegation[/{action}/{user_id}]' => [Module\Settings\Delegation::class,       [R::GET, R::POST]],
 		'/display'                         => [Module\Settings\Display::class,          [R::GET, R::POST]],
 		'/features'                        => [Module\Settings\Features::class,         [R::GET, R::POST]],
+		'/importcontacts'                  => [Module\Settings\ContactImport::class,    [R::GET, R::POST]],
 		'/oauth'                           => [Module\Settings\OAuth::class,            [R::GET, R::POST]],
 		'/profile' => [
 			'[/]'                  => [Module\Settings\Profile\Index::class,       [R::GET, R::POST]],

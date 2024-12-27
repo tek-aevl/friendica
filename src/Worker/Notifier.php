@@ -453,6 +453,10 @@ class Notifier
 			}
 
 			$cdata = Contact::getPublicAndUserContactID($contact['id'], $sender_uid);
+			if (empty($cdata)) {
+				Logger::info('No contact entry found', ['id' => $contact['id'], 'uid' => $sender_uid]);
+				continue;
+			}
 			if (in_array($cdata['public'] ?: $contact['id'], $ap_contacts)) {
 				Logger::info('The public contact is already delivered via AP, so skip delivery via legacy DFRN/Diaspora', ['batch' => $in_batch, 'target' => $post_uriid, 'uid' => $sender_uid, 'contact' => $contact['url']]);
 				continue;
@@ -639,8 +643,8 @@ class Notifier
 	private static function activityPubDelivery($cmd, array $target_item, array $parent, array $thr_parent, int $priority, string $created, array $recipients): array
 	{
 		// Don't deliver via AP when the starting post isn't from a federated network
-		if (!in_array($parent['network'], Protocol::FEDERATED)) {
-			Logger::info('Parent network is no federated network, so no AP delivery', ['network' => $parent['network']]);
+		if (!in_array($parent['network'] ?? '', Protocol::FEDERATED)) {
+			Logger::info('Parent network is no federated network, so no AP delivery', ['network' => $parent['network'] ?? '']);
 			return ['count' => 0, 'contacts' => []];
 		}
 

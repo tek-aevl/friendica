@@ -11,8 +11,7 @@ Um die Liste der Kontakte *denen du folgst* zu exportieren, geht die [Einstellun
 
 ## Import der gefolgten Kontakte
 
-Um die Kontakt CSV Datei zu importieren, gehe in die [Einstellungen](settings).
-Am Ende der Einstellungen zum Nutzerkonto findest du den Abschnitt "Kontakte Importieren".
+Um die Kontakt CSV Datei zu importieren, gehe zu [Kontakte Importieren](settings/importcontacts).
 Hier kannst du die CSV Datei auswählen und hoch laden.
 
 ### Unterstütztes Datei Format

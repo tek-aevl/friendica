@@ -62,7 +62,6 @@ class Connectors extends BaseSettings
 			$this->pconfig->set($this->session->getLocalUserId(), 'system', 'api_spoiler_title', intval($request['api_spoiler_title']));
 			$this->pconfig->set($this->session->getLocalUserId(), 'system', 'api_auto_attach', intval($request['api_auto_attach']));
 			$this->pconfig->set($this->session->getLocalUserId(), 'system', 'article_mode', intval($request['article_mode']));
-			$this->pconfig->set($this->session->getLocalUserId(), 'ostatus', 'legacy_contact', $request['legacy_contact']);
 		} elseif (!empty($request['mail-submit']) && function_exists('imap_open') && !$this->config->get('system', 'imap_disabled')) {
 			$mail_server       =                 $request['mail_server'] ?? '';
 			$mail_port         =                 $request['mail_port'] ?? '';
@@ -127,11 +126,6 @@ class Connectors extends BaseSettings
 		$api_spoiler_title       =  intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'api_spoiler_title', true));
 		$api_auto_attach         =  intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'api_auto_attach', false));
 		$article_mode            =  intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'article_mode'));
-		$legacy_contact          =         $this->pconfig->get($this->session->getLocalUserId(), 'ostatus', 'legacy_contact');
-
-		if (!empty($legacy_contact)) {
-			$this->baseUrl->redirect('ostatus/subscribe?url=' . urlencode($legacy_contact));
-		}
 
 		$connector_settings_forms = [];
 		foreach ($this->database->selectToArray('hook', ['file', 'function'], ['hook' => 'connector_settings']) as $hook) {
@@ -215,7 +209,6 @@ class Connectors extends BaseSettings
 			'$api_spoiler_title'       => ['api_spoiler_title', $this->t('API: Use spoiler field as title'), $api_spoiler_title, $this->t('When activated, the "spoiler_text" field in the API will be used for the title on standalone posts. When deactivated it will be used for spoiler text. For comments it will always be used for spoiler text.')],
 			'$api_auto_attach'         => ['api_auto_attach', $this->t('API: Automatically links at the end of the post as attached posts'), $api_auto_attach, $this->t('When activated, added links at the end of the post react the same way as added links in the web interface.')],
 			'$article_mode'            => ['article_mode', $this->t('Article Mode'), $article_mode, $this->t("Controls how posts with titles are transmitted. Mastodon and its forks don't display the content of these posts if the post is created in the correct (default) way."), $article_modes],
-			'$legacy_contact'          => ['legacy_contact', $this->t('Your legacy ActivityPub/GNU Social account'), $legacy_contact, $this->t('If you enter your old account name from an ActivityPub based system or your GNU Social/Statusnet account name here (in the format user@domain.tld), your contacts will be added automatically. The field will be emptied when done.')],
 
 			'$connector_settings_forms' => $connector_settings_forms,
 
