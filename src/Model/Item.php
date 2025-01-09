@@ -843,14 +843,6 @@ class Item
 		return self::GRAVITY_UNKNOWN;   // Should not happen
 	}
 
-	private static function prepareOriginPost(array $item): array
-	{
-		$item = DI::contentItem()->initializePost($item);
-		$item = DI::contentItem()->finalizePost($item, false);
-
-		return $item;
-	}
-
 	/**
 	 * Inserts item record
 	 *
@@ -861,6 +853,8 @@ class Item
 	 */
 	public static function insert(array $item, int $notify = 0, bool $post_local = true): int
 	{
+		$itemInserter = new ItemInserter(DI::contentItem());
+
 		$orig_item = $item;
 
 		$priority = Worker::PRIORITY_HIGH;
@@ -869,7 +863,7 @@ class Item
 
 		// If it is a posting where users should get notifications, then define it as wall posting
 		if ($notify) {
-			$item = self::prepareOriginPost($item);
+			$item = $itemInserter->prepareOriginPost($item);
 
 			if (is_int($notify) && in_array($notify, Worker::PRIORITIES)) {
 				$priority = $notify;
