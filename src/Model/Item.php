@@ -1917,7 +1917,7 @@ class Item
 	 *
 	 * @param int $uriid
 	 * @param int $uid
-	 * @return int
+	 * @return int|null
 	 */
 	private static function GetOriginUidForUriId(int $uriid, int $uid)
 	{
