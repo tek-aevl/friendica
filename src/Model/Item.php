@@ -1345,10 +1345,10 @@ class Item
 
 		Logger::notice('created item', ['post-id' => $post_user_id, 'uid' => $item['uid'], 'network' => $item['network'], 'uri-id' => $item['uri-id'], 'guid' => $item['guid']]);
 
-		return self::handleCreatedItem($orig_item, $post_user_id, $uid, $notify, $copy_permissions, $parent_origin, $priority, $notify_type, $inserted);
+		return self::handleCreatedItem($orig_item, $post_user_id, $uid, $notify, $copy_permissions, $parent_origin, $priority, $notify_type, $inserted, $source);
 	}
 
-	private static function handleCreatedItem(array $orig_item, int $post_user_id, int $uid, int $notify, bool $copy_permissions, $parent_origin, int $priority, string $notify_type, bool $inserted): int
+	private static function handleCreatedItem(array $orig_item, int $post_user_id, int $uid, int $notify, bool $copy_permissions, $parent_origin, int $priority, string $notify_type, bool $inserted, $source): int
 	{
 		$posted_item = Post::selectFirst(self::ITEM_FIELDLIST, ['post-user-id' => $post_user_id]);
 		if (!DBA::isResult($posted_item)) {
@@ -4270,7 +4270,7 @@ class Item
 	/**
 	 * Fetch the uri-id of a quoted post by searching for data in the body or attached media
 	 *
-	 * @param string $body   The body of the 
+	 * @param string $body   The body of the
 	 * @param int    $uid    The id of the user
 	 * @return integer
 	 */
