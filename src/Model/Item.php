@@ -876,7 +876,7 @@ class Item
 			$item['network'] = trim(($item['network'] ?? '') ?: Protocol::PHANTOM);
 		}
 
-		$item = self::prepareItemData($item, (bool) $notify);
+		$item = $itemInserter->prepareItemData($item, (bool) $notify);
 
 		// Store conversation data
 		$source = $item['source'] ?? '';
@@ -1362,27 +1362,6 @@ class Item
 		}
 
 		return $post_user_id;
-	}
-
-	private static function prepareItemData(array $item, bool $notify): array
-	{
-		$item['guid'] = self::guid($item, $notify);
-		$item['uri'] = substr(trim($item['uri'] ?? '') ?: self::newURI($item['guid']), 0, 255);
-
-		// Store URI data
-		$item['uri-id'] = ItemURI::insert(['uri' => $item['uri'], 'guid' => $item['guid']]);
-
-		// Backward compatibility: parent-uri used to be the direct parent uri.
-		// If it is provided without a thr-parent, it probably is the old behavior.
-		if (empty($item['thr-parent']) || empty($item['parent-uri'])) {
-			$item['thr-parent'] = trim($item['thr-parent'] ?? $item['parent-uri'] ?? $item['uri']);
-			$item['parent-uri'] = $item['thr-parent'];
-		}
-
-		$item['thr-parent-id'] = ItemURI::getIdByURI($item['thr-parent']);
-		$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
-
-		return $item;
 	}
 
 	private static function validateItemData(array $item): array
