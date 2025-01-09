@@ -89,12 +89,6 @@ class Router
 	/** @var bool */
 	private $isLocalUser;
 
-	/** @var float */
-	private $dice_profiler_threshold;
-
-	/** @var Dice */
-	private $dice;
-
 	/** @var string */
 	private $baseRoutesFilepath;
 
@@ -113,11 +107,10 @@ class Router
 	 * @param IManageConfigValues $config
 	 * @param Arguments           $args
 	 * @param LoggerInterface     $logger
-	 * @param Dice                $dice
 	 * @param IHandleUserSessions $userSession
 	 * @param RouteCollector|null $routeCollector
 	 */
-	public function __construct(array $server, string $baseRoutesFilepath, L10n $l10n, ICanCache $cache, ICanLock $lock, IManageConfigValues $config, Arguments $args, LoggerInterface $logger, Dice $dice, IHandleUserSessions $userSession, RouteCollector $routeCollector = null)
+	public function __construct(array $server, string $baseRoutesFilepath, L10n $l10n, ICanCache $cache, ICanLock $lock, IManageConfigValues $config, Arguments $args, LoggerInterface $logger, IHandleUserSessions $userSession, RouteCollector $routeCollector = null)
 	{
 		$this->baseRoutesFilepath      = $baseRoutesFilepath;
 		$this->l10n                    = $l10n;
@@ -125,11 +118,9 @@ class Router
 		$this->lock                    = $lock;
 		$this->args                    = $args;
 		$this->config                  = $config;
-		$this->dice                    = $dice;
 		$this->server                  = $server;
 		$this->logger                  = $logger;
 		$this->isLocalUser             = !empty($userSession->getLocalUserId());
-		$this->dice_profiler_threshold = $config->get('system', 'dice_profiler_threshold', 0);
 
 		$this->routeCollector = $routeCollector ?? new RouteCollector(new Std(), new GroupCountBased());
 
@@ -328,23 +319,9 @@ class Router
 		}
 	}
 
-	public function getModule(?string $module_class = null): ICanHandleRequests
+	public function getParameters(): array
 	{
-		$moduleClass = $module_class ?? $this->getModuleClass();
-
-		$stamp = microtime(true);
-
-		/** @var ICanHandleRequests $module */
-		$module = $this->dice->create($moduleClass, $this->parameters);
-
-		if ($this->dice_profiler_threshold > 0) {
-			$dur = floatval(microtime(true) - $stamp);
-			if ($dur >= $this->dice_profiler_threshold) {
-				$this->logger->notice('Dice module creation lasts too long.', ['duration' => round($dur, 3), 'module' => $moduleClass, 'parameters' => $this->parameters]);
-			}
-		}
-
-		return $module;
+		return $this->parameters;
 	}
 
 	/**

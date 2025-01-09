@@ -36,7 +36,7 @@ class Markers extends BaseApi
 		}
 
 		$condition = ['application-id' => $application['id'], 'uid' => $uid, 'timeline' => $timeline];
-		$marker = DBA::selectFirst('application-marker', [], $condition);
+		$marker    = DBA::selectFirst('application-marker', [], $condition);
 		if (!empty($marker['version'])) {
 			$version = $marker['version'] + 1;
 		} else {
@@ -51,7 +51,7 @@ class Markers extends BaseApi
 	/**
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	protected function rawContent(array $request = [])
+	protected function get(array $request = [])
 	{
 		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid         = self::getCurrentUserID();
@@ -62,7 +62,7 @@ class Markers extends BaseApi
 
 	private function fetchTimelines(int $application_id, int $uid): \stdClass
 	{
-		$values = new \stdClass();
+		$values  = new \stdClass();
 		$markers = DBA::select('application-marker', [], ['application-id' => $application_id, 'uid' => $uid]);
 		while ($marker = DBA::fetch($markers)) {
 			$values->{$marker['timeline']} = [

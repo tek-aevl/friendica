@@ -14,20 +14,10 @@ if (php_sapi_name() !== 'cli') {
 }
 
 use Dice\Dice;
-use Friendica\Core\Logger\Capability\LogChannel;
-use Friendica\DI;
-use Psr\Log\LoggerInterface;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-$dice = (new Dice())->addRules(include __DIR__ . '/../static/dependencies.config.php');
-/** @var \Friendica\Core\Addon\Capability\ICanLoadAddons $addonLoader */
-$addonLoader = $dice->create(\Friendica\Core\Addon\Capability\ICanLoadAddons::class);
-$dice = $dice->addRules($addonLoader->getActiveAddonConfig('dependencies'));
-$dice = $dice->addRule(LoggerInterface::class, ['constructParams' => [LogChannel::CONSOLE]]);
+$dice = (new Dice())->addRules(require(dirname(__DIR__) . '/static/dependencies.config.php'));
 
-/// @fixme Necessary until Hooks inside the Logger can get loaded without the DI-class
-DI::init($dice);
-\Friendica\Core\Logger\Handler\ErrorHandler::register($dice->create(\Psr\Log\LoggerInterface::class));
-
-(new Friendica\Core\Console($dice, $argv))->execute();
+$container = \Friendica\Core\Container::fromDice($dice);
+\Friendica\Core\Console::create($container, $_SERVER['argv'] ?? [])->execute();

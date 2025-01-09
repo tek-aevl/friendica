@@ -219,7 +219,6 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			'constructParams' => [
 				$serverVars,
 				__DIR__ . '/routes.config.php',
-				[Dice::INSTANCE => Dice::SELF],
 				null
 			],
 		],

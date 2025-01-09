@@ -164,9 +164,10 @@ class System
 	 * Executes a child process with 'proc_open'
 	 *
 	 * @param string $command The command to execute
-	 * @param array  $args    Arguments to pass to the command ( [ 'key' => value, 'key2' => value2, ... ]
+	 * @param array  $args    Arguments to pass to the command ( ['arg1', 'arg2', ... ] )
+	 * @param array  $options Options to pass to the command ( [ 'key' => value, 'key2' => value2, ... ]
 	 */
-	public function run(string $command, array $args)
+	public function run(string $command, array $args = [], array $options = [])
 	{
 		if (!function_exists('proc_open')) {
 			$this->logger->warning('"proc_open" not available - quitting');
@@ -175,7 +176,11 @@ class System
 
 		$cmdline = $this->config->get('config', 'php_path', 'php') . ' ' . escapeshellarg($command);
 
-		foreach ($args as $key => $value) {
+		foreach ($args as $argumment) {
+			$cmdline .= ' ' . $argumment;
+		}
+
+		foreach ($options as $key => $value) {
 			if (!is_null($value) && is_bool($value) && !$value) {
 				continue;
 			}
@@ -225,7 +230,7 @@ class System
 		$trace = array_slice($trace, 2 + $offset);
 
 		$callstack = [];
-		$previous = ['class' => '', 'function' => '', 'database' => false];
+		$previous  = ['class' => '', 'function' => '', 'database' => false];
 
 		// The ignore list contains all functions that are only wrapper functions
 		$ignore = ['call_user_func_array'];
@@ -245,15 +250,15 @@ class System
 				// Don't show multiple calls from the Database classes to show the essential parts of the callstack
 				$func['database'] = in_array($func['class'], ['Friendica\Database\DBA', 'Friendica\Database\Database']);
 				if ($full || !$previous['database'] || !$func['database']) {
-					$classparts = explode("\\", $func['class']);
+					$classparts  = explode("\\", $func['class']);
 					$callstack[] = array_pop($classparts).'::'.$func['function'] . (isset($func['line']) ? ' (' . $func['line'] . ')' : '');
-					$previous = $func;
+					$previous    = $func;
 				}
 			} elseif (!in_array($func['function'], $ignore)) {
 				$func['database'] = ($func['function'] == 'q');
-				$callstack[] = $func['function'] . (isset($func['line']) ? ' (' . $func['line'] . ')' : '');
-				$func['class'] = '';
-				$previous = $func;
+				$callstack[]      = $func['function'] . (isset($func['line']) ? ' (' . $func['line'] . ')' : '');
+				$func['class']    = '';
+				$previous         = $func;
 			}
 		}
 
@@ -272,10 +277,13 @@ class System
 	 */
 	public static function echoResponse(ResponseInterface $response)
 	{
-		header(sprintf("HTTP/%s %s %s",
+		header(
+			sprintf(
+				"HTTP/%s %s %s",
 				$response->getProtocolVersion(),
 				$response->getStatusCode(),
-				$response->getReasonPhrase())
+				$response->getReasonPhrase()
+			)
 		);
 
 		foreach ($response->getHeaders() as $key => $header) {
@@ -696,7 +704,7 @@ class System
 
 		if (DI::config()->get('system', 'tosdisplay')) {
 			$rulelist = DI::config()->get('system', 'tosrules') ?: DI::config()->get('system', 'tostext');
-			$msg = BBCode::toPlaintext($rulelist, false);
+			$msg      = BBCode::toPlaintext($rulelist, false);
 			foreach (explode("\n", trim($msg)) as $line) {
 				$line = trim($line);
 				if ($line) {

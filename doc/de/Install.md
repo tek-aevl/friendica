@@ -210,13 +210,13 @@ Gehe in den Friendica-Hauptordner und führe den Kommandozeilen Befehl aus:
 Erstelle einen Cron job oder einen regelmäßigen Task, um den Poller alle 5-10 Minuten im Hintergrund ablaufen zu lassen.
 Beispiel:
 
-    cd /base/directory; /path/to/php bin/worker.php
+    cd /base/directory; /path/to/php bin/console.php worker
 
 Ändere "/base/directory" und "/path/to/php" auf deine Systemvorgaben.
 
 Wenn du einen Linux-Server nutzt, benutze den Befehl "crontab -e" und ergänze eine Zeile wie die Folgende; angepasst an dein System
 
-`*/10 * * * * cd /home/myname/mywebsite; /usr/bin/php bin/worker.php`
+`*/10 * * * * cd /home/myname/mywebsite; /usr/bin/php bin/console.php worker`
 
 Du kannst den PHP-Pfad finden, indem du den Befehl „which php“ ausführst.
 Wenn du Schwierigkeiten mit diesem Schritt hast, kannst du deinen Hosting-Anbieter kontaktieren.

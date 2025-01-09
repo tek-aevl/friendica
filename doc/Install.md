@@ -268,7 +268,7 @@ You might wish to delete/rename `config/local.config.php` to another name and dr
 Set up a cron job or scheduled task to run the worker once every 5-10 minutes in order to perform background processing.
 Example:
 
-    cd /base/directory; /path/to/php bin/worker.php
+    cd /base/directory; /path/to/php bin/console.php worker
 
 Change "/base/directory", and "/path/to/php" as appropriate for your situation.
 
@@ -277,7 +277,7 @@ Change "/base/directory", and "/path/to/php" as appropriate for your situation.
 If you are using a Linux server, run "crontab -e" and add a line like the
 one shown, substituting for your unique paths and settings:
 
-    */10 * * * * cd /home/myname/mywebsite; /usr/bin/php bin/worker.php
+    */10 * * * * cd /home/myname/mywebsite; /usr/bin/php bin/console.php worker
 
 You can generally find the location of PHP by executing "which php".
 If you run into trouble with this section please contact your hosting provider for assistance.
@@ -290,11 +290,11 @@ Once you have installed Friendica and created an admin account as part of the pr
 #### worker alternative: daemon
 Otherwise, you’ll need to use the command line on your remote server and start the Friendica daemon (background task) using the following command:
 
-    cd /path/to/friendica; php bin/daemon.php start
+    cd /path/to/friendica; php bin/console.php daemon start
 
 Once started, you can check the daemon status using the following command:
 
-    cd /path/to/friendica; php bin/daemon.php status
+    cd /path/to/friendica; php bin/console.php daemon status
 
 After a server restart or any other failure, the daemon needs to be restarted.
 This could be achieved by a cronjob.
@@ -426,7 +426,7 @@ provided by one of our members.
 >
 > 	*/10 * * * * cd /var/www/friendica/friendica/ && sudo -u www-data /usr/bin/php \
 >       -d suhosin.executor.func.blacklist=none \
->       -d suhosin.executor.eval.blacklist=none -f bin/worker.php
+>       -d suhosin.executor.eval.blacklist=none -f bin/console.php
 >
 > This worked well for simple test cases, but the friendica-cron still failed
 > with a fatal error:
@@ -435,7 +435,7 @@ provided by one of our members.
 >     (attacker 'REMOTE_ADDR not set', file '/var/www/friendica/friendica/boot.php',
 >     line 1341)
 >
-> After a while I noticed, that `bin/worker.php` calls further PHP script via `proc_open`.
+> After a while I noticed, that `bin/console.php worker` calls further PHP script via `proc_open`.
 > These scripts themselves also use `proc_open` and fail, because they are NOT
 > called with `-d suhosin.executor.func.blacklist=none`.
 >

@@ -28,7 +28,7 @@ Jetstream is a service that connects to the Bluesky firehose.
 With Jetstream, messages arrive in real time rather than having to be polled.
 It also enables real-time processing of blocks or tracking activities performed by the user via the Bluesky website or application.
 
-To enable Jetstream processing, run `bin/jetstream.php' from the command line.
+To enable Jetstream processing, run `bin/console.php jetstream' from the command line.
 You will need to define the process id file in local.config.php in the 'jetstream' section using the key 'pidfile'.
 
 To keep track of the messages processed and the drift (the time difference between the date of the message and the date the system processed that message), some fields are added to the statistics endpoint.

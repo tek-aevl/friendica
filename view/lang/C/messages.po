@@ -1,14 +1,14 @@
 # FRIENDICA Distributed Social Network
-# Copyright (C) 2010-2024, the Friendica project
+# Copyright (C) 2010-2025, the Friendica project
 # This file is distributed under the same license as the Friendica package.
 # Mike Macgirvin, 2010
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 2024.12-dev\n"
+"Project-Id-Version: 2025.02-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-23 10:09+0000\n"
+"POT-Creation-Date: 2025-01-04 20:55-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -646,7 +646,7 @@ msgstr ""
 msgid "Map"
 msgstr ""
 
-#: src/App.php:255
+#: src/App.php:394
 msgid "Apologies but the website is unavailable at the moment."
 msgstr ""
 
@@ -747,17 +747,17 @@ msgstr ""
 msgid "toggle mobile"
 msgstr ""
 
-#: src/App/Router.php:295
+#: src/App/Router.php:286
 #, php-format
 msgid "Method not allowed for this module. Allowed method(s): %s"
 msgstr ""
 
-#: src/App/Router.php:297 src/Module/HTTPException/PageNotFound.php:35
+#: src/App/Router.php:288 src/Module/HTTPException/PageNotFound.php:35
 #: src/Module/Stats.php:56
 msgid "Page not found."
 msgstr ""
 
-#: src/App/Router.php:309
+#: src/App/Router.php:300
 msgid "You must be logged in to use addons. "
 msgstr ""
 
@@ -765,15 +765,15 @@ msgstr ""
 msgid "No system theme config value set."
 msgstr ""
 
-#: src/BaseModule.php:393
+#: src/BaseModule.php:395
 msgid "The form security token was not correct. This probably happened because the form has been opened for too long (>3 hours) before submitting it."
 msgstr ""
 
-#: src/BaseModule.php:420
+#: src/BaseModule.php:422
 msgid "All contacts"
 msgstr ""
 
-#: src/BaseModule.php:425 src/Content/Conversation/Factory/Channel.php:32
+#: src/BaseModule.php:427 src/Content/Conversation/Factory/Channel.php:32
 #: src/Content/Widget.php:254 src/Core/ACL.php:182 src/Module/Contact.php:395
 #: src/Module/Privacy/PermissionTooltip.php:150
 #: src/Module/Privacy/PermissionTooltip.php:172
@@ -781,16 +781,16 @@ msgstr ""
 msgid "Followers"
 msgstr ""
 
-#: src/BaseModule.php:430 src/Content/Widget.php:255 src/Module/Contact.php:398
+#: src/BaseModule.php:432 src/Content/Widget.php:255 src/Module/Contact.php:398
 #: src/Module/Settings/Channels.php:145
 msgid "Following"
 msgstr ""
 
-#: src/BaseModule.php:435 src/Content/Widget.php:256 src/Module/Contact.php:401
+#: src/BaseModule.php:437 src/Content/Widget.php:256 src/Module/Contact.php:401
 msgid "Mutual friends"
 msgstr ""
 
-#: src/BaseModule.php:443
+#: src/BaseModule.php:445
 msgid "Common"
 msgstr ""
 
@@ -944,7 +944,7 @@ msgstr ""
 msgid "Enter user nickname: "
 msgstr ""
 
-#: src/Console/User.php:168 src/Model/User.php:830
+#: src/Console/User.php:168 src/Model/User.php:834
 #: src/Module/Api/Twitter/ContactEndpoint.php:62
 #: src/Module/Moderation/Users/Active.php:55
 #: src/Module/Moderation/Users/Active.php:61
@@ -1711,7 +1711,7 @@ msgstr ""
 
 #: src/Content/Feature.php:116 src/Content/GroupManager.php:133
 #: src/Content/Nav.php:264 src/Content/Text/HTML.php:868
-#: src/Content/Widget.php:555 src/Model/User.php:1390
+#: src/Content/Widget.php:555 src/Model/User.php:1394
 msgid "Groups"
 msgstr ""
 
@@ -1835,7 +1835,7 @@ msgstr ""
 msgid "Create new group"
 msgstr ""
 
-#: src/Content/Item.php:322 src/Model/Item.php:3281
+#: src/Content/Item.php:322 src/Model/Item.php:3297
 msgid "event"
 msgstr ""
 
@@ -1843,7 +1843,7 @@ msgstr ""
 msgid "status"
 msgstr ""
 
-#: src/Content/Item.php:331 src/Model/Item.php:3283
+#: src/Content/Item.php:331 src/Model/Item.php:3299
 #: src/Module/Post/Tag/Add.php:109
 msgid "photo"
 msgstr ""
@@ -2040,7 +2040,7 @@ msgid "Create an account"
 msgstr ""
 
 #: src/Content/Nav.php:247 src/Module/Help.php:53
-#: src/Module/Settings/TwoFactor/AppSpecific.php:119
+#: src/Module/Settings/TwoFactor/AppSpecific.php:118
 #: src/Module/Settings/TwoFactor/Index.php:125
 #: src/Module/Settings/TwoFactor/Recovery.php:96
 #: src/Module/Settings/TwoFactor/Verify.php:135 view/theme/vier/theme.php:228
@@ -2245,8 +2245,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:926 src/Model/Item.php:4080
-#: src/Model/Item.php:4086 src/Model/Item.php:4087
+#: src/Content/Text/BBCode.php:926 src/Model/Item.php:4096
+#: src/Model/Item.php:4102 src/Model/Item.php:4103
 msgid "Link to source"
 msgstr ""
 
@@ -2834,7 +2834,7 @@ msgstr ""
 msgid "Could not connect to database."
 msgstr ""
 
-#: src/Core/L10n.php:426 src/Model/Item.php:2324
+#: src/Core/L10n.php:426 src/Model/Item.php:2340
 msgid "Undetermined"
 msgstr ""
 
@@ -3376,92 +3376,92 @@ msgstr ""
 msgid "Happy Birthday %s"
 msgstr ""
 
-#: src/Model/Item.php:2331
+#: src/Model/Item.php:2347
 #, php-format
 msgid "%s (%s - %s): %s"
 msgstr ""
 
-#: src/Model/Item.php:2333
+#: src/Model/Item.php:2349
 #, php-format
 msgid "%s (%s): %s"
 msgstr ""
 
-#: src/Model/Item.php:2336
+#: src/Model/Item.php:2352
 #, php-format
 msgid ""
 "Detected languages in this post:\n"
 "%s"
 msgstr ""
 
-#: src/Model/Item.php:3285
+#: src/Model/Item.php:3301
 msgid "activity"
 msgstr ""
 
-#: src/Model/Item.php:3287
+#: src/Model/Item.php:3303
 msgid "comment"
 msgstr ""
 
-#: src/Model/Item.php:3290 src/Module/Post/Tag/Add.php:109
+#: src/Model/Item.php:3306 src/Module/Post/Tag/Add.php:109
 msgid "post"
 msgstr ""
 
-#: src/Model/Item.php:3463
+#: src/Model/Item.php:3479
 #, php-format
 msgid "%s is blocked"
 msgstr ""
 
-#: src/Model/Item.php:3465
+#: src/Model/Item.php:3481
 #, php-format
 msgid "%s is ignored"
 msgstr ""
 
-#: src/Model/Item.php:3467
+#: src/Model/Item.php:3483
 #, php-format
 msgid "Content from %s is collapsed"
 msgstr ""
 
-#: src/Model/Item.php:3471
+#: src/Model/Item.php:3487
 msgid "Sensitive content"
 msgstr ""
 
-#: src/Model/Item.php:3980
+#: src/Model/Item.php:3996
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:4011
+#: src/Model/Item.php:4027
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:4013
+#: src/Model/Item.php:4029
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:4018
+#: src/Model/Item.php:4034
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:4020
+#: src/Model/Item.php:4036
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:4022
+#: src/Model/Item.php:4038
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:4063 src/Model/Item.php:4064
+#: src/Model/Item.php:4079 src/Model/Item.php:4080
 msgid "View on separate page"
 msgstr ""
 
@@ -3619,138 +3619,138 @@ msgstr ""
 msgid "Responsible account: %s"
 msgstr ""
 
-#: src/Model/User.php:217 src/Model/User.php:1310
+#: src/Model/User.php:217 src/Model/User.php:1314
 msgid "SERIOUS ERROR: Generation of security keys failed."
 msgstr ""
 
-#: src/Model/User.php:739 src/Model/User.php:772
+#: src/Model/User.php:740 src/Model/User.php:773
 msgid "Login failed"
 msgstr ""
 
-#: src/Model/User.php:804
+#: src/Model/User.php:806
 msgid "Not enough information to authenticate"
 msgstr ""
 
-#: src/Model/User.php:929
+#: src/Model/User.php:933
 msgid "Password can't be empty"
 msgstr ""
 
-#: src/Model/User.php:971
+#: src/Model/User.php:975
 msgid "Empty passwords are not allowed."
 msgstr ""
 
-#: src/Model/User.php:975
+#: src/Model/User.php:979
 msgid "The new password has been exposed in a public data dump, please choose another."
 msgstr ""
 
-#: src/Model/User.php:979
+#: src/Model/User.php:983
 msgid "The password length is limited to 72 characters."
 msgstr ""
 
-#: src/Model/User.php:983
+#: src/Model/User.php:987
 msgid "The password can't contain white spaces nor accentuated letters"
 msgstr ""
 
-#: src/Model/User.php:1192
+#: src/Model/User.php:1196
 msgid "Passwords do not match. Password unchanged."
 msgstr ""
 
-#: src/Model/User.php:1199
+#: src/Model/User.php:1203
 msgid "An invitation is required."
 msgstr ""
 
-#: src/Model/User.php:1203
+#: src/Model/User.php:1207
 msgid "Invitation could not be verified."
 msgstr ""
 
-#: src/Model/User.php:1211
+#: src/Model/User.php:1215
 msgid "Invalid OpenID url"
 msgstr ""
 
-#: src/Model/User.php:1225 src/Security/Authentication.php:231
+#: src/Model/User.php:1229 src/Security/Authentication.php:231
 msgid "We encountered a problem while logging in with the OpenID you provided. Please check the correct spelling of the ID."
 msgstr ""
 
-#: src/Model/User.php:1225 src/Security/Authentication.php:231
+#: src/Model/User.php:1229 src/Security/Authentication.php:231
 msgid "The error message was:"
 msgstr ""
 
-#: src/Model/User.php:1231
+#: src/Model/User.php:1235
 msgid "Please enter the required information."
 msgstr ""
 
-#: src/Model/User.php:1245
+#: src/Model/User.php:1249
 #, php-format
 msgid "system.username_min_length (%s) and system.username_max_length (%s) are excluding each other, swapping values."
 msgstr ""
 
-#: src/Model/User.php:1252
+#: src/Model/User.php:1256
 #, php-format
 msgid "Username should be at least %s character."
 msgid_plural "Username should be at least %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/User.php:1256
+#: src/Model/User.php:1260
 #, php-format
 msgid "Username should be at most %s character."
 msgid_plural "Username should be at most %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/User.php:1264
+#: src/Model/User.php:1268
 msgid "That doesn't appear to be your full (First Last) name."
 msgstr ""
 
-#: src/Model/User.php:1269
+#: src/Model/User.php:1273
 msgid "Your email domain is not among those allowed on this site."
 msgstr ""
 
-#: src/Model/User.php:1273
+#: src/Model/User.php:1277
 msgid "Not a valid email address."
 msgstr ""
 
-#: src/Model/User.php:1276
+#: src/Model/User.php:1280
 msgid "The nickname was blocked from registration by the nodes admin."
 msgstr ""
 
-#: src/Model/User.php:1280 src/Model/User.php:1286
+#: src/Model/User.php:1284 src/Model/User.php:1290
 msgid "Cannot use that email."
 msgstr ""
 
-#: src/Model/User.php:1292
+#: src/Model/User.php:1296
 msgid "Your nickname can only contain a-z, 0-9 and _."
 msgstr ""
 
-#: src/Model/User.php:1300 src/Model/User.php:1350
+#: src/Model/User.php:1304 src/Model/User.php:1354
 msgid "Nickname is already registered. Please choose another."
 msgstr ""
 
-#: src/Model/User.php:1337 src/Model/User.php:1341
+#: src/Model/User.php:1341 src/Model/User.php:1345
 msgid "An error occurred during registration. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1364
+#: src/Model/User.php:1368
 msgid "An error occurred creating your default profile. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1371
+#: src/Model/User.php:1375
 msgid "An error occurred creating your self contact. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1376
+#: src/Model/User.php:1380
 msgid "Friends"
 msgstr ""
 
-#: src/Model/User.php:1380
+#: src/Model/User.php:1384
 msgid "An error occurred creating your default contact circle. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1428
+#: src/Model/User.php:1432
 msgid "Profile Photos"
 msgstr ""
 
-#: src/Model/User.php:1616
+#: src/Model/User.php:1620
 #, php-format
 msgid ""
 "\n"
@@ -3758,7 +3758,7 @@ msgid ""
 "\t\t\tthe administrator of %2$s has set up an account for you."
 msgstr ""
 
-#: src/Model/User.php:1619
+#: src/Model/User.php:1623
 #, php-format
 msgid ""
 "\n"
@@ -3789,12 +3789,12 @@ msgid ""
 "\t\tThank you and welcome to %4$s."
 msgstr ""
 
-#: src/Model/User.php:1651 src/Model/User.php:1757
+#: src/Model/User.php:1655 src/Model/User.php:1761
 #, php-format
 msgid "Registration details for %s"
 msgstr ""
 
-#: src/Model/User.php:1671
+#: src/Model/User.php:1675
 #, php-format
 msgid ""
 "\n"
@@ -3809,12 +3809,12 @@ msgid ""
 "\t\t"
 msgstr ""
 
-#: src/Model/User.php:1690
+#: src/Model/User.php:1694
 #, php-format
 msgid "Registration at %s"
 msgstr ""
 
-#: src/Model/User.php:1714
+#: src/Model/User.php:1718
 #, php-format
 msgid ""
 "\n"
@@ -3823,7 +3823,7 @@ msgid ""
 "\t\t\t"
 msgstr ""
 
-#: src/Model/User.php:1722
+#: src/Model/User.php:1726
 #, php-format
 msgid ""
 "\n"
@@ -3854,7 +3854,7 @@ msgid ""
 "\t\t\tThank you and welcome to %2$s."
 msgstr ""
 
-#: src/Model/User.php:1784
+#: src/Model/User.php:1788
 msgid "User with delegates can't be removed, please remove delegate users first"
 msgstr ""
 
@@ -9544,7 +9544,7 @@ msgstr ""
 
 #: src/Module/Settings/Channels.php:177 src/Module/Settings/Channels.php:198
 #: src/Module/Settings/Display.php:350
-#: src/Module/Settings/TwoFactor/AppSpecific.php:124
+#: src/Module/Settings/TwoFactor/AppSpecific.php:123
 msgid "Description"
 msgstr ""
 
@@ -10446,55 +10446,54 @@ msgid "App-specific password generation failed: This description already exists.
 msgstr ""
 
 #: src/Module/Settings/TwoFactor/AppSpecific.php:80
-#, php-format
-msgid "New app-specific password generated: %s"
+msgid "New app-specific password generated."
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/AppSpecific.php:87
+#: src/Module/Settings/TwoFactor/AppSpecific.php:86
 msgid "App-specific passwords successfully revoked."
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/AppSpecific.php:97
+#: src/Module/Settings/TwoFactor/AppSpecific.php:96
 msgid "App-specific password successfully revoked."
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/AppSpecific.php:118
+#: src/Module/Settings/TwoFactor/AppSpecific.php:117
 msgid "Two-factor app-specific passwords"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/AppSpecific.php:120
+#: src/Module/Settings/TwoFactor/AppSpecific.php:119
 msgid "<p>App-specific passwords are randomly generated passwords used instead your regular password to authenticate your account on third-party applications that don't support two-factor authentication.</p>"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/AppSpecific.php:121
+#: src/Module/Settings/TwoFactor/AppSpecific.php:120
 msgid "Make sure to copy your new app-specific password now. You won’t be able to see it again!"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/AppSpecific.php:125
+#: src/Module/Settings/TwoFactor/AppSpecific.php:124
 msgid "Last Used"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/AppSpecific.php:126
+#: src/Module/Settings/TwoFactor/AppSpecific.php:125
 msgid "Revoke"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/AppSpecific.php:127
+#: src/Module/Settings/TwoFactor/AppSpecific.php:126
 msgid "Revoke All"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/AppSpecific.php:130
+#: src/Module/Settings/TwoFactor/AppSpecific.php:129
 msgid "When you generate a new app-specific password, you must use it right away, it will be shown to you once after you generate it."
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/AppSpecific.php:131
+#: src/Module/Settings/TwoFactor/AppSpecific.php:130
 msgid "Generate new app-specific password"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/AppSpecific.php:132
+#: src/Module/Settings/TwoFactor/AppSpecific.php:131
 msgid "Friendiqa on my Fairphone 2..."
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/AppSpecific.php:133
+#: src/Module/Settings/TwoFactor/AppSpecific.php:132
 msgid "Generate"
 msgstr ""
 
@@ -11750,12 +11749,16 @@ msgstr ""
 msgid "Login failed. Please check your credentials."
 msgstr ""
 
-#: src/Security/Authentication.php:374
+#: src/Security/Authentication.php:267
+msgid "Login failed because your account is blocked."
+msgstr ""
+
+#: src/Security/Authentication.php:380
 #, php-format
 msgid "Welcome %s"
 msgstr ""
 
-#: src/Security/Authentication.php:375
+#: src/Security/Authentication.php:381
 msgid "Please upload a profile photo."
 msgstr ""
 

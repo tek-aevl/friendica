@@ -55,9 +55,9 @@ You should see an output like this:
 
 Finally, you may also want to optimise your database with the following command: ``mysqloptimize -p friendica-db``
 
-### Going offline 
+### Going offline
 Stop background tasks and put your server in maintenance mode.
-1.  If you had set up a worker cron job like this ``*/10 * * * * cd /var/www/friendica; /usr/bin/php bin/worker.php`` run ``crontab -e`` and comment out this line. Alternatively if you deploy a worker daemon, disable this instead.
+1.  If you had set up a worker cron job like this ``*/10 * * * * cd /var/www/friendica; /usr/bin/php bin/console.php worker`` run ``crontab -e`` and comment out this line. Alternatively if you deploy a worker daemon, disable this instead.
 2.  Put your server into maintenance mode: ``bin/console maintenance 1 "We are currently upgrading our system and will be back soon."``
 
 ## Dumping DB
@@ -73,12 +73,12 @@ Import your database on your new server: ``mysql -p friendica_db < your-friendic
 
 ### Configuration file
 Copy your old server's configuration file to ``config/local.config.php``.
-Ensure the newly created database credentials are identical to the setting in the configuration file; otherwise update them accordingly. 
+Ensure the newly created database credentials are identical to the setting in the configuration file; otherwise update them accordingly.
 
 ### Cron job for worker
 Set up the required daily cron job.
 Run ``crontab -e`` and add the following line according to your system specification
-``*/10 * * * * cd /var/www/friendica; /usr/bin/php bin/worker.php`` 
+``*/10 * * * * cd /var/www/friendica; /usr/bin/php bin/console.php worker``
 
 ### DNS settings
 Adjust your DNS records by pointing them to your new server.

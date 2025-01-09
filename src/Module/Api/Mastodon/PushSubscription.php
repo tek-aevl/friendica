@@ -49,9 +49,9 @@ class PushSubscription extends BaseApi
 		$subscription = [
 			'application-id'                => $application['id'],
 			'uid'                           => $uid,
-			'endpoint'                      => $request['subscription']['endpoint'] ?? '',
+			'endpoint'                      => $request['subscription']['endpoint']       ?? '',
 			'pubkey'                        => $request['subscription']['keys']['p256dh'] ?? '',
-			'secret'                        => $request['subscription']['keys']['auth'] ?? '',
+			'secret'                        => $request['subscription']['keys']['auth']   ?? '',
 			Notification::TYPE_FOLLOW       => filter_var($request['data']['alerts'][Notification::TYPE_FOLLOW] ?? false, FILTER_VALIDATE_BOOLEAN),
 			Notification::TYPE_LIKE         => filter_var($request['data']['alerts'][Notification::TYPE_LIKE] ?? false, FILTER_VALIDATE_BOOLEAN),
 			Notification::TYPE_RESHARE      => filter_var($request['data']['alerts'][Notification::TYPE_RESHARE] ?? false, FILTER_VALIDATE_BOOLEAN),
@@ -66,7 +66,7 @@ class PushSubscription extends BaseApi
 		$this->logger->info('Subscription stored', ['ret' => $ret, 'subscription' => $subscription]);
 
 		$subscriptionObj = $this->subscriptionFac->createForApplicationIdAndUserId($application['id'], $uid);
-		$this->response->addJsonContent($subscriptionObj->toArray());
+		$this->jsonExit($subscriptionObj->toArray());
 	}
 
 	public function put(array $request = []): void
@@ -105,7 +105,7 @@ class PushSubscription extends BaseApi
 		]);
 
 		$subscriptionObj = $this->subscriptionFac->createForApplicationIdAndUserId($application['id'], $uid);
-		$this->response->addJsonContent($subscriptionObj->toArray());
+		$this->jsonExit($subscriptionObj->toArray());
 	}
 
 	private function setBoolean($input): bool
@@ -130,10 +130,10 @@ class PushSubscription extends BaseApi
 			'uid'            => $uid,
 		]);
 
-		$this->response->addJsonContent([]);
+		$this->jsonExit([]);
 	}
 
-	protected function rawContent(array $request = []): void
+	protected function get(array $request = []): void
 	{
 		$this->checkAllowedScope(self::SCOPE_PUSH);
 		$uid         = self::getCurrentUserID();

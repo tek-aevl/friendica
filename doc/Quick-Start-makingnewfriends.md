@@ -1,5 +1,5 @@
 This is your Suggested Friends page.
-If you get lost, you can <a href="help/Quick-Start-makenewfriends">click this link</a> to bring yourself back here.
+If you get lost, you can <a href="help/Quick-Start-makingnewfriends">click this link</a> to bring yourself back here.
 
 This is a bit like the Friend Suggestions page of Facebook.
 Everybody on this list has agreed that they may be suggested as a friend.
@@ -16,6 +16,6 @@ Click the link at the top of this page to go back to the suggested friends list 
 Feel uncomfortable adding people you don't know?
 Don't worry - that's where <a href="help/Quick-Start-groupsandpages">Groups and Pages</a> come in!
 
-<iframe src="suggest" width="950" height="600"></iframe>
+<iframe src="contact/suggestions" width="950" height="600"></iframe>
 
 

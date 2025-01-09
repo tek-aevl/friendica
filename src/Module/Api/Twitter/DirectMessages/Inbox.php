@@ -18,7 +18,7 @@ use Friendica\Module\BaseApi;
  */
 class Inbox extends DirectMessagesEndpoint
 {
-	protected function rawContent(array $request = [])
+	protected function get(array $request = [])
 	{
 		$this->checkAllowedScope(BaseApi::SCOPE_READ);
 		$uid  = BaseApi::getCurrentUserID();

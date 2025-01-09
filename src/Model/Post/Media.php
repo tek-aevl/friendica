@@ -90,6 +90,7 @@ class Media
 		}
 
 		$media['url'] = Network::sanitizeUrl($media['url']);
+
 		$media = self::unsetEmptyFields($media);
 		$media = DI::dbaDefinition()->truncateFieldsForTable('post-media', $media);
 
@@ -157,8 +158,11 @@ class Media
 	public static function getAttachElement(string $href, int $length, string $type, string $title = ''): string
 	{
 		$media = self::fetchAdditionalData([
-			'type' => self::DOCUMENT, 'url' => $href,
-			'size' => $length, 'mimetype' => $type, 'description' => $title
+			'type'        => self::DOCUMENT,
+			'url'         => $href,
+			'size'        => $length,
+			'mimetype'    => $type,
+			'description' => $title
 		]);
 
 		return '[attach]href="' . $media['url'] . '" length="' . $media['size'] .
@@ -184,7 +188,7 @@ class Media
 		}
 
 		// Fetch the mimetype or size if missing.
-		if (Network::isValidHttpUrl($media['url']) && empty($media['mimetype']) && !in_array($media['type'], [self::IMAGE, self::HLS])) {
+		if (Network::isValidHttpUrl($media['url']) && (empty($media['mimetype']) || $media['type'] == self::HTML) && !in_array($media['type'], [self::IMAGE, self::HLS])) {
 			$timeout = DI::config()->get('system', 'xrd_timeout');
 			try {
 				$curlResult = DI::httpClient()->head($media['url'], [HttpClientOptions::ACCEPT_CONTENT => HttpClientAccept::AS_DEFAULT, HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::REQUEST => HttpClientRequest::CONTENTTYPE]);
@@ -194,8 +198,8 @@ class Media
 					$curlResult = DI::httpClient()->get($media['url'], HttpClientAccept::AS_DEFAULT, [HttpClientOptions::TIMEOUT => $timeout]);
 				}
 				if ($curlResult->isSuccess()) {
-					if (empty($media['mimetype'])) {
-						$media['mimetype'] = $curlResult->getContentType() ?? '';
+					if (!empty($curlResult->getContentType())) {
+						$media['mimetype'] = $curlResult->getContentType();
 					}
 					if (empty($media['size'])) {
 						$media['size'] = (int)($curlResult->getHeader('Content-Length')[0] ?? strlen($curlResult->getBodyString() ?? ''));
@@ -218,9 +222,9 @@ class Media
 			$imagedata = Images::getInfoFromURLCached($media['url'], empty($media['description']));
 			if ($imagedata) {
 				$media['mimetype'] = $imagedata['mime'];
-				$media['size'] = $imagedata['size'];
-				$media['width'] = $imagedata[0];
-				$media['height'] = $imagedata[1];
+				$media['size']     = $imagedata['size'];
+				$media['width']    = $imagedata[0];
+				$media['height']   = $imagedata[1];
 				$media['blurhash'] = $imagedata['blurhash'] ?? null;
 				if (!empty($imagedata['description']) && empty($media['description'])) {
 					$media['description'] = $imagedata['description'];
@@ -276,13 +280,13 @@ class Media
 
 			// When the original picture is potentially animated but the preview isn't, we override the preview
 			if (in_array($media['mimetype'] ?? '', ['image/gif', 'image/png']) && !in_array($imagedata['mime'], ['image/gif', 'image/png'])) {
-				$media['preview'] = $media['url'];
-				$media['preview-width'] = $media['width'];
+				$media['preview']        = $media['url'];
+				$media['preview-width']  = $media['width'];
 				$media['preview-height'] = $media['height'];
 				return $media;
 			}
 
-			$media['preview-width'] = $imagedata[0];
+			$media['preview-width']  = $imagedata[0];
 			$media['preview-height'] = $imagedata[1];
 		}
 
@@ -336,21 +340,21 @@ class Media
 			$gserver = DBA::selectFirst('gserver', ['url', 'site_name'], ['id' => $contact['gsid']]);
 		}
 
-		$media['type'] = self::ACTIVITY;
-		$media['media-uri-id'] = $item['uri-id'];
-		$media['height'] = null;
-		$media['width'] = null;
-		$media['preview'] = null;
-		$media['preview-height'] = null;
-		$media['preview-width'] = null;
-		$media['blurhash'] = null;
-		$media['description'] = $item['body'];
-		$media['name'] = $item['title'];
-		$media['author-url'] = $item['author-link'];
-		$media['author-name'] = $item['author-name'];
-		$media['author-image'] = $contact['avatar'] ?? $item['author-avatar'];
-		$media['publisher-url'] = $gserver['url'] ?? null;
-		$media['publisher-name'] = $gserver['site_name'] ?? null;
+		$media['type']            = self::ACTIVITY;
+		$media['media-uri-id']    = $item['uri-id'];
+		$media['height']          = null;
+		$media['width']           = null;
+		$media['preview']         = null;
+		$media['preview-height']  = null;
+		$media['preview-width']   = null;
+		$media['blurhash']        = null;
+		$media['description']     = $item['body'];
+		$media['name']            = $item['title'];
+		$media['author-url']      = $item['author-link'];
+		$media['author-name']     = $item['author-name'];
+		$media['author-image']    = $contact['avatar']    ?? $item['author-avatar'];
+		$media['publisher-url']   = $gserver['url']       ?? null;
+		$media['publisher-name']  = $gserver['site_name'] ?? null;
 		$media['publisher-image'] = null;
 
 		Logger::debug('Activity detected', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'plink' => $item['plink'], 'uri' => $item['uri']]);
@@ -378,21 +382,21 @@ class Media
 			$gserver = DBA::selectFirst('gserver', ['url', 'site_name'], ['id' => $contact['gsid']]);
 		}
 
-		$media['type'] = self::ACCOUNT;
-		$media['media-uri-id'] = $contact['uri-id'];
-		$media['height'] = null;
-		$media['width'] = null;
-		$media['preview'] = null;
-		$media['preview-height'] = null;
-		$media['preview-width'] = null;
-		$media['blurhash'] = null;
-		$media['description'] = $contact['about'];
-		$media['name'] = $contact['name'];
-		$media['author-url'] = $contact['url'];
-		$media['author-name'] = $contact['name'];
-		$media['author-image'] = $contact['avatar'];
-		$media['publisher-url'] = $gserver['url'] ?? null;
-		$media['publisher-name'] = $gserver['site_name'] ?? null;
+		$media['type']            = self::ACCOUNT;
+		$media['media-uri-id']    = $contact['uri-id'];
+		$media['height']          = null;
+		$media['width']           = null;
+		$media['preview']         = null;
+		$media['preview-height']  = null;
+		$media['preview-width']   = null;
+		$media['blurhash']        = null;
+		$media['description']     = $contact['about'];
+		$media['name']            = $contact['name'];
+		$media['author-url']      = $contact['url'];
+		$media['author-name']     = $contact['name'];
+		$media['author-image']    = $contact['avatar'];
+		$media['publisher-url']   = $gserver['url']       ?? null;
+		$media['publisher-name']  = $gserver['site_name'] ?? null;
 		$media['publisher-image'] = null;
 
 		Logger::debug('Account detected', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'uri' => $contact['url']]);
@@ -414,22 +418,22 @@ class Media
 				Logger::debug('Detected site data is empty, use suggested media data instead', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'type' => $data['type']]);
 			}
 		} else {
-			$media['preview'] = $data['images'][0]['src'] ?? null;
-			$media['preview-height'] = $data['images'][0]['height'] ?? null;
-			$media['preview-width'] = $data['images'][0]['width'] ?? null;
-			$media['blurhash'] = $data['images'][0]['blurhash'] ?? null;
-			$media['description'] = $data['text'] ?? null;
-			$media['name'] = $data['title'] ?? null;	
+			$media['preview']        = $data['images'][0]['src']      ?? null;
+			$media['preview-height'] = $data['images'][0]['height']   ?? null;
+			$media['preview-width']  = $data['images'][0]['width']    ?? null;
+			$media['blurhash']       = $data['images'][0]['blurhash'] ?? null;
+			$media['description']    = $data['text']                  ?? null;
+			$media['name']           = $data['title']                 ?? null;
 		}
-		
-		$media['type'] = self::HTML;
-		$media['size'] = $data['size'] ?? null;
-		$media['author-url'] = $data['author_url'] ?? null;
-		$media['author-name'] = $data['author_name'] ?? null;
-		$media['author-image'] = $data['author_img'] ?? null;
-		$media['publisher-url'] = $data['publisher_url'] ?? null;
-		$media['publisher-name'] = $data['publisher_name'] ?? null;
-		$media['publisher-image'] = $data['publisher_img'] ?? null;
+
+		$media['type']            = self::HTML;
+		$media['size']            = $data['size']           ?? null;
+		$media['author-url']      = $data['author_url']     ?? null;
+		$media['author-name']     = $data['author_name']    ?? null;
+		$media['author-image']    = $data['author_img']     ?? null;
+		$media['publisher-url']   = $data['publisher_url']  ?? null;
+		$media['publisher-name']  = $data['publisher_name'] ?? null;
+		$media['publisher-image'] = $data['publisher_img']  ?? null;
 
 		return $media;
 	}
@@ -458,9 +462,9 @@ class Media
 		$photo = Photo::selectFirst(['type', 'datasize', 'width', 'height', 'blurhash'], ['resource-id' => $matches[1], 'scale' => $matches[2]]);
 		if (!empty($photo)) {
 			$media['mimetype'] = $photo['type'];
-			$media['size'] = $photo['datasize'];
-			$media['width'] = $photo['width'];
-			$media['height'] = $photo['height'];
+			$media['size']     = $photo['datasize'];
+			$media['width']    = $photo['width'];
+			$media['height']   = $photo['height'];
 			$media['blurhash'] = $photo['blurhash'];
 		}
 
@@ -469,7 +473,7 @@ class Media
 		}
 		$photo = Photo::selectFirst(['width', 'height'], ['resource-id' => $matches[1], 'scale' => $matches[2]]);
 		if (!empty($photo)) {
-			$media['preview-width'] = $photo['width'];
+			$media['preview-width']  = $photo['width'];
 			$media['preview-height'] = $photo['height'];
 		}
 
@@ -502,7 +506,7 @@ class Media
 		}
 
 		$filetype = strtolower($type[0]);
-		$subtype = strtolower($type[1]);
+		$subtype  = strtolower($type[1]);
 
 		if ($filetype == 'image') {
 			$type = self::IMAGE;
@@ -609,23 +613,35 @@ class Media
 		if (preg_match_all("#\[url=([^\]]+?)\]\s*\[img=([^\[\]]*)\]([^\[\]]*)\[\/img\]\s*\[/url\]$endmatchpattern#ism", $body, $pictures, PREG_SET_ORDER)) {
 			foreach ($pictures as $picture) {
 				if (self::isLinkToImagePage($picture[1], $picture[2])) {
-					$body = str_replace($picture[0], '', $body);
+					$body  = str_replace($picture[0], '', $body);
 					$image = str_replace(['-1.', '-2.'], '-0.', $picture[2]);
+
 					$attachments[$image] = [
-						'uri-id' => $uriid, 'type' => self::IMAGE, 'url' => $image,
-						'preview' => $picture[2], 'description' => $picture[3]
+						'uri-id'      => $uriid,
+						'type'        => self::IMAGE,
+						'url'         => $image,
+						'preview'     => $picture[2],
+						'description' => $picture[3]
 					];
 				} elseif (self::isLinkToPhoto($picture[1], $picture[2])) {
 					$body = str_replace($picture[0], '', $body);
+
 					$attachments[$picture[1]] = [
-						'uri-id' => $uriid, 'type' => self::IMAGE, 'url' => $picture[1],
-						'preview' => $picture[2], 'description' => $picture[3]
+						'uri-id'      => $uriid,
+						'type'        => self::IMAGE,
+						'url'         => $picture[1],
+						'preview'     => $picture[2],
+						'description' => $picture[3]
 					];
 				} elseif ($removepicturelinks) {
 					$body = str_replace($picture[0], '', $body);
+
 					$attachments[$picture[1]] = [
-						'uri-id' => $uriid, 'type' => self::UNKNOWN, 'url' => $picture[1],
-						'preview' => $picture[2], 'description' => $picture[3]
+						'uri-id'      => $uriid,
+						'type'        => self::UNKNOWN,
+						'url'         => $picture[1],
+						'preview'     => $picture[2],
+						'description' => $picture[3]
 					];
 				}
 			}
@@ -634,6 +650,7 @@ class Media
 		if (preg_match_all("/\[img=([^\[\]]*)\]([^\[\]]*)\[\/img\]$endmatchpattern/Usi", $body, $pictures, PREG_SET_ORDER)) {
 			foreach ($pictures as $picture) {
 				$body = str_replace($picture[0], '', $body);
+
 				$attachments[$picture[1]] = ['uri-id' => $uriid, 'type' => self::IMAGE, 'url' => $picture[1], 'description' => $picture[2]];
 			}
 		}
@@ -641,23 +658,35 @@ class Media
 		if (preg_match_all("#\[url=([^\]]+?)\]\s*\[img\]([^\[]+?)\[/img\]\s*\[/url\]$endmatchpattern#ism", $body, $pictures, PREG_SET_ORDER)) {
 			foreach ($pictures as $picture) {
 				if (self::isLinkToImagePage($picture[1], $picture[2])) {
-					$body = str_replace($picture[0], '', $body);
+					$body  = str_replace($picture[0], '', $body);
 					$image = str_replace(['-1.', '-2.'], '-0.', $picture[2]);
+
 					$attachments[$image] = [
-						'uri-id' => $uriid, 'type' => self::IMAGE, 'url' => $image,
-						'preview' => $picture[2], 'description' => null
+						'uri-id'      => $uriid,
+						'type'        => self::IMAGE,
+						'url'         => $image,
+						'preview'     => $picture[2],
+						'description' => null
 					];
 				} elseif (self::isLinkToPhoto($picture[1], $picture[2])) {
 					$body = str_replace($picture[0], '', $body);
+
 					$attachments[$picture[1]] = [
-						'uri-id' => $uriid, 'type' => self::IMAGE, 'url' => $picture[1],
-						'preview' => $picture[2], 'description' => null
+						'uri-id'      => $uriid,
+						'type'        => self::IMAGE,
+						'url'         => $picture[1],
+						'preview'     => $picture[2],
+						'description' => null
 					];
 				} elseif ($removepicturelinks) {
 					$body = str_replace($picture[0], '', $body);
+
 					$attachments[$picture[1]] = [
-						'uri-id' => $uriid, 'type' => self::UNKNOWN, 'url' => $picture[1],
-						'preview' => $picture[2], 'description' => null
+						'uri-id'      => $uriid,
+						'type'        => self::UNKNOWN,
+						'url'         => $picture[1],
+						'preview'     => $picture[2],
+						'description' => null
 					];
 				}
 			}
@@ -666,6 +695,7 @@ class Media
 		if (preg_match_all("/\[img\]([^\[\]]*)\[\/img\]$endmatchpattern/ism", $body, $pictures, PREG_SET_ORDER)) {
 			foreach ($pictures as $picture) {
 				$body = str_replace($picture[0], '', $body);
+
 				$attachments[$picture[1]] = ['uri-id' => $uriid, 'type' => self::IMAGE, 'url' => $picture[1]];
 			}
 		}
@@ -673,6 +703,7 @@ class Media
 		if (preg_match_all("/\[audio\]([^\[\]]*)\[\/audio\]$endmatchpattern/ism", $body, $audios, PREG_SET_ORDER)) {
 			foreach ($audios as $audio) {
 				$body = str_replace($audio[0], '', $body);
+
 				$attachments[$audio[1]] = ['uri-id' => $uriid, 'type' => self::AUDIO, 'url' => $audio[1]];
 			}
 		}
@@ -680,6 +711,7 @@ class Media
 		if (preg_match_all("/\[video\]([^\[\]]*)\[\/video\]$endmatchpattern/ism", $body, $videos, PREG_SET_ORDER)) {
 			foreach ($videos as $video) {
 				$body = str_replace($video[0], '', $body);
+
 				$attachments[$video[1]] = ['uri-id' => $uriid, 'type' => self::VIDEO, 'url' => $video[1]];
 			}
 		}
@@ -710,7 +742,7 @@ class Media
 	{
 		do {
 			$prebody = $body;
-			$body = self::insertFromBody(0, $body, true);
+			$body    = self::insertFromBody(0, $body, true);
 		} while ($prebody != $body);
 		return $body;
 	}
@@ -725,7 +757,7 @@ class Media
 	{
 		do {
 			$prebody = $body;
-			$body = self::insertFromBody(0, $body, false, true);
+			$body    = self::insertFromBody(0, $body, false, true);
 		} while ($prebody != $body);
 		return $body;
 	}
@@ -808,15 +840,15 @@ class Media
 
 		Logger::info('Adding attachment data', ['data' => $data]);
 		$attachment = [
-			'uri-id' => $uriid,
-			'type' => self::HTML,
-			'url' => $data['url'],
-			'preview' => $data['preview'] ?? null,
-			'description' => $data['description'] ?? null,
-			'name' => $data['title'] ?? null,
-			'author-url' => $data['author_url'] ?? null,
-			'author-name' => $data['author_name'] ?? null,
-			'publisher-url' => $data['provider_url'] ?? null,
+			'uri-id'         => $uriid,
+			'type'           => self::HTML,
+			'url'            => $data['url'],
+			'preview'        => $data['preview']       ?? null,
+			'description'    => $data['description']   ?? null,
+			'name'           => $data['title']         ?? null,
+			'author-url'     => $data['author_url']    ?? null,
+			'author-name'    => $data['author_name']   ?? null,
+			'publisher-url'  => $data['provider_url']  ?? null,
 			'publisher-name' => $data['provider_name'] ?? null,
 		];
 		if (!empty($data['image'])) {
@@ -839,11 +871,11 @@ class Media
 		}
 
 		foreach ($matches as $attachment) {
-			$media['type'] = self::DOCUMENT;
-			$media['uri-id'] = $uriid;
-			$media['url'] = $attachment[1];
-			$media['size'] = $attachment[2];
-			$media['mimetype'] = $attachment[3];
+			$media['type']        = self::DOCUMENT;
+			$media['uri-id']      = $uriid;
+			$media['url']         = $attachment[1];
+			$media['size']        = $attachment[2];
+			$media['mimetype']    = $attachment[3];
 			$media['description'] = $attachment[4] ?? '';
 
 			self::insert($media);
@@ -1036,20 +1068,20 @@ class Media
 		}
 
 		$data = [
-			'type' => 'link',
-			'url'  => $links[0]['url'],
-			'title' => $links[0]['name'],
-			'text' => $links[0]['description'],
+			'type'           => 'link',
+			'url'            => $links[0]['url'],
+			'title'          => $links[0]['name'],
+			'text'           => $links[0]['description'],
 			'publisher_name' => $links[0]['publisher-name'],
-			'publisher_url' => $links[0]['publisher-url'],
-			'publisher_img' => $links[0]['publisher-image'],
-			'author_name' => $links[0]['author-name'],
-			'author_url' => $links[0]['author-url'],
-			'author_img' => $links[0]['author-image'],
-			'images' => [[
-				'src' => $links[0]['preview'],
+			'publisher_url'  => $links[0]['publisher-url'],
+			'publisher_img'  => $links[0]['publisher-image'],
+			'author_name'    => $links[0]['author-name'],
+			'author_url'     => $links[0]['author-url'],
+			'author_img'     => $links[0]['author-image'],
+			'images'         => [[
+				'src'    => $links[0]['preview'],
 				'height' => $links[0]['preview-height'],
-				'width' => $links[0]['preview-width'],
+				'width'  => $links[0]['preview-width'],
 			]]
 		];
 		$body .= "\n" . PageInfo::getFooterFromData($data);
@@ -1129,5 +1161,20 @@ class Media
 		return DI::baseUrl() . '/photo/media/' .
 			(Proxy::getPixelsFromSize($size) ? Proxy::getPixelsFromSize($size) . '/' : '') .
 			$id;
+	}
+
+	/**
+	 * Fetch the uri-id of an attached uri-post for a given uri-id
+	 *
+	 * @param integer $uri_id Uri-Id of the post
+	 * @return integer uri-id of the first attached post
+	 */
+	public static function getActivityUriId(int $uri_id): int
+	{
+		$posts = self::getByURIId($uri_id, [self::ACTIVITY]);
+		if (!$posts) {
+			return 0;
+		}
+		return reset($posts)['media-uri-id'];
 	}
 }

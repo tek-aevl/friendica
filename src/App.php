@@ -15,23 +15,28 @@ use Friendica\App\Page;
 use Friendica\App\Request;
 use Friendica\App\Router;
 use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Content\Nav;
 use Friendica\Core\Config\Factory\Config;
+use Friendica\Core\Container;
+use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Definition\DbaDefinition;
 use Friendica\Database\Definition\ViewDefinition;
 use Friendica\Module\Maintenance;
 use Friendica\Security\Authentication;
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Core\L10n;
 use Friendica\Core\Logger\Capability\LogChannel;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
-use Friendica\Core\L10n;
 use Friendica\Core\System;
+use Friendica\Core\Update;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ATProtocol\DID;
 use Friendica\Security\ExAuth;
 use Friendica\Security\OpenWebAuth;
+use Friendica\Util\BasePath;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\HTTPInputData;
 use Friendica\Util\HTTPSignature;
@@ -52,16 +57,16 @@ use Psr\Log\LoggerInterface;
 class App
 {
 	const PLATFORM = 'Friendica';
-	const CODENAME = 'Yellow Archangel';
-	const VERSION  = '2024.12-dev';
+	const CODENAME = 'Interrupted Fern';
+	const VERSION  = '2025.02-dev';
 
-	public static function fromDice(Dice $dice): self
+	public static function fromContainer(Container $container): self
 	{
-		return new self($dice);
+		return new self($container);
 	}
 
 	/**
-	 * @var Dice
+	 * @var Container
 	 */
 	private $container;
 
@@ -116,24 +121,20 @@ class App
 	 */
 	private $appHelper;
 
-	private function __construct(Dice $container)
+	private function __construct(Container $container)
 	{
 		$this->container = $container;
 	}
 
 	public function processRequest(ServerRequestInterface $request, float $start_time): void
 	{
-		$this->setupContainerForAddons();
-
-		$this->container = $this->container->addRule(Mode::class, [
+		$this->container->addRule(Mode::class, [
 			'call' => [
 				['determineRunMode', [false, $request->getServerParams()], Dice::CHAIN_CALL],
 			],
 		]);
 
-		$this->setupLegacyServiceLocator();
-
-		$this->registerErrorHandler();
+		$this->container->setup(LogChannel::APP, false);
 
 		$this->requestId = $this->container->create(Request::class)->getRequestId();
 		$this->auth      = $this->container->create(Authentication::class);
@@ -147,39 +148,35 @@ class App
 		$this->session   = $this->container->create(IHandleUserSessions::class);
 		$this->appHelper = $this->container->create(AppHelper::class);
 
-		$this->load(
+		$this->loadSetupForFrontend(
+			$request,
 			$this->container->create(DbaDefinition::class),
 			$this->container->create(ViewDefinition::class),
 		);
 
+		$this->registerTemplateEngine();
+
 		$this->mode->setExecutor(Mode::INDEX);
 
 		$this->runFrontend(
-			$this->container->create(Router::class),
 			$this->container->create(IManagePersonalConfigValues::class),
 			$this->container->create(Page::class),
 			$this->container->create(Nav::class),
 			$this->container->create(ModuleHTTPException::class),
-			new HTTPInputData($request->getServerParams()),
 			$start_time,
-			$request->getServerParams()
+			$request
 		);
 	}
 
 	public function processEjabberd(): void
 	{
-		$this->setupContainerForAddons();
+		$this->container->setup(LogChannel::AUTH_JABBERED, false);
 
-		$this->container = $this->container->addRule(LoggerInterface::class,[
-			'constructParams' => [LogChannel::AUTH_JABBERED],
-		]);
-
-		$this->setupLegacyServiceLocator();
-
-		$this->registerErrorHandler();
+		/** @var BasePath */
+		$basePath = $this->container->create(BasePath::class);
 
 		// Check the database structure and possibly fixes it
-		\Friendica\Core\Update::check(\Friendica\DI::basePath(), true);
+		Update::check($basePath->getPath(), true);
 
 		$appMode = $this->container->create(Mode::class);
 
@@ -190,28 +187,15 @@ class App
 		}
 	}
 
-	private function setupContainerForAddons(): void
+	private function registerTemplateEngine(): void
 	{
-		/** @var \Friendica\Core\Addon\Capability\ICanLoadAddons $addonLoader */
-		$addonLoader = $this->container->create(\Friendica\Core\Addon\Capability\ICanLoadAddons::class);
-
-		$this->container = $this->container->addRules($addonLoader->getActiveAddonConfig('dependencies'));
-	}
-
-	private function setupLegacyServiceLocator(): void
-	{
-		\Friendica\DI::init($this->container);
-	}
-
-	private function registerErrorHandler(): void
-	{
-		\Friendica\Core\Logger\Handler\ErrorHandler::register($this->container->create(LoggerInterface::class));
+		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
 	}
 
 	/**
 	 * Load the whole app instance
 	 */
-	private function load(DbaDefinition $dbaDefinition, ViewDefinition $viewDefinition)
+	private function loadSetupForFrontend(ServerRequestInterface $request, DbaDefinition $dbaDefinition, ViewDefinition $viewDefinition)
 	{
 		if ($this->config->get('system', 'ini_max_execution_time') !== false) {
 			set_time_limit((int)$this->config->get('system', 'ini_max_execution_time'));
@@ -233,7 +217,7 @@ class App
 
 		if ($this->mode->has(Mode::DBAVAILABLE)) {
 			Core\Hook::loadHooks();
-			$loader = (new Config())->createConfigFileManager($this->appHelper->getBasePath(), $_SERVER);
+			$loader = (new Config())->createConfigFileManager($this->appHelper->getBasePath(), $request->getServerParams());
 			Core\Hook::callAll('load_config', $loader);
 
 			// Hooks are now working, reload the whole definitions with hook enabled
@@ -242,8 +226,6 @@ class App
 		}
 
 		$this->loadDefaultTimezone();
-		// Register template engines
-		Core\Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
 	}
 
 	/**
@@ -273,31 +255,30 @@ class App
 	 *
 	 * This probably should change to limit the size of this monster method.
 	 *
-	 * @param Router                      $router
 	 * @param IManagePersonalConfigValues $pconfig
 	 * @param Page                        $page       The Friendica page printing container
 	 * @param ModuleHTTPException         $httpException The possible HTTP Exception container
-	 * @param HTTPInputData               $httpInput  A library for processing PHP input streams
 	 * @param float                       $start_time The start time of the overall script execution
-	 * @param array                       $server     The $_SERVER array
 	 *
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
 	private function runFrontend(
-		Router $router,
 		IManagePersonalConfigValues $pconfig,
 		Page $page,
 		Nav $nav,
 		ModuleHTTPException $httpException,
-		HTTPInputData $httpInput,
 		float $start_time,
-		array $server
+		ServerRequestInterface $request
 	) {
-		$requeststring = ($server['REQUEST_METHOD'] ?? '') . ' ' . ($server['REQUEST_URI'] ?? '') . ' ' . ($server['SERVER_PROTOCOL'] ?? '');
-		$this->logger->debug('Request received', ['address' => $server['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $server['HTTP_REFERER'] ?? '', 'user-agent' => $server['HTTP_USER_AGENT'] ?? '']);
+		$httpInput  = new HTTPInputData($request->getServerParams());
+		$serverVars = $request->getServerParams();
+		$queryVars  = $request->getQueryParams();
+
+		$requeststring = ($serverVars['REQUEST_METHOD'] ?? '') . ' ' . ($serverVars['REQUEST_URI'] ?? '') . ' ' . ($serverVars['SERVER_PROTOCOL'] ?? '');
+		$this->logger->debug('Request received', ['address' => $serverVars['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $serverVars['HTTP_REFERER'] ?? '', 'user-agent' => $serverVars['HTTP_USER_AGENT'] ?? '']);
 		$request_start = microtime(true);
-		$request = $_REQUEST;
+		$request       = $_REQUEST;
 
 		$this->profiler->set($start_time, 'start');
 		$this->profiler->set(microtime(true), 'classinit');
@@ -314,42 +295,42 @@ class App
 			if (!$this->mode->isInstall()) {
 				// Force SSL redirection
 				if ($this->config->get('system', 'force_ssl') &&
-					(empty($server['HTTPS']) || $server['HTTPS'] === 'off') &&
-					(empty($server['HTTP_X_FORWARDED_PROTO']) || $server['HTTP_X_FORWARDED_PROTO'] === 'http') &&
-					!empty($server['REQUEST_METHOD']) &&
-					$server['REQUEST_METHOD'] === 'GET') {
+					(empty($serverVars['HTTPS']) || $serverVars['HTTPS'] === 'off') &&
+					(empty($serverVars['HTTP_X_FORWARDED_PROTO']) || $serverVars['HTTP_X_FORWARDED_PROTO'] === 'http') &&
+					!empty($serverVars['REQUEST_METHOD']) &&
+					$serverVars['REQUEST_METHOD'] === 'GET') {
 					System::externalRedirect($this->baseURL . '/' . $this->args->getQueryString());
 				}
 				Core\Hook::callAll('init_1');
 			}
 
-			DID::routeRequest($this->args->getCommand(), $server);
+			DID::routeRequest($this->args->getCommand(), $serverVars);
 
 			if ($this->mode->isNormal() && !$this->mode->isBackend()) {
-				$requester = HTTPSignature::getSigner('', $server);
+				$requester = HTTPSignature::getSigner('', $serverVars);
 				if (!empty($requester)) {
 					OpenWebAuth::addVisitorCookieForHandle($requester);
 				}
 			}
 
 			// ZRL
-			if (!empty($_GET['zrl']) && $this->mode->isNormal() && !$this->mode->isBackend() && !$this->session->getLocalUserId()) {
+			if (!empty($queryVars['zrl']) && $this->mode->isNormal() && !$this->mode->isBackend() && !$this->session->getLocalUserId()) {
 				// Only continue when the given profile link seems valid.
 				// Valid profile links contain a path with "/profile/" and no query parameters
-				if ((parse_url($_GET['zrl'], PHP_URL_QUERY) == '') &&
-					strpos(parse_url($_GET['zrl'], PHP_URL_PATH) ?? '', '/profile/') !== false) {
-					$this->auth->setUnauthenticatedVisitor($_GET['zrl']);
+				if ((parse_url($queryVars['zrl'], PHP_URL_QUERY) == '') &&
+					strpos(parse_url($queryVars['zrl'], PHP_URL_PATH) ?? '', '/profile/') !== false) {
+					$this->auth->setUnauthenticatedVisitor($queryVars['zrl']);
 					OpenWebAuth::zrlInit();
 				} else {
 					// Someone came with an invalid parameter, maybe as a DDoS attempt
 					// We simply stop processing here
-					$this->logger->debug('Invalid ZRL parameter.', ['zrl' => $_GET['zrl']]);
+					$this->logger->debug('Invalid ZRL parameter.', ['zrl' => $queryVars['zrl']]);
 					throw new HTTPException\ForbiddenException();
 				}
 			}
 
-			if (!empty($_GET['owt']) && $this->mode->isNormal()) {
-				$token = $_GET['owt'];
+			if (!empty($queryVars['owt']) && $this->mode->isNormal()) {
+				$token = $queryVars['owt'];
 				OpenWebAuth::init($token);
 			}
 
@@ -420,11 +401,11 @@ class App
 
 			// The "view" module is required to show the theme CSS
 			if (!$this->mode->isInstall() && !$this->mode->has(Mode::MAINTENANCEDISABLED) && $moduleName !== 'view') {
-				$module = $router->getModule(Maintenance::class);
+				$module = $this->createModuleInstance(Maintenance::class);
 			} else {
 				// determine the module class and save it to the module instance
 				// @todo there's an implicit dependency due SESSION::start(), so it has to be called here (yet)
-				$module = $router->getModule();
+				$module = $this->createModuleInstance(null);
 			}
 
 			// Display can change depending on the requested language, so it shouldn't be cached whole
@@ -444,15 +425,40 @@ class App
 				$response = $page->run($this->appHelper, $this->session, $this->baseURL, $this->args, $this->mode, $response, $this->l10n, $this->profiler, $this->config, $pconfig, $nav, $this->session->getLocalUserId());
 			}
 
-			$this->logger->debug('Request processed sucessfully', ['response' => $response->getStatusCode(), 'address' => $server['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $server['HTTP_REFERER'] ?? '', 'user-agent' => $server['HTTP_USER_AGENT'] ?? '', 'duration' => number_format(microtime(true) - $request_start, 3)]);
-			$this->logSlowCalls(microtime(true) - $request_start, $response->getStatusCode(), $requeststring, $server['HTTP_USER_AGENT'] ?? '');
+			$this->logger->debug('Request processed sucessfully', ['response' => $response->getStatusCode(), 'address' => $serverVars['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $serverVars['HTTP_REFERER'] ?? '', 'user-agent' => $serverVars['HTTP_USER_AGENT'] ?? '', 'duration' => number_format(microtime(true) - $request_start, 3)]);
+			$this->logSlowCalls(microtime(true) - $request_start, $response->getStatusCode(), $requeststring, $serverVars['HTTP_USER_AGENT'] ?? '');
 			System::echoResponse($response);
 		} catch (HTTPException $e) {
-			$this->logger->debug('Request processed with exception', ['response' => $e->getCode(), 'address' => $server['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $server['HTTP_REFERER'] ?? '', 'user-agent' => $server['HTTP_USER_AGENT'] ?? '', 'duration' => number_format(microtime(true) - $request_start, 3)]);
-			$this->logSlowCalls(microtime(true) - $request_start, $e->getCode(), $requeststring, $server['HTTP_USER_AGENT'] ?? '');
+			$this->logger->debug('Request processed with exception', ['response' => $e->getCode(), 'address' => $serverVars['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $serverVars['HTTP_REFERER'] ?? '', 'user-agent' => $serverVars['HTTP_USER_AGENT'] ?? '', 'duration' => number_format(microtime(true) - $request_start, 3)]);
+			$this->logSlowCalls(microtime(true) - $request_start, $e->getCode(), $requeststring, $serverVars['HTTP_USER_AGENT'] ?? '');
 			$httpException->rawContent($e);
 		}
 		$page->logRuntime($this->config, 'runFrontend');
+	}
+
+	private function createModuleInstance(?string $moduleClass = null): ICanHandleRequests
+	{
+		/** @var Router $router */
+		$router = $this->container->create(Router::class);
+
+		$moduleClass = $moduleClass ?? $router->getModuleClass();
+		$parameters  = $router->getParameters();
+
+		$dice_profiler_threshold = $this->config->get('system', 'dice_profiler_threshold', 0);
+
+		$stamp = microtime(true);
+
+		/** @var ICanHandleRequests $module */
+		$module = $this->container->create($moduleClass, $parameters);
+
+		if ($dice_profiler_threshold > 0) {
+			$dur = floatval(microtime(true) - $stamp);
+			if ($dur >= $dice_profiler_threshold) {
+				$this->logger->notice('Dice module creation lasts too long.', ['duration' => round($dur, 3), 'module' => $moduleClass, 'parameters' => $parameters]);
+			}
+		}
+
+		return $module;
 	}
 
 	/**
