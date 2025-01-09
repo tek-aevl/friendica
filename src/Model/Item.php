@@ -818,32 +818,6 @@ class Item
 	}
 
 	/**
-	 * Get the gravity for the given item array
-	 *
-	 * @param array $item
-	 * @return integer gravity
-	 */
-	private static function getGravity(array $item): int
-	{
-		$activity = DI::activity();
-
-		if (isset($item['gravity'])) {
-			return intval($item['gravity']);
-		} elseif ($item['parent-uri-id'] === $item['uri-id']) {
-			return self::GRAVITY_PARENT;
-		} elseif ($activity->match($item['verb'], Activity::POST)) {
-			return self::GRAVITY_COMMENT;
-		} elseif ($activity->match($item['verb'], Activity::FOLLOW)) {
-			return self::GRAVITY_ACTIVITY;
-		} elseif ($activity->match($item['verb'], Activity::ANNOUNCE)) {
-			return self::GRAVITY_ACTIVITY;
-		}
-
-		Logger::info('Unknown gravity for verb', ['verb' => $item['verb']]);
-		return self::GRAVITY_UNKNOWN;   // Should not happen
-	}
-
-	/**
 	 * Inserts item record
 	 *
 	 * @param array $item Item array to be inserted
@@ -853,7 +827,7 @@ class Item
 	 */
 	public static function insert(array $item, int $notify = 0, bool $post_local = true): int
 	{
-		$itemInserter = new ItemInserter(DI::contentItem());
+		$itemInserter = new ItemInserter(DI::contentItem(), DI::activity());
 
 		$orig_item = $item;
 
@@ -917,7 +891,7 @@ class Item
 			}
 		}
 
-		$item = self::validateItemData($item);
+		$item = self::validateItemData($item, $itemInserter);
 
 		// Ensure that there is an avatar cache
 		Contact::checkAvatarCache($item['author-id']);
@@ -1364,7 +1338,7 @@ class Item
 		return $post_user_id;
 	}
 
-	private static function validateItemData(array $item): array
+	private static function validateItemData(array $item, ItemInserter $itemInserter): array
 	{
 		$item['wall']          = intval($item['wall'] ?? 0);
 		$item['extid']         = trim($item['extid'] ?? '');
@@ -1417,7 +1391,11 @@ class Item
 
 		$item['plink'] = ($item['plink'] ?? '') ?: DI::baseUrl() . '/display/' . urlencode($item['guid']);
 
-		$item['gravity'] = self::getGravity($item);
+		$item['gravity'] = $itemInserter->getGravity($item);
+
+		if ($item['gravity'] === self::GRAVITY_UNKNOWN) {
+			Logger::info('Unknown gravity for verb', ['verb' => $item['verb']]);
+		}
 
 		$default = [
 			'url' => $item['author-link'], 'name' => $item['author-name'],

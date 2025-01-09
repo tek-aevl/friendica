@@ -8,6 +8,7 @@
 namespace Friendica\Model;
 
 use Friendica\Content\Item as ItemContent;
+use Friendica\Protocol\Activity;
 
 /**
  * A helper class for inserting an Item Model
@@ -18,9 +19,12 @@ final class ItemInserter
 {
 	private ItemContent $itemContent;
 
-	public function __construct(ItemContent $itemContent)
+	private Activity $activity;
+
+	public function __construct(ItemContent $itemContent, Activity $activity)
 	{
 		$this->itemContent = $itemContent;
+		$this->activity    = $activity;
 	}
 
 	public function prepareOriginPost(array $item): array
@@ -50,5 +54,27 @@ final class ItemInserter
 		$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
 
 		return $item;
+	}
+
+	/**
+	 * Get the gravity for the given item array
+	 *
+	 * @return int gravity
+	 */
+	public function getGravity(array $item): int
+	{
+		if (isset($item['gravity'])) {
+			return intval($item['gravity']);
+		} elseif ($item['parent-uri-id'] === $item['uri-id']) {
+			return Item::GRAVITY_PARENT;
+		} elseif ($this->activity->match($item['verb'], Activity::POST)) {
+			return Item::GRAVITY_COMMENT;
+		} elseif ($this->activity->match($item['verb'], Activity::FOLLOW)) {
+			return Item::GRAVITY_ACTIVITY;
+		} elseif ($this->activity->match($item['verb'], Activity::ANNOUNCE)) {
+			return Item::GRAVITY_ACTIVITY;
+		}
+
+		return Item::GRAVITY_UNKNOWN;   // Should not happen
 	}
 }
