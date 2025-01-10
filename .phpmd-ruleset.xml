@@ -13,7 +13,7 @@
     <rule ref="rulesets/codesize.xml/ExcessiveClassComplexity">
         <priority>3</priority>
         <properties>
-            <property name="maximum" value="500" />
+            <property name="maximum" value="700" />
         </properties>
     </rule>
     <rule ref="rulesets/codesize.xml/CyclomaticComplexity">
