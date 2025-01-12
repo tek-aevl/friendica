@@ -412,8 +412,8 @@ abstract class BaseModule implements ICanHandleRequests
 	public static function checkFormSecurityTokenRedirectOnError(string $err_redirect, string $typename = '', string $formname = 'form_security_token')
 	{
 		if (!self::checkFormSecurityToken($typename, $formname)) {
-			Logger::notice('checkFormSecurityToken failed: user ' . DI::userSession()->getLocalUserNickname() . ' - form element ' . $typename);
-			Logger::debug('checkFormSecurityToken failed', ['request' => $_REQUEST]);
+			DI::logger()->notice('checkFormSecurityToken failed: user ' . DI::userSession()->getLocalUserNickname() . ' - form element ' . $typename);
+			DI::logger()->debug('checkFormSecurityToken failed', ['request' => $_REQUEST]);
 			DI::sysmsg()->addNotice(self::getFormSecurityStandardErrorMessage());
 			DI::baseUrl()->redirect($err_redirect);
 		}
@@ -422,8 +422,8 @@ abstract class BaseModule implements ICanHandleRequests
 	public static function checkFormSecurityTokenForbiddenOnError(string $typename = '', string $formname = 'form_security_token')
 	{
 		if (!self::checkFormSecurityToken($typename, $formname)) {
-			Logger::notice('checkFormSecurityToken failed: user ' . DI::userSession()->getLocalUserNickname() . ' - form element ' . $typename);
-			Logger::debug('checkFormSecurityToken failed', ['request' => $_REQUEST]);
+			DI::logger()->notice('checkFormSecurityToken failed: user ' . DI::userSession()->getLocalUserNickname() . ' - form element ' . $typename);
+			DI::logger()->debug('checkFormSecurityToken failed', ['request' => $_REQUEST]);
 
 			throw new \Friendica\Network\HTTPException\ForbiddenException();
 		}
