@@ -9,12 +9,10 @@ namespace Friendica\Security;
 
 use Exception;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\UnauthorizedException;
-use Friendica\Util\DateTimeFormat;
 
 /**
  * Authentication via the basic auth method
@@ -75,9 +73,9 @@ class BasicAuth
 				$source = 'Twidere';
 			}
 
-			Logger::info('Unrecognized user-agent', ['http_user_agent' => $_SERVER['HTTP_USER_AGENT']]);
+			DI::logger()->info('Unrecognized user-agent', ['http_user_agent' => $_SERVER['HTTP_USER_AGENT']]);
 		} else {
-			Logger::info('Empty user-agent');
+			DI::logger()->info('Empty user-agent');
 		}
 
 		if (empty($source)) {
@@ -160,7 +158,7 @@ class BasicAuth
 			if (!$do_login) {
 				return 0;
 			}
-			Logger::debug('Access denied', ['parameters' => $_SERVER]);
+			DI::logger()->debug('Access denied', ['parameters' => $_SERVER]);
 			// Checking for commandline for the tests, we have to avoid to send a header
 			if (DI::config()->get('system', 'basicauth') && (php_sapi_name() !== 'cli')) {
 				header('WWW-Authenticate: Basic realm="Friendica"');
