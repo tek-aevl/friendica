@@ -13,7 +13,6 @@ use Friendica\Console\AutomaticInstallation;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Installer;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Database\Database;
 use Friendica\DI;
 use Friendica\Test\ConsoleTestCase;
@@ -23,7 +22,6 @@ use Mockery;
 use Mockery\MockInterface;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
-use Psr\Log\NullLogger;
 
 class AutomaticInstallationConsoleTest extends ConsoleTestCase
 {

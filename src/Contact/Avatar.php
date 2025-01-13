@@ -7,7 +7,6 @@
 
 namespace Friendica\Contact;
 
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;

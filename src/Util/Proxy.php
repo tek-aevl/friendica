@@ -8,7 +8,6 @@
 namespace Friendica\Util;
 
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Logger;
 use Friendica\DI;
 use GuzzleHttp\Psr7\Uri;
 

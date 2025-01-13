@@ -8,8 +8,6 @@
 namespace Friendica\Object\Api\Mastodon;
 
 use Friendica\BaseDataTransferObject;
-use Friendica\Core\Logger;
-use Friendica\Core\System;
 
 /**
  * Class Attachment
