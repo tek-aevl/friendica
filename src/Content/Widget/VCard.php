@@ -9,7 +9,6 @@ namespace Friendica\Content\Widget;
 
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
@@ -34,7 +33,7 @@ class VCard
 	public static function getHTML(array $contact, bool $hide_mention = false, bool $hide_follow = false): string
 	{
 		if (!isset($contact['network']) || !isset($contact['id'])) {
-			Logger::warning('Incomplete contact', ['contact' => $contact]);
+			DI::logger()->warning('Incomplete contact', ['contact' => $contact]);
 		}
 
 		$contact_url = Contact::getProfileLink($contact);
