@@ -15,7 +15,6 @@ use Friendica\Content\Text\HTML;
 use Friendica\Content\Widget;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Database\DBA;
@@ -134,7 +133,7 @@ class Index extends BaseSearch
 		// Don't perform a fulltext or tag search on search results that look like an URL
 		// Tags don't look like an URL and the fulltext search does only work with natural words
 		if (parse_url($search, PHP_URL_SCHEME) && parse_url($search, PHP_URL_HOST)) {
-			Logger::info('Skipping tag and fulltext search since the search looks like a URL.', ['q' => $search]);
+			$this->logger->info('Skipping tag and fulltext search since the search looks like a URL.', ['q' => $search]);
 			DI::sysmsg()->addNotice(DI::l10n()->t('No results.'));
 			return $o;
 		}
@@ -159,11 +158,11 @@ class Index extends BaseSearch
 		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
 
 		if ($tag) {
-			Logger::info('Start tag search.', ['q' => $search, 'start' => $pager->getStart(), 'items' => $pager->getItemsPerPage(), 'last' => $last_uriid]);
+			$this->logger->info('Start tag search.', ['q' => $search, 'start' => $pager->getStart(), 'items' => $pager->getItemsPerPage(), 'last' => $last_uriid]);
 			$uriids = Tag::getURIIdListByTag($search, DI::userSession()->getLocalUserId(), $pager->getStart(), $pager->getItemsPerPage(), $last_uriid);
 			$count = Tag::countByTag($search, DI::userSession()->getLocalUserId());
 		} else {
-			Logger::info('Start fulltext search.', ['q' => $search]);
+			$this->logger->info('Start fulltext search.', ['q' => $search]);
 			$uriids = Post\Content::getURIIdListBySearch($search, DI::userSession()->getLocalUserId(), $pager->getStart(), $pager->getItemsPerPage(), $last_uriid);
 			$count = Post\Content::countBySearch($search, DI::userSession()->getLocalUserId());
 		}
@@ -197,7 +196,7 @@ class Index extends BaseSearch
 			'$title' => $title
 		]);
 
-		Logger::info('Start Conversation.', ['q' => $search]);
+		$this->logger->info('Start Conversation.', ['q' => $search]);
 
 		$o .= DI::conversation()->render($items, Conversation::MODE_SEARCH, false, false, 'commented', DI::userSession()->getLocalUserId());
 
