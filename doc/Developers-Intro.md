@@ -170,7 +170,7 @@ Inspired by the [Symonfy BC promise](https://symfony.com/doc/current/contributin
 - Classes, interfaces, traits, enums, functions, methods, properties and constants marked as `@internal` or `@private`
 - Extending or modifying a `final` class or method in any way
 - Calling `private` methods (via Reflection)
-- Accessing `private` propertyies (via Reflection)
+- Accessing `private` properties (via Reflection)
 - Accessing `private` methods (via Reflection)
 - Accessing `private` constants (via Reflection)
 - New properties on overrided `protected` methods
@@ -196,13 +196,13 @@ If we as the Friendica maintainers decide to remove some functions, classes, int
 class Logger {/* ... */}
 ```
 
-This way addons developers might be notified by their IDE or other tools that the usage of the class is deprecated. In Friendica we can now start to replace all occurences and usage of this class with the alternative.
+This way addon developers might be notified by their IDE or other tools that the usage of the class is deprecated. In Friendica we can now start to replace all occurrences and usage of this class with the alternative.
 
-The deprecation albel COULD be remain over multiple releases. As long as the deprecated code is used inside Friendica or the offical addon repository, it SHOULD NOT be hard deprecated.
+The deprecation label COULD be remain over multiple releases. As long as the deprecated code is used inside Friendica or the official addon repository, it SHOULD NOT be hard deprecated.
 
 **2. Hard deprecation**
 
-If the deprecated code is no longer used inside Friendica or the offical addons it MUST be hard deprecated. The code MUST NOT be deleted. It MUST be stay for at least to the next major release.
+If the deprecated code is no longer used inside Friendica or the official addons it MUST be hard deprecated. The code MUST NOT be deleted. It MUST be stay for at least to the next major release.
 
 Hard deprecation code means that the code triggers an `E_USER_DEPRECATION` error if it is called. For instance with the deprecated class `Friendica\Core\Logger` the call of every method should be trigger an error:
 
