@@ -8,7 +8,6 @@
 namespace Friendica\Util;
 
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\DI;
 use phpseclib3\Crypt\PublicKeyLoader;
 
@@ -27,7 +26,7 @@ class Crypto
 	public static function rsaSign($data, $key, $alg = 'sha256')
 	{
 		if (empty($key)) {
-			Logger::warning('Empty key parameter');
+			DI::logger()->warning('Empty key parameter');
 		}
 		openssl_sign($data, $sig, $key, (($alg == 'sha1') ? OPENSSL_ALGO_SHA1 : $alg));
 		return $sig;
@@ -43,7 +42,7 @@ class Crypto
 	public static function rsaVerify($data, $sig, $key, $alg = 'sha256')
 	{
 		if (empty($key)) {
-			Logger::warning('Empty key parameter');
+			DI::logger()->warning('Empty key parameter');
 		}
 		return openssl_verify($data, $sig, $key, (($alg == 'sha1') ? OPENSSL_ALGO_SHA1 : $alg));
 	}
@@ -80,7 +79,7 @@ class Crypto
 		$result = openssl_pkey_new($openssl_options);
 
 		if (empty($result)) {
-			Logger::notice('new_keypair: failed');
+			DI::logger()->notice('new_keypair: failed');
 			return false;
 		}
 
@@ -161,7 +160,7 @@ class Crypto
 	private static function encapsulateOther($data, $pubkey, $alg)
 	{
 		if (!$pubkey) {
-			Logger::notice('no key. data: '.$data);
+			DI::logger()->notice('no key. data: '.$data);
 		}
 		$fn = 'encrypt' . strtoupper($alg);
 		if (method_exists(__CLASS__, $fn)) {
@@ -173,7 +172,7 @@ class Crypto
 			// log the offending call so we can track it down
 			if (!openssl_public_encrypt($key, $k, $pubkey)) {
 				$x = debug_backtrace();
-				Logger::notice('RSA failed', ['trace' => $x[0]]);
+				DI::logger()->notice('RSA failed', ['trace' => $x[0]]);
 			}
 
 			$result['alg'] = $alg;
@@ -203,7 +202,7 @@ class Crypto
 	private static function encapsulateAes($data, $pubkey)
 	{
 		if (!$pubkey) {
-			Logger::notice('aes_encapsulate: no key. data: ' . $data);
+			DI::logger()->notice('aes_encapsulate: no key. data: ' . $data);
 		}
 
 		$key = random_bytes(32);
@@ -214,7 +213,7 @@ class Crypto
 		// log the offending call so we can track it down
 		if (!openssl_public_encrypt($key, $k, $pubkey)) {
 			$x = debug_backtrace();
-			Logger::notice('aes_encapsulate: RSA failed.', ['data' => $x[0]]);
+			DI::logger()->notice('aes_encapsulate: RSA failed.', ['data' => $x[0]]);
 		}
 
 		$result['alg'] = 'aes256cbc';

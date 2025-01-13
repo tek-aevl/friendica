@@ -8,7 +8,6 @@
 namespace Friendica\Util;
 
 use Friendica\Core\Cache\Enum\Duration;
-use Friendica\Core\Logger;
 use Exception;
 use Friendica\Core\System;
 use Friendica\DI;
@@ -72,7 +71,7 @@ class JsonLD
 						$url = DI::basePath() . '/static/apschema.jsonld';
 						break;
 					default:
-						Logger::info('Got url', ['url' => $url]);
+						DI::logger()->info('Got url', ['url' => $url]);
 						break;
 				}
 		}
@@ -89,7 +88,7 @@ class JsonLD
 		}
 
 		if ($recursion > 5) {
-			Logger::error('jsonld bomb detected at: ' . $url);
+			DI::logger()->error('jsonld bomb detected at: ' . $url);
 			System::exit();
 		}
 
@@ -127,9 +126,9 @@ class JsonLD
 				$messages[] = $currentException->getMessage();
 			} while ($currentException = $currentException->getPrevious());
 
-			Logger::notice('JsonLD normalize error', ['messages' => $messages]);
-			Logger::info('JsonLD normalize error', ['trace' => $e->getTraceAsString()]);
-			Logger::debug('JsonLD normalize error', ['jsonobj' => $jsonobj]);
+			DI::logger()->notice('JsonLD normalize error', ['messages' => $messages]);
+			DI::logger()->info('JsonLD normalize error', ['trace' => $e->getTraceAsString()]);
+			DI::logger()->debug('JsonLD normalize error', ['jsonobj' => $jsonobj]);
 		}
 
 		return $normalized;
@@ -176,18 +175,18 @@ class JsonLD
 			$compacted = jsonld_compact($jsonobj, $context);
 		} catch (Exception $e) {
 			$compacted = false;
-			Logger::notice('compacting error', ['msg' => $e->getMessage(), 'previous' => $e->getPrevious(), 'line' => $e->getLine()]);
+			DI::logger()->notice('compacting error', ['msg' => $e->getMessage(), 'previous' => $e->getPrevious(), 'line' => $e->getLine()]);
 			if ($logfailed && DI::config()->get('debug', 'ap_log_failure')) {
 				$tempfile = tempnam(System::getTempPath(), 'failed-jsonld');
 				file_put_contents($tempfile, json_encode(['json' => $orig_json, 'msg' => $e->getMessage(), 'previous' => $e->getPrevious()], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-				Logger::notice('Failed message stored', ['file' => $tempfile]);
+				DI::logger()->notice('Failed message stored', ['file' => $tempfile]);
 			}
 		}
 
 		$json = json_decode(json_encode($compacted, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true);
 
 		if ($json === false) {
-			Logger::notice('JSON encode->decode failed', ['orig_json' => $orig_json, 'compacted' => $compacted]);
+			DI::logger()->notice('JSON encode->decode failed', ['orig_json' => $orig_json, 'compacted' => $compacted]);
 			$json = [];
 		}
 
@@ -212,7 +211,7 @@ class JsonLD
 			// Workaround for servers with missing context
 			// See issue https://github.com/nextcloud/social/issues/330
 			if (!in_array('https://w3id.org/security/v1', $json['@context'])) {
-				Logger::debug('Missing security context');
+				DI::logger()->debug('Missing security context');
 				$json['@context'][] = 'https://w3id.org/security/v1';
 			}
 		}
@@ -220,16 +219,16 @@ class JsonLD
 		// Issue 14448: Peertube transmits an unexpected type and schema URL.
 		array_walk_recursive($json['@context'], function (&$value, $key) {
 			if ($key == '@type' && $value == '@json') {
-				Logger::debug('"@json" converted to "@id"');
+				DI::logger()->debug('"@json" converted to "@id"');
 				$value = '@id';
 			}
 			if ($key == 'sc' && $value == 'http://schema.org/') {
-				Logger::debug('schema.org path fixed');
+				DI::logger()->debug('schema.org path fixed');
 				$value = 'http://schema.org#';
 			}
 			// Issue 14630: Wordpress Event Bridge uses a URL that cannot be retrieved
 			if (is_int($key) && $value == 'https://schema.org/') {
-				Logger::debug('https schema.org path fixed');
+				DI::logger()->debug('https schema.org path fixed');
 				$value = 'https://schema.org/docs/jsonldcontext.json#';
 			}
 		});
@@ -237,7 +236,7 @@ class JsonLD
 		// Bookwyrm transmits "id" fields with "null", which isn't allowed.
 		array_walk_recursive($json, function (&$value, $key) {
 			if ($key == 'id' && is_null($value)) {
-				Logger::debug('Fixed null id');
+				DI::logger()->debug('Fixed null id');
 				$value = '';
 			}
 		});

@@ -8,7 +8,6 @@
 namespace Friendica\Util;
 
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
@@ -79,13 +78,13 @@ class Network
 				try {
 					$curlResult = DI::httpClient()->get($url, HttpClientAccept::DEFAULT, $options);
 				} catch (\Exception $e) {
-					Logger::notice('Got exception', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+					DI::logger()->notice('Got exception', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
 					return false;
 				}
 			}
 
 			if (!$curlResult->isSuccess()) {
-				Logger::notice('Url not reachable', ['host' => $host, 'url' => $url]);
+				DI::logger()->notice('Url not reachable', ['host' => $host, 'url' => $url]);
 				return false;
 			} elseif ($curlResult->isRedirectUrl()) {
 				$url = $curlResult->getRedirectUrl();
@@ -184,7 +183,7 @@ class Network
 		try {
 			return self::isUriBlocked(new Uri($url));
 		} catch (\Throwable $e) {
-			Logger::warning('Invalid URL', ['url' => $url]);
+			DI::logger()->warning('Invalid URL', ['url' => $url]);
 			return false;
 		}
 	}
@@ -310,7 +309,7 @@ class Network
 			$avatar['url'] = DI::baseUrl() . Contact::DEFAULT_AVATAR_PHOTO;
 		}
 
-		Logger::info('Avatar: ' . $avatar['email'] . ' ' . $avatar['url']);
+		DI::logger()->info('Avatar: ' . $avatar['email'] . ' ' . $avatar['url']);
 		return $avatar['url'];
 	}
 
@@ -508,7 +507,7 @@ class Network
 	private static function idnToAscii(string $uri): string
 	{
 		if (!function_exists('idn_to_ascii')) {
-			Logger::error('IDN functions are missing.');
+			DI::logger()->error('IDN functions are missing.');
 			return $uri;
 		}
 		return idn_to_ascii($uri);
@@ -634,7 +633,7 @@ class Network
 		}
 
 		if ($sanitized != $url) {
-			Logger::debug('Link got sanitized', ['url' => $url, 'sanitzed' => $sanitized]);
+			DI::logger()->debug('Link got sanitized', ['url' => $url, 'sanitzed' => $sanitized]);
 		}
 		return $sanitized;
 	}
@@ -654,7 +653,7 @@ class Network
 		try {
 			return new Uri($uri);
 		} catch (\Exception $e) {
-			Logger::debug('Invalid URI', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'uri' => $uri]);
+			DI::logger()->debug('Invalid URI', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'uri' => $uri]);
 			return null;
 		}
 	}
@@ -662,10 +661,10 @@ class Network
 	/**
 	 * Remove an Url parameter
 	 *
-	 * @param string $url 
-	 * @param string $parameter 
-	 * @return string 
-	 * @throws MalformedUriException 
+	 * @param string $url
+	 * @param string $parameter
+	 * @return string
+	 * @throws MalformedUriException
 	 */
 	public static function removeUrlParameter(string $url, string $parameter): string
 	{

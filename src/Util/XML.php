@@ -11,7 +11,7 @@ use DOMDocument;
 use DOMElement;
 use DOMNode;
 use DOMXPath;
-use Friendica\Core\Logger;
+use Friendica\DI;
 use SimpleXMLElement;
 
 /**
@@ -256,7 +256,7 @@ class XML
 		}
 
 		if (!function_exists('xml_parser_create')) {
-			Logger::error('Xml::toArray: parser function missing');
+			DI::logger()->error('Xml::toArray: parser function missing');
 			return [];
 		}
 
@@ -272,7 +272,7 @@ class XML
 		}
 
 		if (!$parser) {
-			Logger::warning('Xml::toArray: xml_parser_create: no resource');
+			DI::logger()->warning('Xml::toArray: xml_parser_create: no resource');
 			return [];
 		}
 
@@ -284,9 +284,9 @@ class XML
 		@xml_parser_free($parser);
 
 		if (! $xml_values) {
-			Logger::debug('Xml::toArray: libxml: parse error: ' . $contents);
+			DI::logger()->debug('Xml::toArray: libxml: parse error: ' . $contents);
 			foreach (libxml_get_errors() as $err) {
-				Logger::debug('libxml: parse: ' . $err->code . ' at ' . $err->line . ':' . $err->column . ' : ' . $err->message);
+				DI::logger()->debug('libxml: parse: ' . $err->code . ' at ' . $err->line . ':' . $err->column . ' : ' . $err->message);
 			}
 			libxml_clear_errors();
 			return [];
@@ -436,11 +436,11 @@ class XML
 		$x = @simplexml_load_string($s);
 		if (!$x) {
 			if (!$suppress_log) {
-				Logger::error('Error(s) while parsing XML string.');
+				DI::logger()->error('Error(s) while parsing XML string.');
 				foreach (libxml_get_errors() as $err) {
-					Logger::info('libxml error', ['code' => $err->code, 'position' => $err->line . ':' . $err->column, 'message' => $err->message]);
+					DI::logger()->info('libxml error', ['code' => $err->code, 'position' => $err->line . ':' . $err->column, 'message' => $err->message]);
 				}
-				Logger::debug('Erroring XML string', ['xml' => $s]);
+				DI::logger()->debug('Erroring XML string', ['xml' => $s]);
 			}
 			libxml_clear_errors();
 		}
