@@ -7,8 +7,8 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 
@@ -31,7 +31,7 @@ class UpdateContact
 
 		$success = Contact::updateFromProbe($contact_id);
 
-		Logger::info('Updated from probe', ['id' => $contact_id, 'success' => $success]);
+		DI::logger()->info('Updated from probe', ['id' => $contact_id, 'success' => $success]);
 	}
 
 	/**
