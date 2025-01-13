@@ -30,7 +30,6 @@
 
 use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
 use Friendica\Core\Config\ValueObject\Cache;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Storage\Capability\ICanReadFromStorage;
 use Friendica\Core\Storage\Type\Database as DatabaseStorage;

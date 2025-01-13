@@ -7,7 +7,6 @@
  *
  */
 
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Network\HTTPException\NotModifiedException;
 

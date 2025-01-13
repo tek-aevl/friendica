@@ -16,13 +16,11 @@ use Friendica\App\Mode;
 use Friendica\AppHelper;
 use Friendica\Content\Text\Plaintext;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
-use Friendica\Model\Profile;
 
 const FRIO_SCHEME_ACCENT_BLUE   = '#1e87c2';
 const FRIO_SCHEME_ACCENT_RED    = '#b50404';
