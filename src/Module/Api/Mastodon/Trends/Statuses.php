@@ -12,7 +12,6 @@ use Friendica\App\BaseURL;
 use Friendica\AppHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -67,7 +66,7 @@ class Statuses extends BaseApi
 			try {
 				$trending[] = DI::mstdnStatus()->createFromUriId($status['uri-id'], $uid, $display_quotes);
 			} catch (\Exception $exception) {
-				Logger::info('Post not fetchable', ['uri-id' => $status['uri-id'], 'uid' => $uid, 'exception' => $exception]);
+				$this->logger->info('Post not fetchable', ['uri-id' => $status['uri-id'], 'uid' => $uid, 'exception' => $exception]);
 			}
 		}
 		DBA::close($statuses);

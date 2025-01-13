@@ -7,9 +7,7 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Module\BaseApi;
@@ -34,7 +32,7 @@ class Directory extends BaseApi
 			'local'  => false,    // Only return local accounts.
 		], $request);
 
-		Logger::info('directory', ['offset' => $request['offset'], 'limit' => $request['limit'], 'order' => $request['order'], 'local' => $request['local']]);
+		$this->logger->info('directory', ['offset' => $request['offset'], 'limit' => $request['limit'], 'order' => $request['order'], 'local' => $request['local']]);
 
 		if ($request['local']) {
 			$table = 'owner-view';
