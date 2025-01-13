@@ -21,12 +21,25 @@ use Psr\Log\NullLogger;
 
 class LoggerManagerTest extends TestCase
 {
-	public function testGetLoggerReturnsPsrLogger(): void
+	/**
+	 * Clean the private static properties
+	 *
+	 * @see LoggerManager::$logger
+	 * @see LoggerManager::$logChannel
+	 */
+	protected function tearDown(): void
 	{
 		$reflectionProperty = new \ReflectionProperty(LoggerManager::class, 'logger');
 		$reflectionProperty->setAccessible(true);
 		$reflectionProperty->setValue(null, null);
 
+		$reflectionProperty = new \ReflectionProperty(LoggerManager::class, 'logChannel');
+		$reflectionProperty->setAccessible(true);
+		$reflectionProperty->setValue(null, LogChannel::DEFAULT);
+	}
+
+	public function testGetLoggerReturnsPsrLogger(): void
+	{
 		$factory = new LoggerManager(
 			$this->createStub(IManageConfigValues::class),
 			$this->createStub(LoggerFactory::class)
@@ -37,10 +50,6 @@ class LoggerManagerTest extends TestCase
 
 	public function testGetLoggerReturnsSameObject(): void
 	{
-		$reflectionProperty = new \ReflectionProperty(LoggerManager::class, 'logger');
-		$reflectionProperty->setAccessible(true);
-		$reflectionProperty->setValue(null, null);
-
 		$factory = new LoggerManager(
 			$this->createStub(IManageConfigValues::class),
 			$this->createStub(LoggerFactory::class)
@@ -55,10 +64,6 @@ class LoggerManagerTest extends TestCase
 		$config->method('get')->willReturnMap([
 			['system', 'debugging', null, false],
 		]);
-
-		$reflectionProperty = new \ReflectionProperty(LoggerManager::class, 'logger');
-		$reflectionProperty->setAccessible(true);
-		$reflectionProperty->setValue(null, null);
 
 		$factory = new LoggerManager(
 			$config,
@@ -76,10 +81,6 @@ class LoggerManagerTest extends TestCase
 			['system', 'profiling', null, true],
 		]);
 
-		$reflectionProperty = new \ReflectionProperty(LoggerManager::class, 'logger');
-		$reflectionProperty->setAccessible(true);
-		$reflectionProperty->setValue(null, null);
-
 		$factory = new LoggerManager(
 			$config,
 			$this->createStub(LoggerFactory::class)
@@ -95,10 +96,6 @@ class LoggerManagerTest extends TestCase
 			['system', 'debugging', null, false],
 			['system', 'profiling', null, true],
 		]);
-
-		$reflectionProperty = new \ReflectionProperty(LoggerManager::class, 'logger');
-		$reflectionProperty->setAccessible(true);
-		$reflectionProperty->setValue(null, null);
 
 		$factory = new LoggerManager(
 			$config,
@@ -119,10 +116,6 @@ class LoggerManagerTest extends TestCase
 			['system', 'debugging', null, false],
 			['system', 'profiling', null, true],
 		]);
-
-		$reflectionProperty = new \ReflectionProperty(LoggerManager::class, 'logger');
-		$reflectionProperty->setAccessible(true);
-		$reflectionProperty->setValue(null, null);
 
 		$factory = new LoggerManager(
 			$config,
