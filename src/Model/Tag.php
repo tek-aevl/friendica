@@ -26,13 +26,13 @@ use Friendica\Util\Strings;
  */
 class Tag
 {
-	const UNKNOWN  = 0;
-	const HASHTAG  = 1;
-	const MENTION  = 2;
+	const UNKNOWN = 0;
+	const HASHTAG = 1;
+	const MENTION = 2;
 	/**
 	 * An implicit mention is a mention in a comment body that is redundant with the threading information.
 	 */
-	const IMPLICIT_MENTION  = 8;
+	const IMPLICIT_MENTION = 8;
 	/**
 	 * An exclusive mention transmits the post only to the target account without transmitting it to the followers, usually a group.
 	 */
@@ -90,7 +90,7 @@ class Tag
 			return;
 		}
 
-		$cid = 0;
+		$cid   = 0;
 		$tagid = 0;
 
 		if (in_array($type, [self::MENTION, self::EXCLUSIVE_MENTION, self::IMPLICIT_MENTION, self::TO, self::CC, self::BTO, self::BCC, self::AUDIENCE, self::ATTRIBUTED])) {
@@ -137,7 +137,7 @@ class Tag
 		$fields = ['uri-id' => $uriId, 'type' => $type, 'tid' => $tagid, 'cid' => $cid];
 
 		if (in_array($type, [self::MENTION, self::EXCLUSIVE_MENTION, self::IMPLICIT_MENTION])) {
-			$condition = $fields;
+			$condition         = $fields;
 			$condition['type'] = [self::MENTION, self::EXCLUSIVE_MENTION, self::IMPLICIT_MENTION];
 			if (DBA::exists('post-tag', $condition)) {
 				DI::logger()->info('Tag already exists', $fields);
@@ -528,9 +528,9 @@ class Tag
 	public static function populateFromItem(array &$item): array
 	{
 		$return = [
-			'tags' => [],
-			'hashtags' => [],
-			'mentions' => [],
+			'tags'              => [],
+			'hashtags'          => [],
+			'mentions'          => [],
 			'implicit_mentions' => [],
 		];
 
@@ -556,7 +556,7 @@ class Tag
 					}
 
 					$return['hashtags'][] = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
-					$return['tags'][] = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
+					$return['tags'][]     = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
 					break;
 
 				case self::MENTION:
@@ -567,7 +567,7 @@ class Tag
 						$tag['url'] = Contact::magicLink($tag['url']);
 					}
 					$return['mentions'][] = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
-					$return['tags'][] = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
+					$return['tags'][]     = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
 					break;
 
 				case self::IMPLICIT_MENTION:
@@ -808,7 +808,7 @@ class Tag
 	 */
 	private static function getUIDListByTag(string $tag): array
 	{
-		$uids = [];
+		$uids     = [];
 		$searches = DBA::select('search', ['uid'], ['term' => $tag]);
 		while ($search = DBA::fetch($searches)) {
 			$uids[] = $search['uid'];

@@ -35,15 +35,15 @@ class Directory extends BaseApi
 		$this->logger->info('directory', ['offset' => $request['offset'], 'limit' => $request['limit'], 'order' => $request['order'], 'local' => $request['local']]);
 
 		if ($request['local']) {
-			$table = 'owner-view';
+			$table     = 'owner-view';
 			$condition = ['net-publish' => true];
 		} else {
-			$table = 'contact';
+			$table     = 'contact';
 			$condition = ['uid' => 0, 'hidden' => false, 'network' => Protocol::FEDERATED];
 		}
 
 		$params = ['limit' => [$request['offset'], $request['limit']],
-			'order' => [($request['order'] == 'active') ? 'last-item' : 'created' => true]];
+			'order'           => [($request['order'] == 'active') ? 'last-item' : 'created' => true]];
 
 		$accounts = [];
 		$contacts = DBA::select($table, ['id', 'uid'], $condition, $params);

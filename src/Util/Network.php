@@ -20,7 +20,6 @@ use Psr\Http\Message\UriInterface;
 
 class Network
 {
-
 	/**
 	 * Return raw post data from a post request
 	 *
@@ -58,7 +57,7 @@ class Network
 		}
 
 		$xrd_timeout = DI::config()->get('system', 'xrd_timeout');
-		$host = parse_url($url, PHP_URL_HOST);
+		$host        = parse_url($url, PHP_URL_HOST);
 
 		if (empty($host) || !(filter_var($host, FILTER_VALIDATE_IP) || @dns_get_record($host . '.', DNS_A + DNS_AAAA))) {
 			return false;
@@ -66,7 +65,7 @@ class Network
 
 		if (in_array(parse_url($url, PHP_URL_SCHEME), ['https', 'http'])) {
 			$options = [HttpClientOptions::VERIFY => true, HttpClientOptions::TIMEOUT => $xrd_timeout,
-				HttpClientOptions::REQUEST => HttpClientRequest::URLVERIFIER];
+				HttpClientOptions::REQUEST           => HttpClientRequest::URLVERIFIER];
 			try {
 				$curlResult = DI::httpClient()->head($url, $options);
 			} catch (\Exception $e) {
@@ -298,9 +297,9 @@ class Network
 
 	public static function lookupAvatarByEmail(string $email): string
 	{
-		$avatar['size'] = 300;
-		$avatar['email'] = $email;
-		$avatar['url'] = '';
+		$avatar['size']    = 300;
+		$avatar['email']   = $email;
+		$avatar['url']     = '';
 		$avatar['success'] = false;
 
 		Hook::callAll('avatar_lookup', $avatar);
@@ -340,18 +339,18 @@ class Network
 							'fb_action_ids', 'fb_action_types', 'fb_ref',
 							'awesm', 'wtrid',
 							'woo_campaign', 'woo_source', 'woo_medium', 'woo_content', 'woo_term']
-						)
+					)
 					) {
 						$pair = $param . '=' . urlencode($value);
-						$url = str_replace($pair, '', $url);
+						$url  = str_replace($pair, '', $url);
 
 						// Second try: if the url isn't encoded completely
 						$pair = $param . '=' . str_replace(' ', '+', $value);
-						$url = str_replace($pair, '', $url);
+						$url  = str_replace($pair, '', $url);
 
 						// Third try: Maybe the url isn't encoded at all
 						$pair = $param . '=' . $value;
-						$url = str_replace($pair, '', $url);
+						$url  = str_replace($pair, '', $url);
 
 						$url = str_replace(['?&', '&&'], ['?', ''], $url);
 					}
@@ -383,7 +382,7 @@ class Network
 
 		$base = [
 			'scheme' => parse_url($basepath, PHP_URL_SCHEME),
-			'host' => parse_url($basepath, PHP_URL_HOST),
+			'host'   => parse_url($basepath, PHP_URL_HOST),
 		];
 
 		$parts = array_merge($base, parse_url('/' . ltrim($url, '/')));
@@ -463,7 +462,7 @@ class Network
 		$pathparts1 = explode('/', $parts1['path']);
 		$pathparts2 = explode('/', $parts2['path']);
 
-		$i = 0;
+		$i    = 0;
 		$path = '';
 		do {
 			$path1 = $pathparts1[$i] ?? '';
@@ -491,7 +490,7 @@ class Network
 		$parts = parse_url($uri);
 		if (!empty($parts['scheme']) && !empty($parts['host'])) {
 			$parts['host'] = self::idnToAscii($parts['host']);
-			$uri = (string)Uri::fromParts($parts);
+			$uri           = (string)Uri::fromParts($parts);
 		} else {
 			$parts = explode('@', $uri);
 			if (count($parts) == 2) {

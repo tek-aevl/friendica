@@ -115,7 +115,7 @@ class Delivery
 		} else {
 			$data = ActivityPub\Transmitter::createCachedActivityFromItem($item_id);
 			if (!empty($data)) {
-				$timestamp  = microtime(true);
+				$timestamp = microtime(true);
 				try {
 					$response   = HTTPSignature::post($data, $inbox, $owner);
 					$success    = $response->isSuccess();
@@ -150,7 +150,7 @@ class Delivery
 
 					// Resubscribe to relay server upon client error
 					if (!$serverfail && ($response->getReturnCode() >= 400) && ($response->getReturnCode() <= 499)) {
-						$actor = self:: fetchActorForRelayInbox($inbox);
+						$actor = self::fetchActorForRelayInbox($inbox);
 						if (!empty($actor)) {
 							$drop = !ActivityPub\Transmitter::sendRelayFollow($actor);
 							DI::logger()->notice('Resubscribed to relay', ['url' => $actor, 'success' => !$drop]);

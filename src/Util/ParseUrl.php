@@ -77,7 +77,7 @@ class ParseUrl
 			return [];
 		}
 
-		$contenttype =  $curlResult->getContentType();
+		$contenttype = $curlResult->getContentType();
 		if (empty($contenttype)) {
 			return ['application', 'octet-stream'];
 		}
@@ -108,14 +108,16 @@ class ParseUrl
 	{
 		if (empty($url)) {
 			return [
-				'url' => '',
+				'url'  => '',
 				'type' => 'error',
 			];
 		}
 
 		$urlHash = hash('sha256', $url);
 
-		$parsed_url = DBA::selectFirst('parsed_url', ['content'],
+		$parsed_url = DBA::selectFirst(
+			'parsed_url',
+			['content'],
 			['url_hash' => $urlHash, 'oembed' => false]
 		);
 		if (!empty($parsed_url['content'])) {
@@ -186,7 +188,7 @@ class ParseUrl
 	{
 		if (empty($url)) {
 			return [
-				'url' => '',
+				'url'  => '',
 				'type' => 'error',
 			];
 		}
@@ -203,8 +205,8 @@ class ParseUrl
 		$url = Network::stripTrackingQueryParams($url);
 
 		$siteinfo = [
-			'url' => $url,
-			'type' => 'link',
+			'url'     => $url,
+			'type'    => 'link',
 			'expires' => DateTimeFormat::utc(self::DEFAULT_EXPIRATION_FAILURE),
 		];
 
@@ -244,12 +246,12 @@ class ParseUrl
 
 		if ($cacheControlHeader = $curlResult->getHeader('Cache-Control')[0] ?? '') {
 			if (preg_match('/max-age=([0-9]+)/i', $cacheControlHeader, $matches)) {
-				$maxAge = max(86400, (int)array_pop($matches));
+				$maxAge              = max(86400, (int)array_pop($matches));
 				$siteinfo['expires'] = DateTimeFormat::utc("now + $maxAge seconds");
 			}
 		}
 
-		$body = $curlResult->getBodyString();
+		$body             = $curlResult->getBodyString();
 		$siteinfo['size'] = mb_strlen($body);
 
 		$charset = '';
@@ -259,7 +261,8 @@ class ParseUrl
 			if (isset($mediaType->parameters['charset'])) {
 				$charset = $mediaType->parameters['charset'];
 			}
-		} catch(\InvalidArgumentException $e) {}
+		} catch(\InvalidArgumentException $e) {
+		}
 
 		$siteinfo['charset'] = $charset;
 
@@ -305,9 +308,9 @@ class ParseUrl
 			}
 
 			if (@$meta_tag['http-equiv'] == 'refresh') {
-				$path = $meta_tag['content'];
+				$path     = $meta_tag['content'];
 				$pathinfo = explode(';', $path);
-				$content = '';
+				$content  = '';
 				foreach ($pathinfo as $value) {
 					if (substr(strtolower($value), 0, 4) == 'url=') {
 						$content = substr($value, 4);
@@ -487,7 +490,7 @@ class ParseUrl
 
 		if (!empty($siteinfo['text']) && mb_strlen($siteinfo['text']) > self::MAX_DESC_COUNT) {
 			$siteinfo['text'] = mb_substr($siteinfo['text'], 0, self::MAX_DESC_COUNT) . '…';
-			$pos = mb_strrpos($siteinfo['text'], '.');
+			$pos              = mb_strrpos($siteinfo['text'], '.');
 			if ($pos > self::MIN_DESC_COUNT) {
 				$siteinfo['text'] = mb_substr($siteinfo['text'], 0, $pos + 1);
 			}
@@ -510,7 +513,7 @@ class ParseUrl
 	 * @param array $siteinfo
 	 * @return array
 	 */
-	private static function checkMedia(string $page_url, array $siteinfo) : array
+	private static function checkMedia(string $page_url, array $siteinfo): array
 	{
 		if (!empty($siteinfo['images'])) {
 			array_walk($siteinfo['images'], function (&$image) use ($page_url) {
@@ -521,13 +524,13 @@ class ParseUrl
 				 */
 				if (!empty($image['url'])) {
 					$image['url'] = self::completeUrl($image['url'], $page_url);
-					$photodata = Images::getInfoFromURLCached($image['url']);
+					$photodata    = Images::getInfoFromURLCached($image['url']);
 					if (($photodata) && ($photodata[0] > 50) && ($photodata[1] > 50)) {
-						$image['src'] = $image['url'];
-						$image['width'] = $photodata[0];
-						$image['height'] = $photodata[1];
+						$image['src']         = $image['url'];
+						$image['width']       = $photodata[0];
+						$image['height']      = $photodata[1];
 						$image['contenttype'] = $photodata['mime'];
-						$image['blurhash'] = $photodata['blurhash'] ?? null;
+						$image['blurhash']    = $photodata['blurhash'] ?? null;
 						unset($image['url']);
 						ksort($image);
 					} else {
@@ -544,14 +547,14 @@ class ParseUrl
 		foreach (['audio', 'video'] as $element) {
 			if (!empty($siteinfo[$element])) {
 				array_walk($siteinfo[$element], function (&$media) use ($page_url, &$siteinfo) {
-					$url = '';
-					$embed = '';
-					$content = '';
+					$url         = '';
+					$embed       = '';
+					$content     = '';
 					$contenttype = '';
 					foreach (['embed', 'content', 'url'] as $field) {
 						if (!empty($media[$field])) {
 							$media[$field] = self::completeUrl($media[$field], $page_url);
-							$type = self::getContentType($media[$field]);
+							$type          = self::getContentType($media[$field]);
 							if (($type[0] ?? '') == 'text') {
 								if ($field == 'embed') {
 									$embed = $media[$field];
@@ -559,7 +562,7 @@ class ParseUrl
 									$url = $media[$field];
 								}
 							} elseif (!empty($type[0])) {
-								$content = $media[$field];
+								$content     = $media[$field];
 								$contenttype = implode('/', $type);
 							}
 						}
@@ -706,7 +709,7 @@ class ParseUrl
 		} elseif (!empty($jsonld['@type'])) {
 			$siteinfo = self::parseJsonLd($siteinfo, $jsonld);
 		} elseif (!empty($jsonld)) {
-			$keys = array_keys($jsonld);
+			$keys         = array_keys($jsonld);
 			$numeric_keys = true;
 			foreach ($keys as $key) {
 				if (!is_int($key)) {
@@ -810,7 +813,7 @@ class ParseUrl
 			case 'Person':
 			case 'Patient':
 			case 'PerformingGroup':
-			case 'DanceGroup';
+			case 'DanceGroup':
 			case 'MusicGroup':
 			case 'TheaterGroup':
 				return self::parseJsonLdWebPerson($siteinfo, $jsonld);
@@ -953,7 +956,7 @@ class ParseUrl
 			$content = JsonLD::fetchElement($jsonld, 'keywords');
 			if (!empty($content)) {
 				$siteinfo['keywords'] = [];
-				$keywords = explode(',', $content);
+				$keywords             = explode(',', $content);
 				foreach ($keywords as $keyword) {
 					$siteinfo['keywords'][] = trim($keyword);
 				}

@@ -29,11 +29,15 @@ class PollContacts
 		$condition = ['network' => [Protocol::FEED, Protocol::MAIL], 'self' => false, 'blocked' => false, 'archive' => false];
 
 		if (!empty($abandon_days)) {
-			$condition = DBA::mergeConditions($condition,
-				["`uid` != ? AND `uid` IN (SELECT `uid` FROM `user` WHERE `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired` AND `last-activity` > ?)", 0, DateTimeFormat::utc('now - ' . $abandon_days . ' days')]);
-		} else 	{
-			$condition = DBA::mergeConditions($condition,
-				["`uid` != ? AND `uid` IN (SELECT `uid` FROM `user` WHERE `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`)", 0]);
+			$condition = DBA::mergeConditions(
+				$condition,
+				["`uid` != ? AND `uid` IN (SELECT `uid` FROM `user` WHERE `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired` AND `last-activity` > ?)", 0, DateTimeFormat::utc('now - ' . $abandon_days . ' days')]
+			);
+		} else {
+			$condition = DBA::mergeConditions(
+				$condition,
+				["`uid` != ? AND `uid` IN (SELECT `uid` FROM `user` WHERE `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`)", 0]
+			);
 		}
 
 		$contacts = DBA::select('contact', ['id', 'nick', 'name', 'network', 'archive', 'last-update', 'priority', 'rating'], $condition);
@@ -47,10 +51,10 @@ class PollContacts
 				continue;
 			}
 
-			$now = DateTimeFormat::utcNow();
+			$now         = DateTimeFormat::utcNow();
 			$next_update = DateTimeFormat::utc($contact['last-update'] . ' + ' . $interval . ' minute');
 
-			if ($now < $next_update)  {
+			if ($now < $next_update) {
 				DI::logger()->debug('No update', ['cid' => $contact['id'], 'interval' => $interval, 'next' => $next_update, 'now' => $now]);
 				continue;
 			}
