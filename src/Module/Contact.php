@@ -12,7 +12,6 @@ use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Widget;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Theme;
@@ -121,7 +120,7 @@ class Contact extends BaseModule
 		try {
 			UpdateContact::add(Worker::PRIORITY_HIGH, $contact_id);
 		} catch (\InvalidArgumentException $e) {
-			Logger::notice($e->getMessage(), ['contact' => $contact]);
+			DI::logger()->notice($e->getMessage(), ['contact' => $contact]);
 		}
 	}
 

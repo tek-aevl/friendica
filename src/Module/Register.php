@@ -14,7 +14,6 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Worker;
@@ -89,7 +88,7 @@ class Register extends BaseModule
 		if ($max_dailies) {
 			$count = DBA::count('user', ['`register_date` > UTC_TIMESTAMP - INTERVAL 1 day']);
 			if ($count >= $max_dailies) {
-				Logger::notice('max daily registrations exceeded.');
+				$this->logger->notice('max daily registrations exceeded.');
 				DI::sysmsg()->addNotice(DI::l10n()->t('This site has exceeded the number of allowed daily account registrations. Please try again tomorrow.'));
 				return '';
 			}
@@ -250,7 +249,7 @@ class Register extends BaseModule
 
 		// Is there text in the tar pit?
 		if (!empty($arr['email'])) {
-			Logger::info('Tar pit', $arr);
+			$this->logger->info('Tar pit', $arr);
 			DI::sysmsg()->addNotice(DI::l10n()->t('You have entered too much information.'));
 			DI::baseUrl()->redirect('register/');
 		}
@@ -273,7 +272,7 @@ class Register extends BaseModule
 		}
 
 		if ($arr['email'] != $arr['repeat']) {
-			Logger::info('Mail mismatch', $arr);
+			$this->logger->info('Mail mismatch', $arr);
 			DI::sysmsg()->addNotice(DI::l10n()->t('Please enter the identical mail address in the second field.'));
 			$regdata = ['email' => $arr['email'], 'nickname' => $arr['nickname'], 'username' => $arr['username']];
 			DI::baseUrl()->redirect('register?' . http_build_query($regdata));
