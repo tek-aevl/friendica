@@ -12,7 +12,6 @@ use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Model\User;
 use Friendica\Module\Response;
