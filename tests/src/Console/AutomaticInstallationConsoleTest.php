@@ -104,7 +104,6 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 		});
 
 		$this->mode->shouldReceive('isInstall')->andReturn(true);
-		Logger::init(new NullLogger());
 	}
 
 	/**
