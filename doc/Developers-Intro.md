@@ -156,3 +156,76 @@ If you are interested in improving those clients, please contact the developers 
 * iOS: *currently no client*
 * SailfishOS: **Friendiy** [src](https://kirgroup.com/projects/fabrixxm/harbour-friendly) - developed by [Fabio](https://kirgroup.com/profile/fabrixxm/profile)
 * Windows: **Friendica Mobile** for Windows versions [before 8.1](http://windowsphone.com/s?appid=e3257730-c9cf-4935-9620-5261e3505c67) and [Windows 10](https://www.microsoft.com/store/apps/9nblggh0fhmn) - developed by [Gerhard Seeber](http://mozartweg.dyndns.org/friendica/profile/gerhard/profile)
+
+## Backward compatability
+
+### Backward Compatibility Promise
+
+Friendica can be extended by addons. These addons relies on many internal classes and conventions. As developers our work on Friendica should not break things in the addons without giving the addon maintainers a chance to fix their addons. Our goal is to build trust for the addon maintainers but also allow Friendica developers to move on. This is called the Backward Compatibility Promise.
+
+We promise BC inside every major release. If one release breaks BC, this should considered as a bug and will be fix in a bugfix release.
+
+Inspired by the [Symonfy BC promise](https://symfony.com/doc/current/contributing/code/bc.html) we promise BC for every class, interface, trait, enum, function, constant, etc., but with the exception of:
+
+- Classes, interfaces, traits, enums, functions, methods, properties and constants marked as `@internal` or `@private`
+- Extending or modifying a `final` class or method in any way
+- Calling `private` methods (via Reflection)
+- Accessing `private` propertyies (via Reflection)
+- Accessing `private` methods (via Reflection)
+- Accessing `private` constants (via Reflection)
+- New properties on overrided `protected` methods
+- Possible name collisions with new methods in an extended class (addon developers should prefix their custom methods in the extending classes in an appropriate way)
+- Dropping support for every PHP version that has reached end of life
+
+Breaking changes will be happen only in a new release but MUST be hard deprecated first.
+
+### Deprecation and removing features
+
+As the development goes by Friendica needs to get rid of old code and concepts. This will be done in 3 steps to give addon maintainer a chance to adjust their addons.
+
+**1. Label deprecation**
+
+If we as the Friendica maintainers decide to remove some functions, classes, interface, etc. we start this by adding a `@deprecated` PHPDoc note on the code. For instance the class `Friendica\Core\Logger` should be removed, so we add the following note with a possible replacement.
+
+```php
+/**
+ * Logger functions
+ *
+ * @deprecated 2025.02 Use constructor injection or `DI::logger()` instead
+ */
+class Logger {/* ... */}
+```
+
+This way addons developers might be notified by their IDE or other tools that the usage of the class is deprecated. In Friendica we can now start to replace all occurences and usage of this class with the alternative.
+
+The deprecation albel COULD be remain over multiple releases. As long as the deprecated code is used inside Friendica or the offical addon repository, it SHOULD NOT be hard deprecated.
+
+**2. Hard deprecation**
+
+If the deprecated code is no longer used inside Friendica or the offical addons it MUST be hard deprecated. The code MUST NOT be deleted. It MUST be stay for at least to the next major release.
+
+Hard deprecation code means that the code triggers an `E_USER_DEPRECATION` error if it is called. For instance with the deprecated class `Friendica\Core\Logger` the call of every method should be trigger an error:
+
+```php
+/**
+ * Logger functions
+ *
+ * @deprecated 2025.02 Use constructor injection or `DI::logger()` instead
+ */
+class Logger {
+	public static function info(string $message, array $context = [])
+	{
+        trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed in the next major release, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+
+		self::getInstance()->info($message, $context);
+	}
+
+    /* ... */
+}
+```
+
+This way the maintainer or users of addons will be notified that the addon will stop working in the next release. The addon maintainer now has the time until the next release to fix the deprecations.
+
+**3. Code Removing**
+
+Once a major release is published we as the Friendica maintainers can remove all code that is hard deprecated.
