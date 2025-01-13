@@ -9,11 +9,29 @@ declare(strict_types=1);
 
 namespace Friendica\Core;
 
+use Dice\Dice;
+
 /**
- * Dependency Injection Container
+ * Wrapper for the Dice class to make some basic setups
  */
-interface Container
+final class DiceContainer implements Container
 {
+	public static function fromBasePath(string $basePath): self
+	{
+		$path = $basePath . '/static/dependencies.config.php';
+
+		$dice = (new Dice())->addRules(require($path));
+
+		return new self($dice);
+	}
+
+	private Dice $container;
+
+	private function __construct(Dice $container)
+	{
+		$this->container = $container;
+	}
+
 	/**
 	 * Returns a fully constructed object based on $name using $args and $share as constructor arguments if supplied
 	 * @param string $name  name The name of the class to instantiate
@@ -23,7 +41,10 @@ interface Container
 	 *
 	 * @see Dice::create()
 	 */
-	public function create(string $name, array $args = [], array $share = []): object;
+	public function create(string $name, array $args = [], array $share = []): object
+	{
+		return $this->container->create($name, $args, $share);
+	}
 
 	/**
 	 * Add a rule $rule to the class $name
@@ -32,5 +53,22 @@ interface Container
 	 *
 	 * @see Dice::addRule()
 	 */
-	public function addRule(string $name, array $rule): void;
+	public function addRule(string $name, array $rule): void
+	{
+		$this->container = $this->container->addRule($name, $rule);
+	}
+
+	/**
+	 * Only used to inject Dice into DI class
+	 *
+	 * @see \Friendica\DI
+	 *
+	 * @internal
+	 *
+	 * @deprecated
+	 */
+	public function getDice(): Dice
+	{
+		return $this->container;
+	}
 }

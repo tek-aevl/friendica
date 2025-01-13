@@ -23,6 +23,10 @@ var DzFactory = function (max_imagesize) {
 			dictRemoveFile: dzStrings.dictRemoveFile,
 			dictMaxFilesExceeded: dzStrings.dictMaxFilesExceeded,
 			accept: function(file, done) {
+					const targetTextarea = document.getElementById(textareaElementId);
+					if (targetTextarea.setRangeText) {
+						targetTextarea.setRangeText("\n[upload-" + file.name + "]\n", targetTextarea.selectionStart, targetTextarea.selectionEnd, "end");
+					}
 				done();
 			},
 			init: function() {
@@ -30,7 +34,8 @@ var DzFactory = function (max_imagesize) {
 					const targetTextarea = document.getElementById(textareaElementId);
 					if (targetTextarea.setRangeText) {
 						//if setRangeText function is supported by current browser
-						targetTextarea.setRangeText(serverResponse);
+						let u = "[upload-" + file.name + "]";
+						targetTextarea.setRangeText(serverResponse, targetTextarea.value.indexOf(u), targetTextarea.value.indexOf(u) + u.length, "end");
 					} else {
 						targetTextarea.focus();
 						document.execCommand('insertText', false /*no UI*/, serverResponse);

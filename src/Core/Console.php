@@ -9,7 +9,6 @@ namespace Friendica\Core;
 
 use Friendica;
 use Friendica\App;
-use Friendica\Core\Logger\Capability\LogChannel;
 
 /**
  * Description of Console
@@ -186,12 +185,6 @@ HELP;
 		array_unshift($subargs, $this->executable);
 
 		$className = $this->subConsoles[$command];
-
-		if (is_subclass_of($className, Friendica\Console\AbstractConsole::class)) {
-			$this->container->setup($className::LOG_CHANNEL);
-		} else {
-			$this->container->setup(LogChannel::CONSOLE);
-		}
 
 		/** @var Console $subconsole */
 		$subconsole = $this->container->create($className, [$subargs]);

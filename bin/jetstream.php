@@ -9,8 +9,6 @@
  * @deprecated 2025.02 use bin/console.php jetstream instead
  */
 
-use Dice\Dice;
-
 if (php_sapi_name() !== 'cli') {
 	header($_SERVER["SERVER_PROTOCOL"] . ' 403 Forbidden');
 	exit();
@@ -21,10 +19,11 @@ chdir(dirname(__DIR__));
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-$dice = (new Dice())->addRules(require(dirname(__DIR__) . '/static/dependencies.config.php'));
-
 $argv = $_SERVER['argv'] ?? [];
 array_splice($argv, 1, 0, "jetstream");
 
-$container = \Friendica\Core\Container::fromDice($dice);
-\Friendica\Core\Console::create($container, $argv)->execute();
+$container = \Friendica\Core\DiceContainer::fromBasePath(dirname(__DIR__));
+
+$app = \Friendica\App::fromContainer($container);
+
+$app->processConsole($argv);

@@ -10,61 +10,20 @@ namespace Friendica\Core;
 use Friendica\DI;
 use Friendica\Core\Logger\Type\WorkerLogger;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 
 /**
  * Logger functions
+ *
+ * @deprecated 2025.02 Use constructor injection or `DI::logger()` instead
  */
 class Logger
 {
-	/**
-	 * LoggerInterface The default Logger type
-	 *
-	 * @var string
-	 */
-	const TYPE_LOGGER = LoggerInterface::class;
-	/**
-	 * WorkerLogger A specific worker logger type, which can be enabled
-	 *
-	 * @var string
-	 */
-	const TYPE_WORKER = WorkerLogger::class;
-	/**
-	 * @var string $type LoggerInterface The current logger type
-	 */
-	private static $type = self::TYPE_LOGGER;
-
 	/**
 	 * @return LoggerInterface|WorkerLogger
 	 */
 	private static function getInstance()
 	{
-		if (self::$type === self::TYPE_LOGGER) {
-			return DI::logger();
-		} else {
-			return DI::workerLogger();
-		}
-	}
-
-	/**
-	 * Enable additional logging for worker usage
-	 *
-	 * @param string $functionName The worker function, which got called
-	 *
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 */
-	public static function enableWorker(string $functionName)
-	{
-		self::$type = self::TYPE_WORKER;
-		DI::workerLogger()->setFunctionName($functionName);
-	}
-
-	/**
-	 * Disable additional logging for worker usage
-	 */
-	public static function disableWorker()
-	{
-		self::$type = self::TYPE_LOGGER;
+		return DI::logger();
 	}
 
 	/**
@@ -190,22 +149,5 @@ class Logger
 	public static function debug(string $message, array $context = [])
 	{
 		self::getInstance()->debug($message, $context);
-	}
-
-	/**
-	 * An alternative logger for development.
-	 *
-	 * Works largely as log() but allows developers
-	 * to isolate particular elements they are targeting
-	 * personally without background noise
-	 *
-	 * @param string $message Message to log
-	 * @param string $level Logging level
-	 * @return void
-	 * @throws \Exception
-	 */
-	public static function devLog(string $message, string $level = LogLevel::DEBUG)
-	{
-		DI::devLogger()->log($level, $message);
 	}
 }

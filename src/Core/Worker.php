@@ -8,6 +8,8 @@
 namespace Friendica\Core;
 
 use Friendica\Core\Cache\Enum\Duration;
+use Friendica\Core\Logger\Capability\LogChannel;
+use Friendica\Core\Logger\Type\WorkerLogger;
 use Friendica\Core\Worker\Entity\Process;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -537,9 +539,15 @@ class Worker
 
 		self::coolDown();
 
-		Logger::enableWorker($funcname);
+		DI::loggerManager()->changeLogChannel(LogChannel::WORKER);
 
-		Logger::info('Process start.', ['priority' => $queue['priority'], 'id' => $queue['id']]);
+		$logger = DI::logger();
+
+		if ($logger instanceof WorkerLogger) {
+			$logger->setFunctionName($funcname);
+		}
+
+		DI::logger()->info('Process start.', ['priority' => $queue['priority'], 'id' => $queue['id']]);
 
 		$stamp = (float)microtime(true);
 
@@ -559,19 +567,19 @@ class Worker
 			try {
 				call_user_func_array(sprintf('Friendica\Worker\%s::execute', $funcname), $argv);
 			} catch (\Throwable $e) {
-				Logger::error('Uncaught exception in worker method execution', ['class' => get_class($e), 'message' => $e->getMessage(), 'code' => $e->getCode(), 'file' => $e->getFile() . ':' . $e->getLine(), 'trace' => $e->getTraceAsString(), 'previous' => $e->getPrevious()]);
+				DI::logger()->error('Uncaught exception in worker method execution', ['class' => get_class($e), 'message' => $e->getMessage(), 'code' => $e->getCode(), 'file' => $e->getFile() . ':' . $e->getLine(), 'trace' => $e->getTraceAsString(), 'previous' => $e->getPrevious()]);
 				Worker::defer();
 			}
 		} else {
 			try {
 				$funcname($argv, count($argv));
 			} catch (\Throwable $e) {
-				Logger::error('Uncaught exception in worker execution', ['message' => $e->getMessage(), 'code' => $e->getCode(), 'file' => $e->getFile() . ':' . $e->getLine(), 'trace' => $e->getTraceAsString(), 'previous' => $e->getPrevious()]);
+				DI::logger()->error('Uncaught exception in worker execution', ['message' => $e->getMessage(), 'code' => $e->getCode(), 'file' => $e->getFile() . ':' . $e->getLine(), 'trace' => $e->getTraceAsString(), 'previous' => $e->getPrevious()]);
 				Worker::defer();
 			}
 		}
 
-		Logger::disableWorker();
+		DI::loggerManager()->changeLogChannel(LogChannel::DEFAULT);
 
 		$appHelper->setQueue([]);
 
@@ -591,7 +599,7 @@ class Worker
 		$rest    = round(max(0, $up_duration - (self::$db_duration + self::$lock_duration)), 2);
 		$exec    = round($duration, 2);
 
-		Logger::info('Performance:', ['function' => $funcname, 'state' => self::$state, 'count' => $dbcount, 'stat' => $dbstat, 'write' => $dbwrite, 'lock' => $dblock, 'total' => $dbtotal, 'rest' => $rest, 'exec' => $exec]);
+		DI::logger()->info('Performance:', ['function' => $funcname, 'state' => self::$state, 'count' => $dbcount, 'stat' => $dbstat, 'write' => $dbwrite, 'lock' => $dblock, 'total' => $dbtotal, 'rest' => $rest, 'exec' => $exec]);
 
 		self::coolDown();
 
@@ -603,16 +611,16 @@ class Worker
 		self::$lock_duration     = 0;
 
 		if ($duration > 3600) {
-			Logger::info('Longer than 1 hour.', ['priority' => $queue['priority'], 'id' => $queue['id'], 'duration' => round($duration / 60, 3)]);
+			DI::logger()->info('Longer than 1 hour.', ['priority' => $queue['priority'], 'id' => $queue['id'], 'duration' => round($duration / 60, 3)]);
 		} elseif ($duration > 600) {
-			Logger::info('Longer than 10 minutes.', ['priority' => $queue['priority'], 'id' => $queue['id'], 'duration' => round($duration / 60, 3)]);
+			DI::logger()->info('Longer than 10 minutes.', ['priority' => $queue['priority'], 'id' => $queue['id'], 'duration' => round($duration / 60, 3)]);
 		} elseif ($duration > 300) {
-			Logger::info('Longer than 5 minutes.', ['priority' => $queue['priority'], 'id' => $queue['id'], 'duration' => round($duration / 60, 3)]);
+			DI::logger()->info('Longer than 5 minutes.', ['priority' => $queue['priority'], 'id' => $queue['id'], 'duration' => round($duration / 60, 3)]);
 		} elseif ($duration > 120) {
-			Logger::info('Longer than 2 minutes.', ['priority' => $queue['priority'], 'id' => $queue['id'], 'duration' => round($duration / 60, 3)]);
+			DI::logger()->info('Longer than 2 minutes.', ['priority' => $queue['priority'], 'id' => $queue['id'], 'duration' => round($duration / 60, 3)]);
 		}
 
-		Logger::info('Process done.', ['function' => $funcname, 'priority' => $queue['priority'], 'retrial' => $queue['retrial'], 'id' => $queue['id'], 'duration' => round($duration, 3)]);
+		DI::logger()->info('Process done.', ['function' => $funcname, 'priority' => $queue['priority'], 'retrial' => $queue['retrial'], 'id' => $queue['id'], 'duration' => round($duration, 3)]);
 
 		DI::profiler()->saveLog(DI::logger(), 'ID ' . $queue['id'] . ': ' . $funcname);
 	}

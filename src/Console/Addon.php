@@ -60,9 +60,9 @@ HELP;
 	{
 		parent::__construct($argv);
 
-		$this->appMode     = $appMode;
-		$this->l10n        = $l10n;
-		$this->dba         = $dba;
+		$this->appMode = $appMode;
+		$this->l10n    = $l10n;
+		$this->dba     = $dba;
 
 		AddonCore::loadAddons();
 	}
@@ -121,27 +121,28 @@ HELP;
 				$this->out($this->getHelp());
 				return false;
 		}
+
 		foreach (AddonCore::getAvailableList() as $addon) {
 			$addon_name = $addon[0];
-			$enabled = AddonCore::isEnabled($addon_name) ? "enabled" : "disabled";
-			switch ($subCmd) {
-				case 'all':
-					$table->addRow([$addon_name, $enabled]);
-					break;
-				case 'enabled':
-					if (!$enabled) {
-						continue 2;
-					}
-					$table->addRow([$addon_name]);
-				case 'disabled':
-					if ($enabled) {
-						continue 2;
-					}
-					$table->addRow([$addon_name]);
-					break;
+			$enabled    = AddonCore::isEnabled($addon_name);
+
+			if ($subCmd === 'all') {
+				$table->addRow([$addon_name, $enabled ? 'enabled' : 'disabled']);
+
+				continue;
 			}
 
+			if ($subCmd === 'enabled' && $enabled === true) {
+				$table->addRow([$addon_name]);
+				continue;
+			}
+
+			if ($subCmd === 'disabled' && $enabled === false) {
+				$table->addRow([$addon_name]);
+				continue;
+			}
 		}
+
 		$this->out($table->getTable());
 
 		return 0;

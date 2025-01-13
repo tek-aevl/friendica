@@ -9,6 +9,7 @@ namespace Friendica;
 
 use Dice\Dice;
 use Friendica\Core\Logger\Capability\ICheckLoggerSettings;
+use Friendica\Core\Logger\LoggerManager;
 use Friendica\Core\Logger\Util\LoggerSettingsCheck;
 use Friendica\Core\Session\Capability\IHandleSessions;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
@@ -305,8 +306,8 @@ abstract class DI
 	public static function flushLogger()
 	{
 		$flushDice = self::$dice
-			->addRule(LoggerInterface::class, self::$dice->getRule(LoggerInterface::class))
-			->addRule('$devLogger', self::$dice->getRule('$devLogger'));
+			->addRule(LoggerInterface::class, self::$dice->getRule(LoggerInterface::class));
+
 		static::init($flushDice);
 	}
 
@@ -324,19 +325,18 @@ abstract class DI
 	}
 
 	/**
-	 * @return LoggerInterface
-	 */
-	public static function devLogger()
-	{
-		return self::$dice->create('$devLogger');
-	}
-
-	/**
+	 * @deprecated 2025.02 Use `DI::loggerManager()` and `DI::logger()` instead
+	 *
 	 * @return \Friendica\Core\Logger\Type\WorkerLogger
 	 */
 	public static function workerLogger()
 	{
 		return self::$dice->create(Core\Logger\Type\WorkerLogger::class);
+	}
+
+	public static function loggerManager(): LoggerManager
+	{
+		return self::$dice->create(LoggerManager::class);
 	}
 
 	//

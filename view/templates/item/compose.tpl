@@ -92,6 +92,9 @@
 			<div id="comment-edit-preview-{{$id}}" class="comment-edit-preview" style="display:none;"></div>
 
 			<div id="permissions-section" style="display: none;">
+			<script>
+				dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}');
+			</script>
 {{if $type == 'post'}}
 			<h3>{{$l10n.visibility_title}}</h3>
 			{{$acl_selector nofilter}}
@@ -113,8 +116,6 @@
     </div>
 </div>
 <script>
-	dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}');
-
 	document.addEventListener("DOMContentLoaded", function() {
 		var textareas = document.querySelectorAll(".expandable-textarea");
 

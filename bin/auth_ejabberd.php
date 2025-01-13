@@ -44,15 +44,12 @@ if (php_sapi_name() !== 'cli') {
 	exit();
 }
 
-use Dice\Dice;
+chdir(dirname(__DIR__));
 
-chdir(dirname(__FILE__, 2));
+require dirname(__DIR__) . '/vendor/autoload.php';
 
-require dirname(__FILE__, 2) . '/vendor/autoload.php';
+$container = \Friendica\Core\DiceContainer::fromBasePath(dirname(__DIR__));
 
-$dice = (new Dice())->addRules(require(dirname(__FILE__, 2) . '/static/dependencies.config.php'));
-
-$container = \Friendica\Core\Container::fromDice($dice);
-$app       = \Friendica\App::fromContainer($container);
+$app = \Friendica\App::fromContainer($container);
 
 $app->processEjabberd();

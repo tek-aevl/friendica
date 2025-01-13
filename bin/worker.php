@@ -16,17 +16,16 @@ if (php_sapi_name() !== 'cli') {
 	exit();
 }
 
-use Dice\Dice;
-
 // Ensure that worker.php is executed from the base path of the installation
 chdir(dirname(__DIR__));
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-$dice = (new Dice())->addRules(require(dirname(__DIR__) . '/static/dependencies.config.php'));
-
 $argv = $_SERVER['argv'] ?? [];
 array_splice($argv, 1, 0, "worker");
 
-$container = \Friendica\Core\Container::fromDice($dice);
-\Friendica\Core\Console::create($container, $argv)->execute();
+$container = \Friendica\Core\DiceContainer::fromBasePath(dirname(__DIR__));
+
+$app = \Friendica\App::fromContainer($container);
+
+$app->processConsole($argv);

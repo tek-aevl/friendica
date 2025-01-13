@@ -157,10 +157,18 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			],
 		],
 		\Psr\Log\LoggerInterface::class => [
-			'instanceOf' => \Friendica\Core\Logger\Factory\Logger::class,
+			'instanceOf' => \Friendica\Core\Logger\LoggerManager::class,
 			'call' => [
-				['create', [], Dice::CHAIN_CALL],
+				['getLogger', [], Dice::CHAIN_CALL],
 			],
+		],
+		\Friendica\Core\Logger\LoggerManager::class => [
+			'substitutions' => [
+				\Friendica\Core\Logger\Factory\LoggerFactory::class => \Friendica\Core\Logger\Factory\LegacyLoggerFactory::class,
+			],
+		],
+		\Friendica\Core\Logger\Factory\LoggerFactory::class => [
+			'instanceOf' => \Friendica\Core\Logger\Factory\LegacyLoggerFactory::class,
 		],
 		\Friendica\Core\Logger\Type\SyslogLogger::class => [
 			'instanceOf' => \Friendica\Core\Logger\Factory\SyslogLogger::class,
@@ -178,12 +186,6 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			'instanceOf' => \Friendica\Core\Logger\Util\Introspection::class,
 			'constructParams' => [
 				\Friendica\Core\Logger\Capability\IHaveCallIntrospections::IGNORE_CLASS_LIST,
-			],
-		],
-		'$devLogger' => [
-			'instanceOf' => \Friendica\Core\Logger\Factory\StreamLogger::class,
-			'call' => [
-				['createDev', [], Dice::CHAIN_CALL],
 			],
 		],
 		\Friendica\Core\Cache\Capability\ICanCache::class => [

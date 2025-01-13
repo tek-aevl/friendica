@@ -32,7 +32,7 @@ abstract class AbstractConsole extends Console
 	 */
 	protected function checkDeprecated(string $command): void
 	{
-		if (substr($this->executable, -strlen(CoreConsole::getDefaultExecutable())) === CoreConsole::getDefaultExecutable()) {
+		if (substr($this->executable, -strlen(CoreConsole::getDefaultExecutable())) !== CoreConsole::getDefaultExecutable()) {
 			$this->out(sprintf("'%s' is deprecated and will removed. Please use 'bin/console.php %s' instead", $this->executable, $command));
 		}
 	}

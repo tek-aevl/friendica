@@ -13,11 +13,10 @@ if (php_sapi_name() !== 'cli') {
 	exit();
 }
 
-use Dice\Dice;
-
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-$dice = (new Dice())->addRules(require(dirname(__DIR__) . '/static/dependencies.config.php'));
+$container = \Friendica\Core\DiceContainer::fromBasePath(dirname(__DIR__));
 
-$container = \Friendica\Core\Container::fromDice($dice);
-\Friendica\Core\Console::create($container, $_SERVER['argv'] ?? [])->execute();
+$app = \Friendica\App::fromContainer($container);
+
+$app->processConsole($_SERVER['argv'] ?? []);
