@@ -13,7 +13,6 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Content\Widget\ContactBlock;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
@@ -202,7 +201,7 @@ class Profile
 	{
 		$profile = User::getOwnerDataByNick($nickname);
 		if (!isset($profile['account_removed']) || $profile['account_removed']) {
-			Logger::info('profile error: ' . DI::args()->getQueryString());
+			DI::logger()->info('profile error: ' . DI::args()->getQueryString());
 			return [];
 		}
 
@@ -433,7 +432,7 @@ class Profile
 		$p['url'] = Contact::magicLinkById($cid, $profile['url']);
 
 		if (!isset($profile['hidewall'])) {
-			Logger::warning('Missing hidewall key in profile array', ['profile' => $profile]);
+			DI::logger()->warning('Missing hidewall key in profile array', ['profile' => $profile]);
 		}
 
 		if ($profile['account-type'] == Contact::TYPE_COMMUNITY) {

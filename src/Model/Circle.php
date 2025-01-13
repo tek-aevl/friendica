@@ -9,7 +9,6 @@ namespace Friendica\Model;
 
 use Friendica\BaseModule;
 use Friendica\Content\Widget;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Database\Database;
@@ -495,7 +494,7 @@ class Circle
 		}
 		DBA::close($stmt);
 
-		Logger::info('Got circles', $display_circles);
+		DI::logger()->info('Got circles', $display_circles);
 
 		$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('circle_selection.tpl'), [
 			'$id' => $id,
@@ -608,7 +607,7 @@ class Circle
 	 */
 	public static function getIdForGroup(int $id): int
 	{
-		Logger::info('Get id for group id', ['id' => $id]);
+		DI::logger()->info('Get id for group id', ['id' => $id]);
 		$contact = Contact::getById($id, ['uid', 'name', 'contact-type', 'manually-approve']);
 		if (empty($contact) || ($contact['contact-type'] != Contact::TYPE_COMMUNITY) || !$contact['manually-approve']) {
 			return 0;
@@ -638,7 +637,7 @@ class Circle
 	 */
 	public static function updateMembersForGroup(int $id)
 	{
-		Logger::info('Update group members', ['id' => $id]);
+		DI::logger()->info('Update group members', ['id' => $id]);
 
 		$contact = Contact::getById($id, ['uid', 'url']);
 		if (empty($contact)) {
@@ -673,6 +672,6 @@ class Circle
 		}
 
 		DBA::delete('group_member', ['gid' => $gid, 'contact-id' => $current]);
-		Logger::info('Updated group members', ['id' => $id, 'count' => DBA::count('group_member', ['gid' => $gid])]);
+		DI::logger()->info('Updated group members', ['id' => $id, 'count' => DBA::count('group_member', ['gid' => $gid])]);
 	}
 }
