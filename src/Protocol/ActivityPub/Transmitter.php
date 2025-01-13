@@ -12,7 +12,6 @@ use Friendica\Content\Feature;
 use Friendica\Content\Smilies;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Cache\Enum\Duration;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -908,14 +907,14 @@ class Transmitter
 	{
 		$tags = Tag::getByURIId($uri_id, [Tag::TO, Tag::CC, Tag::BTO, Tag::BCC, Tag::AUDIENCE]);
 		if (empty($tags)) {
-			Logger::debug('No receivers found', ['uri-id' => $uri_id]);
+			DI::logger()->debug('No receivers found', ['uri-id' => $uri_id]);
 			$post = Post::selectFirst(Item::DELIVER_FIELDLIST, ['uri-id' => $uri_id, 'origin' => true]);
 			if (!empty($post)) {
 				ActivityPub\Transmitter::storeReceiversForItem($post);
 				$tags = Tag::getByURIId($uri_id, [Tag::TO, Tag::CC, Tag::BTO, Tag::BCC, Tag::AUDIENCE]);
-				Logger::debug('Receivers are created', ['uri-id' => $uri_id, 'receivers' => count($tags)]);
+				DI::logger()->debug('Receivers are created', ['uri-id' => $uri_id, 'receivers' => count($tags)]);
 			} else {
-				Logger::debug('Origin item not found', ['uri-id' => $uri_id]);
+				DI::logger()->debug('Origin item not found', ['uri-id' => $uri_id]);
 			}
 		}
 
@@ -1328,7 +1327,7 @@ class Transmitter
 		if (!$api_mode) {
 			$condition['parent-network'] = Protocol::NATIVE_SUPPORT;
 		}
-		Logger::info('Fetching activity', $condition);
+		DI::logger()->info('Fetching activity', $condition);
 		$item = Post::selectFirst(Item::DELIVER_FIELDLIST, $condition);
 		if (!DBA::isResult($item)) {
 			return false;
@@ -1351,7 +1350,7 @@ class Transmitter
 		if (!$api_mode) {
 			$condition['parent-network'] = Protocol::NATIVE_SUPPORT;
 		}
-		Logger::info('Fetching activity', $condition);
+		DI::logger()->info('Fetching activity', $condition);
 		$item = Post::selectFirst(Item::DELIVER_FIELDLIST, $condition, ['order' => ['uid' => true]]);
 		if (!DBA::isResult($item)) {
 			return false;
@@ -1375,17 +1374,17 @@ class Transmitter
 			$data = Post\Activity::getByURIId($item['uri-id']);
 			if (!$item['origin'] && !empty($data)) {
 				if (!$object_mode) {
-					Logger::info('Return stored conversation', ['item' => $item['id']]);
+					DI::logger()->info('Return stored conversation', ['item' => $item['id']]);
 					return $data;
 				} elseif (!empty($data['object'])) {
-					Logger::info('Return stored conversation object', ['item' => $item['id']]);
+					DI::logger()->info('Return stored conversation object', ['item' => $item['id']]);
 					return $data['object'];
 				}
 			}
 		}
 
 		if (!$api_mode && !$item['deleted'] && !$item['origin']) {
-			Logger::debug('Post is not ours and is not stored', ['id' => $item['id'], 'uri-id' => $item['uri-id']]);
+			DI::logger()->debug('Post is not ours and is not stored', ['id' => $item['id'], 'uri-id' => $item['uri-id']]);
 			return false;
 		}
 
@@ -1467,7 +1466,7 @@ class Transmitter
 			$uid = $item['uid'];
 		}
 
-		Logger::info('Fetched activity', ['item' => $item['id'], 'uid' => $uid]);
+		DI::logger()->info('Fetched activity', ['item' => $item['id'], 'uid' => $uid]);
 
 		// We only sign our own activities
 		if (!$api_mode && !$object_mode && $item['origin']) {
@@ -2118,7 +2117,7 @@ class Transmitter
 
 		$signed = LDSignature::sign($data, $owner);
 
-		Logger::info('Deliver profile deletion for user ' . $owner['uid'] . ' to ' . $inbox . ' via ActivityPub');
+		DI::logger()->info('Deliver profile deletion for user ' . $owner['uid'] . ' to ' . $inbox . ' via ActivityPub');
 		return HTTPSignature::transmit($signed, $inbox, $owner);
 	}
 
@@ -2146,7 +2145,7 @@ class Transmitter
 
 		$signed = LDSignature::sign($data, $owner);
 
-		Logger::info('Deliver profile relocation for user ' . $owner['uid'] . ' to ' . $inbox . ' via ActivityPub');
+		DI::logger()->info('Deliver profile relocation for user ' . $owner['uid'] . ' to ' . $inbox . ' via ActivityPub');
 		return HTTPSignature::transmit($signed, $inbox, $owner);
 	}
 
@@ -2161,7 +2160,7 @@ class Transmitter
 	public static function sendProfileDeletion(array $owner, string $inbox): bool
 	{
 		if (empty($owner['uprvkey'])) {
-			Logger::error('No private key for owner found, the deletion message cannot be processed.', ['user' => $owner['uid']]);
+			DI::logger()->error('No private key for owner found, the deletion message cannot be processed.', ['user' => $owner['uid']]);
 			return false;
 		}
 
@@ -2179,7 +2178,7 @@ class Transmitter
 
 		$signed = LDSignature::sign($data, $owner);
 
-		Logger::info('Deliver profile deletion for user ' . $owner['uid'] . ' to ' . $inbox . ' via ActivityPub');
+		DI::logger()->info('Deliver profile deletion for user ' . $owner['uid'] . ' to ' . $inbox . ' via ActivityPub');
 		return HTTPSignature::transmit($signed, $inbox, $owner);
 	}
 
@@ -2211,7 +2210,7 @@ class Transmitter
 
 		$signed = LDSignature::sign($data, $owner);
 
-		Logger::info('Deliver profile update for user ' . $owner['uid'] . ' to ' . $inbox . ' via ActivityPub');
+		DI::logger()->info('Deliver profile update for user ' . $owner['uid'] . ' to ' . $inbox . ' via ActivityPub');
 		return HTTPSignature::transmit($signed, $inbox, $owner);
 	}
 
@@ -2231,13 +2230,13 @@ class Transmitter
 	{
 		$profile = APContact::getByURL($target);
 		if (empty($profile['inbox'])) {
-			Logger::warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
+			DI::logger()->warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
 			return false;
 		}
 
 		$owner = User::getOwnerDataById($uid);
 		if (empty($owner)) {
-			Logger::warning('No user found for actor, aborting', ['uid' => $uid]);
+			DI::logger()->warning('No user found for actor, aborting', ['uid' => $uid]);
 			return false;
 		}
 
@@ -2255,7 +2254,7 @@ class Transmitter
 			'to' => [$profile['url']],
 		];
 
-		Logger::info('Sending activity ' . $activity . ' to ' . $target . ' for user ' . $uid);
+		DI::logger()->info('Sending activity ' . $activity . ' to ' . $target . ' for user ' . $uid);
 
 		$signed = LDSignature::sign($data, $owner);
 		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);
@@ -2277,7 +2276,7 @@ class Transmitter
 	{
 		$profile = APContact::getByURL($target);
 		if (empty($profile['inbox'])) {
-			Logger::warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
+			DI::logger()->warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
 			return false;
 		}
 
@@ -2285,7 +2284,7 @@ class Transmitter
 			// We need to use some user as a sender. It doesn't care who it will send. We will use an administrator account.
 			$admin = User::getFirstAdmin(['uid']);
 			if (!$admin) {
-				Logger::warning('No available admin user for transmission', ['target' => $target]);
+				DI::logger()->warning('No available admin user for transmission', ['target' => $target]);
 				return false;
 			}
 
@@ -2297,7 +2296,7 @@ class Transmitter
 			'author-id' => Contact::getPublicIdByUserId($uid)
 		];
 		if (Post::exists($condition)) {
-			Logger::info('Follow for ' . $object . ' for user ' . $uid . ' does already exist.');
+			DI::logger()->info('Follow for ' . $object . ' for user ' . $uid . ' does already exist.');
 			return false;
 		}
 
@@ -2313,7 +2312,7 @@ class Transmitter
 			'to' => [$profile['url']],
 		];
 
-		Logger::info('Sending follow ' . $object . ' to ' . $target . ' for user ' . $uid);
+		DI::logger()->info('Sending follow ' . $object . ' to ' . $target . ' for user ' . $uid);
 
 		$signed = LDSignature::sign($data, $owner);
 		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);
@@ -2333,13 +2332,13 @@ class Transmitter
 	{
 		$profile = APContact::getByURL($target);
 		if (empty($profile['inbox'])) {
-			Logger::warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
+			DI::logger()->warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
 			return;
 		}
 
 		$owner = User::getOwnerDataById($uid);
 		if (!$owner) {
-			Logger::notice('No user found for actor', ['uid' => $uid]);
+			DI::logger()->notice('No user found for actor', ['uid' => $uid]);
 			return;
 		}
 
@@ -2358,7 +2357,7 @@ class Transmitter
 			'to' => [$profile['url']],
 		];
 
-		Logger::debug('Sending accept to ' . $target . ' for user ' . $uid . ' with id ' . $id);
+		DI::logger()->debug('Sending accept to ' . $target . ' for user ' . $uid . ' with id ' . $id);
 
 		$signed = LDSignature::sign($data, $owner);
 		HTTPSignature::transmit($signed, $profile['inbox'], $owner);
@@ -2378,7 +2377,7 @@ class Transmitter
 	{
 		$profile = APContact::getByURL($target);
 		if (empty($profile['inbox'])) {
-			Logger::warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
+			DI::logger()->warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
 			return false;
 		}
 
@@ -2397,7 +2396,7 @@ class Transmitter
 			'to' => [$profile['url']],
 		];
 
-		Logger::debug('Sending reject to ' . $target . ' for user ' . $owner['uid'] . ' with id ' . $objectId);
+		DI::logger()->debug('Sending reject to ' . $target . ' for user ' . $owner['uid'] . ' with id ' . $objectId);
 
 		$signed = LDSignature::sign($data, $owner);
 		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);
@@ -2418,7 +2417,7 @@ class Transmitter
 	{
 		$profile = APContact::getByURL($target);
 		if (empty($profile['inbox'])) {
-			Logger::warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
+			DI::logger()->warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
 			return false;
 		}
 
@@ -2444,7 +2443,7 @@ class Transmitter
 			'to' => [$profile['url']],
 		];
 
-		Logger::info('Sending undo to ' . $target . ' for user ' . $owner['uid'] . ' with id ' . $objectId);
+		DI::logger()->info('Sending undo to ' . $target . ' for user ' . $owner['uid'] . ' with id ' . $objectId);
 
 		$signed = LDSignature::sign($data, $owner);
 		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);
@@ -2465,7 +2464,7 @@ class Transmitter
 	{
 		$profile = APContact::getByURL($target);
 		if (empty($profile['inbox'])) {
-			Logger::warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
+			DI::logger()->warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
 			return false;
 		}
 
@@ -2491,7 +2490,7 @@ class Transmitter
 			'to' => [$profile['url']],
 		];
 
-		Logger::info('Sending undo to ' . $target . ' for user ' . $owner['uid'] . ' with id ' . $objectId);
+		DI::logger()->info('Sending undo to ' . $target . ' for user ' . $owner['uid'] . ' with id ' . $objectId);
 
 		$signed = LDSignature::sign($data, $owner);
 		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);
