@@ -277,7 +277,7 @@ function photos_post()
 		}
 
 		if (!empty($_POST['rotate']) && (intval($_POST['rotate']) == 1 || intval($_POST['rotate']) == 2)) {
-			Logger::debug('rotate');
+			DI::logger()->debug('rotate');
 
 			$photo = Photo::getPhotoForUser($page_owner_uid, $resource_id);
 
