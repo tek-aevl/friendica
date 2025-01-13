@@ -9,7 +9,6 @@ namespace Friendica\Model\Post;
 
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -48,7 +47,7 @@ class Engagement
 	public static function storeFromItem(array $item): int
 	{
 		if (in_array($item['verb'], [Activity::FOLLOW, Activity::VIEW, Activity::READ])) {
-			Logger::debug('Technical activities are not stored', ['uri-id' => $item['uri-id'], 'parent-uri-id' => $item['parent-uri-id'], 'verb' => $item['verb']]);
+			DI::logger()->debug('Technical activities are not stored', ['uri-id' => $item['uri-id'], 'parent-uri-id' => $item['parent-uri-id'], 'verb' => $item['verb']]);
 			return 0;
 		}
 
@@ -59,7 +58,7 @@ class Engagement
 			['uri-id' => $item['parent-uri-id']]);
 
 		if ($parent['created'] < self::getCreationDateLimit(false)) {
-			Logger::debug('Post is too old', ['uri-id' => $item['uri-id'], 'parent-uri-id' => $item['parent-uri-id'], 'created' => $parent['created']]);
+			DI::logger()->debug('Post is too old', ['uri-id' => $item['uri-id'], 'parent-uri-id' => $item['parent-uri-id'], 'created' => $parent['created']]);
 			return 0;
 		}
 
@@ -114,16 +113,16 @@ class Engagement
 			])
 		];
 		if (!$store && ($engagement['comments'] == 0) && ($engagement['activities'] == 0)) {
-			Logger::debug('No media, follower, subscribed tags, comments or activities. Engagement not stored', ['fields' => $engagement]);
+			DI::logger()->debug('No media, follower, subscribed tags, comments or activities. Engagement not stored', ['fields' => $engagement]);
 			return 0;
 		}
 		$exists = DBA::exists('post-engagement', ['uri-id' => $engagement['uri-id']]);
 		if ($exists) {
 			$ret = DBA::update('post-engagement', $engagement, ['uri-id' => $engagement['uri-id']]);
-			Logger::debug('Engagement updated', ['uri-id' => $engagement['uri-id'], 'ret' => $ret]);
+			DI::logger()->debug('Engagement updated', ['uri-id' => $engagement['uri-id'], 'ret' => $ret]);
 		} else {
 			$ret = DBA::insert('post-engagement', $engagement);
-			Logger::debug('Engagement inserted', ['uri-id' => $engagement['uri-id'], 'ret' => $ret]);
+			DI::logger()->debug('Engagement inserted', ['uri-id' => $engagement['uri-id'], 'ret' => $ret]);
 		}
 		return ($ret && !$exists) ? $engagement['uri-id'] : 0;
 	}
@@ -369,11 +368,11 @@ class Engagement
 	{
 		$limit = self::getCreationDateLimit(true);
 		if (empty($limit)) {
-			Logger::notice('Expiration limit not reached');
+			DI::logger()->notice('Expiration limit not reached');
 			return;
 		}
 		DBA::delete('post-engagement', ["`created` < ?", $limit]);
-		Logger::notice('Cleared expired engagements', ['limit' => $limit, 'rows' => DBA::affectedRows()]);
+		DI::logger()->notice('Cleared expired engagements', ['limit' => $limit, 'rows' => DBA::affectedRows()]);
 	}
 
 	private static function getCreationDateLimit(bool $forDeletion): string
