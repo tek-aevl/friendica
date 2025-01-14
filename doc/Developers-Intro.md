@@ -157,13 +157,11 @@ If you are interested in improving those clients, please contact the developers 
 * SailfishOS: **Friendiy** [src](https://kirgroup.com/projects/fabrixxm/harbour-friendly) - developed by [Fabio](https://kirgroup.com/profile/fabrixxm/profile)
 * Windows: **Friendica Mobile** for Windows versions [before 8.1](http://windowsphone.com/s?appid=e3257730-c9cf-4935-9620-5261e3505c67) and [Windows 10](https://www.microsoft.com/store/apps/9nblggh0fhmn) - developed by [Gerhard Seeber](http://mozartweg.dyndns.org/friendica/profile/gerhard/profile)
 
-## Backward compatability
+## Backward compatibility
 
 ### Backward Compatibility Promise
 
 Friendica can be extended by addons. These addons relies on many internal classes and conventions. As developers our work on Friendica should not break things in the addons without giving the addon maintainers a chance to fix their addons. Our goal is to build trust for the addon maintainers but also allow Friendica developers to move on. This is called the Backward Compatibility Promise.
-
-We promise BC for deprecated code for at least 6 month. After this time the deprecated code will be remove with the next release. If a release breaks BC without deprecation, this SHOULD considered as a bug and BC SHOULD be restored in a bugfix release.
 
 Inspired by the [Symonfy BC promise](https://symfony.com/doc/current/contributing/code/bc.html) we promise BC for every class, interface, trait, enum, function, constant, etc., but with the exception of:
 
@@ -173,11 +171,9 @@ Inspired by the [Symonfy BC promise](https://symfony.com/doc/current/contributin
 - Accessing `private` properties (via Reflection)
 - Accessing `private` methods (via Reflection)
 - Accessing `private` constants (via Reflection)
-- New properties on overrided `protected` methods
+- New properties on overridden `protected` methods
 - Possible name collisions with new methods in an extended class (addon developers should prefix their custom methods in the extending classes in an appropriate way)
 - Dropping support for every PHP version that has reached end of life
-
-Breaking changes will be happen only in a new release but MUST be hard deprecated first.
 
 ### Deprecation and removing features
 
@@ -196,13 +192,13 @@ If we as the Friendica maintainers decide to remove some functions, classes, int
 class Logger {/* ... */}
 ```
 
-This way addon developers might be notified by their IDE or other tools that the usage of the class is deprecated. In Friendica we can now start to replace all occurrences and usage of this class with the alternative.
+This way addon developers might be notified early by their IDE or other tools that the usage of the class is deprecated. In Friendica we can now start to replace all occurrences and usage of this class with the alternative.
 
-The deprecation label COULD be remain over multiple releases. As long as the deprecated code is used inside Friendica or the official addon repository, it SHOULD NOT be hard deprecated.
+The deprecation label COULD be remain over multiple releases. As long as the `@deprecated` labeled code is used inside Friendica or the official addon repository, it SHOULD NOT be hard deprecated.
 
 **2. Hard deprecation**
 
-If the deprecated code is no longer used inside Friendica or the official addons it MUST be hard deprecated. The code MUST NOT be deleted. It MUST be stay for at least to the next major release.
+If the deprecated code is no longer used inside Friendica or the official addons it MUST be hard deprecated. The code MUST NOT be deleted. Starting from the next release, it MUST be stay for at least 6 months. Hard deprecated code COULD remain longer than 6 months, depending on when a release appears. Addon developer MUST NOT consider that they have more than 6 months to adjust their code.
 
 Hard deprecation code means that the code triggers an `E_USER_DEPRECATION` error if it is called. For instance with the deprecated class `Friendica\Core\Logger` the call of every method should be trigger an error:
 
@@ -215,17 +211,23 @@ Hard deprecation code means that the code triggers an `E_USER_DEPRECATION` error
 class Logger {
 	public static function info(string $message, array $context = [])
 	{
-        trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed in the next major release, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+		trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.05 and will be removed after 6 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		self::getInstance()->info($message, $context);
 	}
 
-    /* ... */
+	/* ... */
 }
 ```
 
-This way the maintainer or users of addons will be notified that the addon will stop working in the next release. The addon maintainer now has the time until the next release to fix the deprecations.
+This way the maintainer or users of addons will be notified that the addon will stop working in one of the next releases. The addon maintainer now has at least 6 months to fix the deprecations.
+
+Please note that the deprecation message contains the release that will be released next. In the example the code was hard deprecated in `2025.05` and COULD be removed earliest with the `2025.11` release.
 
 **3. Code Removing**
 
-Once a major release is published we as the Friendica maintainers can remove all code that is hard deprecated.
+We promise BC for deprecated code for at least 6 month, starting from the release the deprecation was announced. After this time the deprecated code COULD be remove within the next release.
+
+Breaking changes MUST be happen only in a new release but MUST be hard deprecated first. The BC promise refers only to releases, respective the `stable` branch. Deprecated code on other branches like `develop` or RC branches could be removed earlier. This is not a BC break as long as the release is published 6 months after the deprecation.
+
+If a release breaks BC without deprecation or earlier than 6 months, this SHOULD considered as a bug and BC SHOULD be restored in a bugfix release.
