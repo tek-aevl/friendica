@@ -51,6 +51,7 @@ class UpdateContact
 			return 0;
 		}
 
+		DI::logger()->debug('Update contact', ['id' => $contact_id]);
 		return Worker::add($run_parameters, 'UpdateContact', $contact_id);
 	}
 }

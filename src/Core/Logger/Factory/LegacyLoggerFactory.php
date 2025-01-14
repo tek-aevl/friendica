@@ -15,7 +15,17 @@ use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
 /**
- * Manager for the core logging instances
+ * Bridge for the legacy Logger factory.
+ *
+ * This class can be removed after the following classes are replaced or
+ * refactored implementing the `\Friendica\Core\Logger\Factory\LoggerFactory`:
+ *
+ * - Friendica\Core\Logger\Factory\StreamLogger
+ * - Friendica\Core\Logger\Factory\SyslogLogger
+ * - monolog addon: Friendica\Addon\monolog\src\Factory\Monolog
+ *
+ * @see \Friendica\Core\Logger\Factory\StreamLogger
+ * @see \Friendica\Core\Logger\Factory\SyslogLogger
  */
 final class LegacyLoggerFactory implements LoggerFactory
 {
