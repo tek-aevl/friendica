@@ -163,7 +163,7 @@ If you are interested in improving those clients, please contact the developers 
 
 Friendica can be extended by addons. These addons relies on many internal classes and conventions. As developers our work on Friendica should not break things in the addons without giving the addon maintainers a chance to fix their addons. Our goal is to build trust for the addon maintainers but also allow Friendica developers to move on. This is called the Backward Compatibility Promise.
 
-We promise BC inside every major release. If one release breaks BC, this should considered as a bug and will be fix in a bugfix release.
+We promise BC for deprecated code for at least 6 month. After this time the deprecated code will be remove with the next release. If a release breaks BC without deprecation, this SHOULD considered as a bug and BC SHOULD be restored in a bugfix release.
 
 Inspired by the [Symonfy BC promise](https://symfony.com/doc/current/contributing/code/bc.html) we promise BC for every class, interface, trait, enum, function, constant, etc., but with the exception of:
 
