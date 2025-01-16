@@ -161,7 +161,11 @@ If you are interested in improving those clients, please contact the developers 
 
 ### Backward Compatibility Promise
 
-Friendica can be extended by addons. These addons relies on many internal classes and conventions. As developers our work on Friendica should not break things in the addons without giving the addon maintainers a chance to fix their addons. Our goal is to build trust for the addon maintainers but also allow Friendica developers to move on. This is called the Backward Compatibility Promise.
+Friendica can be extended by addons.
+These addons relies on many classes and conventions from Friendica.
+As developers our work on Friendica should not break things in the addons without giving the addon maintainers a chance to fix their addons.
+Our goal is to build trust for the addon maintainers but also allow Friendica developers to move on. 
+This is called the Backward Compatibility Promise.
 
 Inspired by the [Symonfy BC promise](https://symfony.com/doc/current/contributing/code/bc.html) we promise BC for every class, interface, trait, enum, function, constant, etc., but with the exception of:
 
@@ -177,11 +181,13 @@ Inspired by the [Symonfy BC promise](https://symfony.com/doc/current/contributin
 
 ### Deprecation and removing features
 
-As the development goes by Friendica needs to get rid of old code and concepts. This will be done in 3 steps to give addon maintainer a chance to adjust their addons.
+As the development goes by Friendica needs to get rid of old code and concepts.
+This will be done in 3 steps to give addon maintainers a chance to adjust their addons.
 
 **1. Label deprecation**
 
-If we as the Friendica maintainers decide to remove some functions, classes, interface, etc. we start this by adding a `@deprecated` PHPDoc note on the code. For instance the class `Friendica\Core\Logger` should be removed, so we add the following note with a possible replacement.
+If we as the Friendica maintainers decide to remove some functions, classes, interface, etc. we start this by adding a `@deprecated` PHPDoc note on the code.
+For instance the class `Friendica\Core\Logger` should be removed, so we add the following note with a possible replacement:
 
 ```php
 /**
@@ -192,15 +198,22 @@ If we as the Friendica maintainers decide to remove some functions, classes, int
 class Logger {/* ... */}
 ```
 
-This way addon developers might be notified early by their IDE or other tools that the usage of the class is deprecated. In Friendica we can now start to replace all occurrences and usage of this class with the alternative.
+This way addon developers might be notified early by their IDE or other tools that the usage of the class is deprecated.
+In Friendica we can now start to replace all occurrences and usage of this class with the alternative.
 
-The deprecation label COULD be remain over multiple releases. As long as the `@deprecated` labeled code is used inside Friendica or the official addon repository, it SHOULD NOT be hard deprecated.
+The deprecation label COULD be remain over multiple releases.
+As long as the code that is labeled with `@deprecated` is used inside Friendica or the official addon repository, it SHOULD NOT be hard deprecated.
 
 **2. Hard deprecation**
 
-If the deprecated code is no longer used inside Friendica or the official addons it MUST be hard deprecated. The code MUST NOT be deleted. Starting from the next release, it MUST be stay for at least 6 months. Hard deprecated code COULD remain longer than 6 months, depending on when a release appears. Addon developer MUST NOT consider that they have more than 6 months to adjust their code.
+If the deprecated code is no longer used inside Friendica or the official addons it MUST be hard deprecated.
+The code MUST NOT be deleted.
+Starting from the next release, it MUST be stay for at least 6 months.
+Hard deprecated code COULD remain longer than 6 months, depending on when a release appears.
+Addon developer MUST NOT consider that they have more than 6 months to adjust their code.
 
-Hard deprecation code means that the code triggers an `E_USER_DEPRECATION` error if it is called. For instance with the deprecated class `Friendica\Core\Logger` the call of every method should be trigger an error:
+Hard deprecation code means that the code triggers an `E_USER_DEPRECATION` error if it is called.
+For instance with the deprecated class `Friendica\Core\Logger` the call of every method should be trigger an error:
 
 ```php
 /**
@@ -220,14 +233,20 @@ class Logger {
 }
 ```
 
-This way the maintainer or users of addons will be notified that the addon will stop working in one of the next releases. The addon maintainer now has at least 6 months to fix the deprecations.
+This way the maintainer or users of addons will be notified that the addon will stop working in one of the next releases.
+The addon maintainer now has at least 6 months to fix the deprecations.
 
-Please note that the deprecation message contains the release that will be released next. In the example the code was hard deprecated in `2025.05` and COULD be removed earliest with the `2025.11` release.
+Please note that the deprecation message contains the release that will be released next.
+In the example the code was hard deprecated in `2025.05` and COULD be removed earliest with the `2025.11` release.
 
 **3. Code Removing**
 
-We promise BC for deprecated code for at least 6 month, starting from the release the deprecation was announced. After this time the deprecated code COULD be remove within the next release.
+We promise BC for deprecated code for at least 6 months, starting from the release the deprecation was announced.
+After this time the deprecated code COULD be remove within the next release.
 
-Breaking changes MUST be happen only in a new release but MUST be hard deprecated first. The BC promise refers only to releases, respective the `stable` branch. Deprecated code on other branches like `develop` or RC branches could be removed earlier. This is not a BC break as long as the release is published 6 months after the deprecation.
+Breaking changes MUST be happen only in a new release but MUST be hard deprecated first.
+The BC promise refers only to releases, respective the `stable` branch.
+Deprecated code on other branches like `develop` or RC branches could be removed earlier.
+This is not a BC break as long as the release is published 6 months after the deprecation.
 
 If a release breaks BC without deprecation or earlier than 6 months, this SHOULD considered as a bug and BC SHOULD be restored in a bugfix release.
