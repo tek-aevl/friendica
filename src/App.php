@@ -158,7 +158,7 @@ class App
 		$this->session   = $this->container->create(IHandleUserSessions::class);
 		$this->appHelper = $this->container->create(AppHelper::class);
 
-		$this->loadSetupForFrontend(
+		$this->load(
 			$request,
 			$this->container->create(DbaDefinition::class),
 			$this->container->create(ViewDefinition::class),
@@ -272,7 +272,7 @@ class App
 	/**
 	 * Load the whole app instance
 	 */
-	private function loadSetupForFrontend(ServerRequestInterface $request, DbaDefinition $dbaDefinition, ViewDefinition $viewDefinition)
+	private function load(ServerRequestInterface $request, DbaDefinition $dbaDefinition, ViewDefinition $viewDefinition)
 	{
 		if ($this->config->get('system', 'ini_max_execution_time') !== false) {
 			set_time_limit((int)$this->config->get('system', 'ini_max_execution_time'));
