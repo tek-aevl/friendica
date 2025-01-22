@@ -171,7 +171,6 @@ class App
 		$this->registerTemplateEngine();
 
 		$this->runFrontend(
-			$this->mode,
 			$this->container->create(IManagePersonalConfigValues::class),
 			$this->container->create(Page::class),
 			$this->container->create(Nav::class),
@@ -374,7 +373,6 @@ class App
 	 * @throws \ImagickException
 	 */
 	private function runFrontend(
-		Mode $mode,
 		IManagePersonalConfigValues $pconfig,
 		Page $page,
 		Nav $nav,
@@ -382,7 +380,7 @@ class App
 		float $start_time,
 		ServerRequestInterface $request
 	) {
-		$mode->setExecutor(Mode::INDEX);
+		$this->mode->setExecutor(Mode::INDEX);
 
 		$httpInput  = new HTTPInputData($request->getServerParams());
 		$serverVars = $request->getServerParams();
@@ -401,11 +399,11 @@ class App
 
 		try {
 			// Missing DB connection: ERROR
-			if ($mode->has(Mode::LOCALCONFIGPRESENT) && !$mode->has(Mode::DBAVAILABLE)) {
+			if ($this->mode->has(Mode::LOCALCONFIGPRESENT) && !$this->mode->has(Mode::DBAVAILABLE)) {
 				throw new HTTPException\InternalServerErrorException($this->l10n->t('Apologies but the website is unavailable at the moment.'));
 			}
 
-			if (!$mode->isInstall()) {
+			if (!$this->mode->isInstall()) {
 				// Force SSL redirection
 				if ($this->config->get('system', 'force_ssl') &&
 					(empty($serverVars['HTTPS']) || $serverVars['HTTPS'] === 'off') &&
@@ -419,7 +417,7 @@ class App
 
 			DID::routeRequest($this->args->getCommand(), $serverVars);
 
-			if ($mode->isNormal() && !$mode->isBackend()) {
+			if ($this->mode->isNormal() && !$this->mode->isBackend()) {
 				$requester = HTTPSignature::getSigner('', $serverVars);
 				if (!empty($requester)) {
 					OpenWebAuth::addVisitorCookieForHandle($requester);
@@ -427,7 +425,7 @@ class App
 			}
 
 			// ZRL
-			if (!empty($queryVars['zrl']) && $mode->isNormal() && !$mode->isBackend() && !$this->session->getLocalUserId()) {
+			if (!empty($queryVars['zrl']) && $this->mode->isNormal() && !$this->mode->isBackend() && !$this->session->getLocalUserId()) {
 				// Only continue when the given profile link seems valid.
 				// Valid profile links contain a path with "/profile/" and no query parameters
 				if ((parse_url($queryVars['zrl'], PHP_URL_QUERY) == '') &&
@@ -442,12 +440,12 @@ class App
 				}
 			}
 
-			if (!empty($queryVars['owt']) && $mode->isNormal()) {
+			if (!empty($queryVars['owt']) && $this->mode->isNormal()) {
 				$token = $queryVars['owt'];
 				OpenWebAuth::init($token);
 			}
 
-			if (!$mode->isBackend()) {
+			if (!$this->mode->isBackend()) {
 				$this->auth->withSession();
 			}
 
@@ -463,7 +461,7 @@ class App
 
 			// in install mode, any url loads install module
 			// but we need "view" module for stylesheet
-			if ($mode->isInstall() && $moduleName !== 'install') {
+			if ($this->mode->isInstall() && $moduleName !== 'install') {
 				$this->baseURL->redirect('install');
 			} else {
 				Core\Update::check($this->appHelper->getBasePath(), false);
@@ -513,7 +511,7 @@ class App
 			$page['page_title'] = $moduleName;
 
 			// The "view" module is required to show the theme CSS
-			if (!$mode->isInstall() && !$mode->has(Mode::MAINTENANCEDISABLED) && $moduleName !== 'view') {
+			if (!$this->mode->isInstall() && !$this->mode->has(Mode::MAINTENANCEDISABLED) && $moduleName !== 'view') {
 				$module = $this->createModuleInstance(Maintenance::class);
 			} else {
 				// determine the module class and save it to the module instance
@@ -535,7 +533,7 @@ class App
 
 			// Wrapping HTML responses in the theme template
 			if ($response->getHeaderLine(ICanCreateResponses::X_HEADER) === ICanCreateResponses::TYPE_HTML) {
-				$response = $page->run($this->appHelper, $this->session, $this->baseURL, $this->args, $mode, $response, $this->l10n, $this->profiler, $this->config, $pconfig, $nav, $this->session->getLocalUserId());
+				$response = $page->run($this->appHelper, $this->session, $this->baseURL, $this->args, $this->mode, $response, $this->l10n, $this->profiler, $this->config, $pconfig, $nav, $this->session->getLocalUserId());
 			}
 
 			$this->logger->debug('Request processed sucessfully', ['response' => $response->getStatusCode(), 'address' => $serverVars['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $serverVars['HTTP_REFERER'] ?? '', 'user-agent' => $serverVars['HTTP_USER_AGENT'] ?? '', 'duration' => number_format(microtime(true) - $request_start, 3)]);
