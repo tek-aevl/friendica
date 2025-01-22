@@ -164,6 +164,7 @@ class App
 			$this->container->create(ViewDefinition::class),
 			$this->mode,
 			$this->config,
+			$this->profiler,
 		);
 
 		$this->registerTemplateEngine();
@@ -278,7 +279,8 @@ class App
 		DbaDefinition $dbaDefinition,
 		ViewDefinition $viewDefinition,
 		Mode $mode,
-		IManageConfigValues $config
+		IManageConfigValues $config,
+		Profiler $profiler
 	): void {
 		if ($config->get('system', 'ini_max_execution_time') !== false) {
 			set_time_limit((int) $config->get('system', 'ini_max_execution_time'));
@@ -296,7 +298,7 @@ class App
 		// Ensure that all "strtotime" operations do run timezone independent
 		date_default_timezone_set('UTC');
 
-		$this->profiler->reset();
+		$profiler->reset();
 
 		if ($mode->has(Mode::DBAVAILABLE)) {
 			Core\Hook::loadHooks();
