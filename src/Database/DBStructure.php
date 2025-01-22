@@ -8,7 +8,6 @@
 namespace Friendica\Database;
 
 use Exception;
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\User;
@@ -238,7 +237,7 @@ class DBStructure
 
 		$errors = '';
 
-		Logger::info('updating structure');
+		DI::logger()->info('updating structure');
 
 		// Get the current structure
 		$database = [];
@@ -251,7 +250,7 @@ class DBStructure
 			foreach ($tables as $table) {
 				$table = current($table);
 
-				Logger::info('updating structure', ['table' => $table]);
+				DI::logger()->info('updating structure', ['table' => $table]);
 				$database[$table] = self::tableStructure($table);
 			}
 		}

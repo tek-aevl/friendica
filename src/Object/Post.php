@@ -11,7 +11,6 @@ use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
 use Friendica\Core\Addon;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
@@ -782,10 +781,10 @@ class Post
 	public function addChild(Post $item)
 	{
 		if (!$item->getId()) {
-			Logger::error('Post object has no id', ['post' => $item]);
+			DI::logger()->error('Post object has no id', ['post' => $item]);
 			return false;
 		} elseif ($this->getChild($item->getId())) {
-			Logger::warning('Post object already exists', ['post' => $item]);
+			DI::logger()->warning('Post object already exists', ['post' => $item]);
 			return false;
 		}
 
@@ -793,13 +792,13 @@ class Post
 		 * Only add what will be displayed
 		 */
 		if ($item->getDataValue('network') === Protocol::MAIL && DI::userSession()->getLocalUserId() != $item->getDataValue('uid')) {
-			Logger::warning('Post object does not belong to local user', ['post' => $item, 'local_user' => DI::userSession()->getLocalUserId()]);
+			DI::logger()->warning('Post object does not belong to local user', ['post' => $item, 'local_user' => DI::userSession()->getLocalUserId()]);
 			return false;
 		} elseif (
 			DI::activity()->match($item->getDataValue('verb'), Activity::LIKE) ||
 			DI::activity()->match($item->getDataValue('verb'), Activity::DISLIKE)
 		) {
-			Logger::warning('Post objects is a like/dislike', ['post' => $item]);
+			DI::logger()->warning('Post objects is a like/dislike', ['post' => $item]);
 			return false;
 		}
 
@@ -884,7 +883,7 @@ class Post
 			}
 		}
 
-		Logger::info('[WARN] Item::removeChild : Item is not a child (' . $id . ').');
+		DI::logger()->info('[WARN] Item::removeChild : Item is not a child (' . $id . ').');
 		return false;
 	}
 
@@ -947,7 +946,7 @@ class Post
 	public function getDataValue(string $name)
 	{
 		if (!isset($this->data[$name])) {
-			// Logger::info('[ERROR] Item::getDataValue : Item has no value name "'. $name .'".');
+			// DI::logger()->info('[ERROR] Item::getDataValue : Item has no value name "'. $name .'".');
 			return false;
 		}
 

@@ -13,7 +13,6 @@ use DOMNode;
 use DOMXPath;
 use Friendica\App;
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -716,7 +715,7 @@ class DFRN
 		$mentioned = [];
 
 		if (!$item['parent']) {
-			Logger::warning('Item without parent found.', ['type' => $type, 'item' => $item]);
+			DI::logger()->warning('Item without parent found.', ['type' => $type, 'item' => $item]);
 			return null;
 		}
 
@@ -938,14 +937,14 @@ class DFRN
 	{
 		if (!$public_batch) {
 			if (empty($contact['addr'])) {
-				Logger::notice('Empty contact handle for ' . $contact['id'] . ' - ' . $contact['url'] . ' - trying to update it.');
+				DI::logger()->notice('Empty contact handle for ' . $contact['id'] . ' - ' . $contact['url'] . ' - trying to update it.');
 				if (Contact::updateFromProbe($contact['id'])) {
 					$new_contact = DBA::selectFirst('contact', ['addr'], ['id' => $contact['id']]);
 					$contact['addr'] = $new_contact['addr'];
 				}
 
 				if (empty($contact['addr'])) {
-					Logger::notice('Unable to find contact handle for ' . $contact['id'] . ' - ' . $contact['url']);
+					DI::logger()->notice('Unable to find contact handle for ' . $contact['id'] . ' - ' . $contact['url']);
 					return -21;
 				}
 			}
@@ -953,7 +952,7 @@ class DFRN
 			try {
 				$pubkey = DI::dsprContact()->getByAddr(WebFingerUri::fromString($contact['addr']))->pubKey;
 			} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
-				Logger::notice('Unable to find contact details for ' . $contact['id'] . ' - ' . $contact['addr']);
+				DI::logger()->notice('Unable to find contact details for ' . $contact['id'] . ' - ' . $contact['addr']);
 				return -22;
 			}
 		} else {
@@ -974,7 +973,7 @@ class DFRN
 		$dest_url = ($public_batch ? $contact['batch'] : $contact['notify']);
 
 		if (empty($dest_url)) {
-			Logger::info('Empty destination', ['public' => $public_batch, 'contact' => $contact]);
+			DI::logger()->info('Empty destination', ['public' => $public_batch, 'contact' => $contact]);
 			return -24;
 		}
 
@@ -983,7 +982,7 @@ class DFRN
 		try {
 			$postResult = DI::httpClient()->post($dest_url, $envelope, ['Content-Type' => $content_type], 0, HttpClientRequest::DFRN);
 		} catch (\Throwable $th) {
-			Logger::notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
+			DI::logger()->notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
 			return -25;
 		}
 
@@ -995,7 +994,7 @@ class DFRN
 		}
 
 		if (empty($curl_stat) || empty($xml)) {
-			Logger::notice('Empty answer from ' . $contact['id'] . ' - ' . $dest_url);
+			DI::logger()->notice('Empty answer from ' . $contact['id'] . ' - ' . $dest_url);
 			return -9; // timed out
 		}
 
@@ -1004,8 +1003,8 @@ class DFRN
 		}
 
 		if (strpos($xml, '<?xml') === false) {
-			Logger::notice('No valid XML returned from ' . $contact['id'] . ' - ' . $dest_url);
-			Logger::debug('Returned XML: ' . $xml);
+			DI::logger()->notice('No valid XML returned from ' . $contact['id'] . ' - ' . $dest_url);
+			DI::logger()->debug('Returned XML: ' . $xml);
 			return 3;
 		}
 
@@ -1021,7 +1020,7 @@ class DFRN
 		}
 
 		if (!empty($res->message)) {
-			Logger::info('Transmit to ' . $dest_url . ' returned status '.$res->status.' - '.$res->message);
+			DI::logger()->info('Transmit to ' . $dest_url . ' returned status '.$res->status.' - '.$res->message);
 		}
 
 		return intval($res->status);
@@ -1063,7 +1062,7 @@ class DFRN
 			$author["contact-id"] = $contact_old["id"];
 			$author["network"] = $contact_old["network"];
 		} else {
-			Logger::info('Contact not found', ['condition' => $condition]);
+			DI::logger()->info('Contact not found', ['condition' => $condition]);
 
 			$author["contact-unknown"] = true;
 			$contact = Contact::getByURL($author["link"], null, ["id", "network"]);
@@ -1112,12 +1111,12 @@ class DFRN
 		}
 
 		if (empty($author['avatar'])) {
-			Logger::notice('Empty author: ' . $xml);
+			DI::logger()->notice('Empty author: ' . $xml);
 			$author['avatar'] = '';
 		}
 
 		if (DBA::isResult($contact_old) && !$onlyfetch) {
-			Logger::info("Check if contact details for contact " . $contact_old["id"] . " (" . $contact_old["nick"] . ") have to be updated.");
+			DI::logger()->info("Check if contact details for contact " . $contact_old["id"] . " (" . $contact_old["nick"] . ") have to be updated.");
 
 			$poco = ["url" => $contact_old["url"], "network" => $contact_old["network"]];
 
@@ -1178,7 +1177,7 @@ class DFRN
 			// If the "hide" element is present then the profile isn't searchable.
 			$hide = intval(XML::getFirstNodeValue($xpath, $element . "/dfrn:hide/text()", $context) == "true");
 
-			Logger::info("Hidden status for contact " . $contact_old["url"] . ": " . $hide);
+			DI::logger()->info("Hidden status for contact " . $contact_old["url"] . ": " . $hide);
 
 			// If the contact isn't searchable then set the contact to "hidden".
 			// Problem: This can be manually overridden by the user.
@@ -1318,7 +1317,7 @@ class DFRN
 	 */
 	private static function processMail(DOMXPath $xpath, DOMNode $mail, array $importer)
 	{
-		Logger::info("Processing mails");
+		DI::logger()->info("Processing mails");
 
 		$msg = [];
 		$msg['uid'] = $importer['importer_uid'];
@@ -1346,7 +1345,7 @@ class DFRN
 	 */
 	private static function processSuggestion(DOMXPath $xpath, DOMNode $suggestion, array $importer)
 	{
-		Logger::info('Processing suggestions');
+		DI::logger()->info('Processing suggestions');
 
 		$url = $xpath->evaluate('string(dfrn:url[1]/text())', $suggestion);
 		$cid = Contact::getIdForURL($url);
@@ -1422,7 +1421,7 @@ class DFRN
 	 */
 	private static function processRelocation(DOMXPath $xpath, DOMNode $relocation, array $importer): bool
 	{
-		Logger::info("Processing relocations");
+		DI::logger()->info("Processing relocations");
 
 		/// @TODO Rewrite this to one statement
 		$relocate = [];
@@ -1452,7 +1451,7 @@ class DFRN
 		// update contact
 		$old = Contact::selectFirst(['photo', 'url'], ['id' => $importer['id'], 'uid' => $importer['importer_uid']]);
 		if (!DBA::isResult($old)) {
-			Logger::warning('Existing contact had not been fetched', ['id' => $importer['id']]);
+			DI::logger()->warning('Existing contact had not been fetched', ['id' => $importer['id']]);
 			return false;
 		}
 
@@ -1475,7 +1474,7 @@ class DFRN
 
 		Contact::updateAvatar($importer['id'], $relocate['avatar'], true);
 
-		Logger::info('Contacts are updated.');
+		DI::logger()->info('Contacts are updated.');
 
 		/// @TODO
 		/// merge with current record, current contents have priority
@@ -1558,7 +1557,7 @@ class DFRN
 	 */
 	private static function processVerbs(int $entrytype, array $importer, array &$item)
 	{
-		Logger::info('Process verb ' . $item['verb'] . ' and object-type ' . $item['object-type'] . ' for entrytype ' . $entrytype);
+		DI::logger()->info('Process verb ' . $item['verb'] . ' and object-type ' . $item['object-type'] . ' for entrytype ' . $entrytype);
 
 		if (($entrytype == self::TOP_LEVEL) && !empty($importer['id'])) {
 			// The filling of the "contact" variable is done for legacy reasons
@@ -1570,22 +1569,22 @@ class DFRN
 			// Big question: Do we need these functions? They were part of the "consume_feed" function.
 			// This function once was responsible for DFRN and OStatus.
 			if ($activity->match($item['verb'], Activity::FOLLOW)) {
-				Logger::info("New follower");
+				DI::logger()->info("New follower");
 				Contact::addRelationship($importer, $contact, $item);
 				return false;
 			}
 			if ($activity->match($item['verb'], Activity::UNFOLLOW)) {
-				Logger::info("Lost follower");
+				DI::logger()->info("Lost follower");
 				Contact::removeFollower($contact);
 				return false;
 			}
 			if ($activity->match($item['verb'], Activity::REQ_FRIEND)) {
-				Logger::info("New friend request");
+				DI::logger()->info("New friend request");
 				Contact::addRelationship($importer, $contact, $item, true);
 				return false;
 			}
 			if ($activity->match($item['verb'], Activity::UNFRIEND)) {
-				Logger::info("Lost sharer");
+				DI::logger()->info("Lost sharer");
 				Contact::removeSharer($contact);
 				return false;
 			}
@@ -1631,7 +1630,7 @@ class DFRN
 				if ($xt->type == Activity\ObjectType::NOTE) {
 					$item_tag = Post::selectFirst(['id', 'uri-id'], ['uri' => $xt->id, 'uid' => $importer['importer_uid']]);
 					if (!DBA::isResult($item_tag)) {
-						Logger::warning('Post had not been fetched', ['uri' => $xt->id, 'uid' => $importer['importer_uid']]);
+						DI::logger()->warning('Post had not been fetched', ['uri' => $xt->id, 'uid' => $importer['importer_uid']]);
 						return false;
 					}
 
@@ -1696,23 +1695,23 @@ class DFRN
 	{
 		if (DBA::exists('contact', ["`nurl` = ? AND `uid` != ? AND `rel` IN (?, ?)",
 			Strings::normaliseLink($item["author-link"]), 0, Contact::FRIEND, Contact::SHARING])) {
-			Logger::debug('Author has got followers - accepted', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'url' => $item['uri'], 'author' => $item["author-link"]]);
+			DI::logger()->debug('Author has got followers - accepted', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'url' => $item['uri'], 'author' => $item["author-link"]]);
 			return true;
 		}
 
 		if ($importer['importer_uid'] != 0) {
-			Logger::debug('Message is directed to a user - accepted', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'url' => $item['uri'], 'importer' => $importer['importer_uid']]);
+			DI::logger()->debug('Message is directed to a user - accepted', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'url' => $item['uri'], 'importer' => $importer['importer_uid']]);
 			return true;
 		}
 
 		if ($item['uri'] != $item['thr-parent']) {
-			Logger::debug('Message is no parent - accepted', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'url' => $item['uri']]);
+			DI::logger()->debug('Message is no parent - accepted', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'url' => $item['uri']]);
 			return true;
 		}
 
 		$tags = array_column(Tag::getByURIId($item['uri-id'], [Tag::HASHTAG]), 'name');
 		if (Relay::isSolicitedPost($tags, $item['body'], $item['author-id'], $item['uri'], Protocol::DFRN)) {
-			Logger::debug('Post is accepted because of the relay settings', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'url' => $item['uri'], 'author' => $item["author-link"]]);
+			DI::logger()->debug('Post is accepted because of the relay settings', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'url' => $item['uri'], 'author' => $item["author-link"]]);
 			return true;
 		} else {
 			return false;
@@ -1735,7 +1734,7 @@ class DFRN
 	 */
 	private static function processEntry(array $header, DOMXPath $xpath, DOMNode $entry, array $importer, string $xml, int $protocol)
 	{
-		Logger::info("Processing entries");
+		DI::logger()->info("Processing entries");
 
 		$item = $header;
 
@@ -1751,7 +1750,7 @@ class DFRN
 		);
 		// Is there an existing item?
 		if (DBA::isResult($current) && !self::isEditedTimestampNewer($current, $item)) {
-			Logger::info("Item " . $item['uri'] . " (" . $item['edited'] . ") already existed.");
+			DI::logger()->info("Item " . $item['uri'] . " (" . $item['edited'] . ") already existed.");
 			return;
 		}
 
@@ -1961,10 +1960,10 @@ class DFRN
 
 			// Is it an event?
 			if (($item['object-type'] == Activity\ObjectType::EVENT) && !$owner_unknown) {
-				Logger::info("Item " . $item['uri'] . " seems to contain an event.");
+				DI::logger()->info("Item " . $item['uri'] . " seems to contain an event.");
 				$ev = Event::fromBBCode($item['body']);
 				if ((!empty($ev['desc']) || !empty($ev['summary'])) && !empty($ev['start'])) {
-					Logger::info("Event in item " . $item['uri'] . " was found.");
+					DI::logger()->info("Event in item " . $item['uri'] . " was found.");
 					$ev['cid']       = $importer['id'];
 					$ev['uid']       = $importer['importer_uid'];
 					$ev['uri']       = $item['uri'];
@@ -1984,7 +1983,7 @@ class DFRN
 					}
 
 					$event_id = Event::store($ev);
-					Logger::info('Event was stored', ['id' => $event_id]);
+					DI::logger()->info('Event was stored', ['id' => $event_id]);
 
 					$item = Event::getItemArrayForImportedId($event_id, $item);
 				}
@@ -1992,13 +1991,13 @@ class DFRN
 		}
 
 		if (!self::processVerbs($entrytype, $importer, $item)) {
-			Logger::info("Exiting because 'processVerbs' told us so");
+			DI::logger()->info("Exiting because 'processVerbs' told us so");
 			return;
 		}
 
 		// This check is done here to be able to receive connection requests in "processVerbs"
 		if (($entrytype == self::TOP_LEVEL) && $owner_unknown) {
-			Logger::info("Item won't be stored because user " . $importer['importer_uid'] . " doesn't follow " . $item['owner-link'] . ".");
+			DI::logger()->info("Item won't be stored because user " . $importer['importer_uid'] . " doesn't follow " . $item['owner-link'] . ".");
 			return;
 		}
 
@@ -2006,9 +2005,9 @@ class DFRN
 		// Update content if 'updated' changes
 		if (DBA::isResult($current)) {
 			if (self::updateContent($current, $item, $importer, $entrytype)) {
-				Logger::info("Item " . $item['uri'] . " was updated.");
+				DI::logger()->info("Item " . $item['uri'] . " was updated.");
 			} else {
-				Logger::info("Item " . $item['uri'] . " already existed.");
+				DI::logger()->info("Item " . $item['uri'] . " already existed.");
 			}
 			return;
 		}
@@ -2016,20 +2015,20 @@ class DFRN
 		if (in_array($entrytype, [self::REPLY, self::REPLY_RC])) {
 			if (($item['uid'] != 0) && !Post::exists(['uid' => $item['uid'], 'uri' => $item['thr-parent']])) {
 				if (DI::pConfig()->get($item['uid'], 'system', 'accept_only_sharer') == Item::COMPLETION_NONE) {
-					Logger::info('Completion is set to "none", so we stop here.', ['uid' => $item['uid'], 'owner-id' => $item['owner-id'], 'author-id' => $item['author-id'], 'gravity' => $item['gravity'], 'uri' => $item['uri']]);
+					DI::logger()->info('Completion is set to "none", so we stop here.', ['uid' => $item['uid'], 'owner-id' => $item['owner-id'], 'author-id' => $item['author-id'], 'gravity' => $item['gravity'], 'uri' => $item['uri']]);
 					return;
 				}
 				if (!Contact::isSharing($item['owner-id'], $item['uid']) && !Contact::isSharing($item['author-id'], $item['uid'])) {
-					Logger::info('Contact is not sharing with the user', ['uid' => $item['uid'], 'owner-id' => $item['owner-id'], 'author-id' => $item['author-id'], 'gravity' => $item['gravity'], 'uri' => $item['uri']]);
+					DI::logger()->info('Contact is not sharing with the user', ['uid' => $item['uid'], 'owner-id' => $item['owner-id'], 'author-id' => $item['author-id'], 'gravity' => $item['gravity'], 'uri' => $item['uri']]);
 					return;
 				}
 				if (($item['gravity'] == Item::GRAVITY_ACTIVITY) && DI::pConfig()->get($item['uid'], 'system', 'accept_only_sharer') == Item::COMPLETION_COMMENT) {
-					Logger::info('Completion is set to "comment", but this is an activity. so we stop here.', ['uid' => $item['uid'], 'owner-id' => $item['owner-id'], 'author-id' => $item['author-id'], 'gravity' => $item['gravity'], 'uri' => $item['uri']]);
+					DI::logger()->info('Completion is set to "comment", but this is an activity. so we stop here.', ['uid' => $item['uid'], 'owner-id' => $item['owner-id'], 'author-id' => $item['author-id'], 'gravity' => $item['gravity'], 'uri' => $item['uri']]);
 					return;
 				}
-				Logger::debug('Post is accepted.', ['uid' => $item['uid'], 'owner-id' => $item['owner-id'], 'author-id' => $item['author-id'], 'gravity' => $item['gravity'], 'uri' => $item['uri']]);
+				DI::logger()->debug('Post is accepted.', ['uid' => $item['uid'], 'owner-id' => $item['owner-id'], 'author-id' => $item['author-id'], 'gravity' => $item['gravity'], 'uri' => $item['uri']]);
 			} else {
-				Logger::debug('Thread parent exists.', ['uid' => $item['uid'], 'owner-id' => $item['owner-id'], 'author-id' => $item['author-id'], 'gravity' => $item['gravity'], 'uri' => $item['uri']]);
+				DI::logger()->debug('Thread parent exists.', ['uid' => $item['uid'], 'owner-id' => $item['owner-id'], 'author-id' => $item['author-id'], 'gravity' => $item['gravity'], 'uri' => $item['uri']]);
 			}
 
 			// Will be overwritten for sharing accounts in Item::insert
@@ -2039,7 +2038,7 @@ class DFRN
 
 			$posted_id = Item::insert($item);
 			if ($posted_id) {
-				Logger::info("Reply from contact " . $item['contact-id'] . " was stored with id " . $posted_id);
+				DI::logger()->info("Reply from contact " . $item['contact-id'] . " was stored with id " . $posted_id);
 
 				if ($item['uid'] == 0) {
 					Item::distribute($posted_id);
@@ -2049,7 +2048,7 @@ class DFRN
 			}
 		} else { // $entrytype == self::TOP_LEVEL
 			if (($item['uid'] != 0) && !Contact::isSharing($item['owner-id'], $item['uid']) && !Contact::isSharing($item['author-id'], $item['uid'])) {
-				Logger::info('Contact is not sharing with the user', ['uid' => $item['uid'], 'owner-id' => $item['owner-id'], 'author-id' => $item['author-id'], 'gravity' => $item['gravity'], 'uri' => $item['uri']]);
+				DI::logger()->info('Contact is not sharing with the user', ['uid' => $item['uid'], 'owner-id' => $item['owner-id'], 'author-id' => $item['author-id'], 'gravity' => $item['gravity'], 'uri' => $item['uri']]);
 				return;
 			}
 
@@ -2064,7 +2063,7 @@ class DFRN
 				$posted_id = $notify;
 			}
 
-			Logger::info("Item was stored with id " . $posted_id);
+			DI::logger()->info("Item was stored with id " . $posted_id);
 
 			if ($item['uid'] == 0) {
 				Item::distribute($posted_id);
@@ -2083,7 +2082,7 @@ class DFRN
 	 */
 	private static function processDeletion(DOMXPath $xpath, DOMNode $deletion, array $importer)
 	{
-		Logger::info("Processing deletions");
+		DI::logger()->info("Processing deletions");
 		$uri = null;
 
 		foreach ($deletion->attributes as $attributes) {
@@ -2099,18 +2098,18 @@ class DFRN
 		$condition = ['uri' => $uri, 'uid' => $importer['importer_uid']];
 		$item = Post::selectFirst(['id', 'parent', 'contact-id', 'uri-id', 'deleted', 'gravity'], $condition);
 		if (!DBA::isResult($item)) {
-			Logger::info('Item with URI ' . $uri . ' for user ' . $importer['importer_uid'] . ' was not found.');
+			DI::logger()->info('Item with URI ' . $uri . ' for user ' . $importer['importer_uid'] . ' was not found.');
 			return;
 		}
 
 		if (DBA::exists('post-category', ['uri-id' => $item['uri-id'], 'uid' => $importer['importer_uid'], 'type' => Post\Category::FILE])) {
-			Logger::notice('Item is filed. It will not be deleted.', ['uri' => $uri, 'uri-id' => $item['uri_id'], 'uid' => $importer['importer_uid']]);
+			DI::logger()->notice('Item is filed. It will not be deleted.', ['uri' => $uri, 'uri-id' => $item['uri_id'], 'uid' => $importer['importer_uid']]);
 			return;
 		}
 
 		// When it is a starting post it has to belong to the person that wants to delete it
 		if (($item['gravity'] == Item::GRAVITY_PARENT) && ($item['contact-id'] != $importer['id'])) {
-			Logger::info('Item with URI ' . $uri . ' do not belong to contact ' . $importer['id'] . ' - ignoring deletion.');
+			DI::logger()->info('Item with URI ' . $uri . ' do not belong to contact ' . $importer['id'] . ' - ignoring deletion.');
 			return;
 		}
 
@@ -2118,7 +2117,7 @@ class DFRN
 		if (($item['gravity'] != Item::GRAVITY_PARENT) && ($item['contact-id'] != $importer['id'])) {
 			$condition = ['id' => $item['parent'], 'contact-id' => $importer['id']];
 			if (!Post::exists($condition)) {
-				Logger::info('Item with URI ' . $uri . ' was not found or must not be deleted by contact ' . $importer['id'] . ' - ignoring deletion.');
+				DI::logger()->info('Item with URI ' . $uri . ' was not found or must not be deleted by contact ' . $importer['id'] . ' - ignoring deletion.');
 				return;
 			}
 		}
@@ -2127,7 +2126,7 @@ class DFRN
 			return;
 		}
 
-		Logger::info('deleting item '.$item['id'].' uri='.$uri);
+		DI::logger()->info('deleting item '.$item['id'].' uri='.$uri);
 
 		Item::markForDeletion(['id' => $item['id']]);
 	}
@@ -2190,7 +2189,7 @@ class DFRN
 			self::fetchauthor($xpath, $doc->firstChild, $importer, 'dfrn:owner', false, $xml);
 		}
 
-		Logger::info("Import DFRN message for user " . $importer['importer_uid'] . " from contact " . $importer['id']);
+		DI::logger()->info("Import DFRN message for user " . $importer['importer_uid'] . " from contact " . $importer['id']);
 
 		if (!empty($importer['gsid']) && ($protocol == Conversation::PARCEL_DIASPORA_DFRN)) {
 			GServer::setProtocol($importer['gsid'], Post\DeliveryData::DFRN);
@@ -2263,7 +2262,7 @@ class DFRN
 				self::processDeletion($xpath, $deletion, $importer);
 			}
 			if (count($deletions) > 0) {
-				Logger::info(count($deletions) . ' deletions had been processed');
+				DI::logger()->info(count($deletions) . ' deletions had been processed');
 				return 200;
 			}
 		}
@@ -2273,7 +2272,7 @@ class DFRN
 			self::processEntry($header, $xpath, $entry, $importer, $xml, $protocol);
 		}
 
-		Logger::info("Import done for user " . $importer['importer_uid'] . " from contact " . $importer['id']);
+		DI::logger()->info("Import done for user " . $importer['importer_uid'] . " from contact " . $importer['id']);
 		return 200;
 	}
 

@@ -14,7 +14,6 @@ use Friendica\App\Router;
 use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -227,7 +226,7 @@ class BaseApi extends BaseModule
 					self::setBoundaries($post_item['uri-id']);
 			}
 		} catch (\Exception $e) {
-			Logger::debug('Error processing page boundary calculation, skipping', ['error' => $e]);
+			$this->logger->debug('Error processing page boundary calculation, skipping', ['error' => $e]);
 		}
 	}
 
@@ -455,7 +454,7 @@ class BaseApi extends BaseModule
 			$posts_week = Post::countThread($condition);
 
 			if ($posts_week > $throttle_week) {
-				Logger::notice('Weekly posting limit reached', ['uid' => $uid, 'posts' => $posts_week, 'limit' => $throttle_week]);
+				$this->logger->notice('Weekly posting limit reached', ['uid' => $uid, 'posts' => $posts_week, 'limit' => $throttle_week]);
 				$error = $this->t('Too Many Requests');
 				$error_description = $this->tt("Weekly posting limit of %d post reached. The post was rejected.", "Weekly posting limit of %d posts reached. The post was rejected.", $throttle_week);
 				$errorobj = new \Friendica\Object\Api\Mastodon\Error($error, $error_description);
@@ -471,7 +470,7 @@ class BaseApi extends BaseModule
 			$posts_month = Post::countThread($condition);
 
 			if ($posts_month > $throttle_month) {
-				Logger::notice('Monthly posting limit reached', ['uid' => $uid, 'posts' => $posts_month, 'limit' => $throttle_month]);
+				$this->logger->notice('Monthly posting limit reached', ['uid' => $uid, 'posts' => $posts_month, 'limit' => $throttle_month]);
 				$error = $this->t('Too Many Requests');
 				$error_description = $this->tt('Monthly posting limit of %d post reached. The post was rejected.', 'Monthly posting limit of %d posts reached. The post was rejected.', $throttle_month);
 				$errorobj = new \Friendica\Object\Api\Mastodon\Error($error, $error_description);

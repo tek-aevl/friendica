@@ -7,7 +7,6 @@
  *
  */
 
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Network\HTTPException\NotModifiedException;
 
@@ -37,7 +36,7 @@ foreach (['style', $style] as $file) {
 			$modified = $stylemodified;
 		}
 	} else {
-		Logger::warning('Missing CSS file', ['file' => $stylecssfile, 'uid' => $uid]);
+		DI::logger()->warning('Missing CSS file', ['file' => $stylecssfile, 'uid' => $uid]);
 	}
 }
 $modified = gmdate('r', $modified);

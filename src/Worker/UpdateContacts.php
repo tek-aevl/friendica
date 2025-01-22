@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -30,11 +29,11 @@ class UpdateContacts
 		$updating = Worker::countWorkersByCommand('UpdateContact');
 		$limit = $update_limit - $updating;
 		if ($limit <= 0) {
-			Logger::info('The number of currently running jobs exceed the limit');
+			DI::logger()->info('The number of currently running jobs exceed the limit');
 			return;
 		}
 
-		Logger::info('Updating contact', ['count' => $limit]);
+		DI::logger()->info('Updating contact', ['count' => $limit]);
 
 		$condition = ['self' => false];
 
@@ -54,20 +53,20 @@ class UpdateContacts
 				if ((!empty($contact['gsid']) || !empty($contact['baseurl'])) && GServer::reachable($contact)) {
 					$stamp = (float)microtime(true);
 					$success = Contact::updateFromProbe($contact['id']);
-					Logger::debug('Direct update', ['id' => $contact['id'], 'count' => $count, 'duration' => round((float)microtime(true) - $stamp, 3), 'success' => $success]);
+					DI::logger()->debug('Direct update', ['id' => $contact['id'], 'count' => $count, 'duration' => round((float)microtime(true) - $stamp, 3), 'success' => $success]);
 					++$count;
 				} elseif (UpdateContact::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], $contact['id'])) {
-					Logger::debug('Update by worker', ['id' => $contact['id'], 'count' => $count]);
+					DI::logger()->debug('Update by worker', ['id' => $contact['id'], 'count' => $count]);
 					++$count;
 				}
 			} catch (\InvalidArgumentException $e) {
-				Logger::notice($e->getMessage(), ['contact' => $contact]);
+				DI::logger()->notice($e->getMessage(), ['contact' => $contact]);
 			}
 
 			Worker::coolDown();
 		}
 		DBA::close($contacts);
 
-		Logger::info('Initiated update for federated contacts', ['count' => $count]);
+		DI::logger()->info('Initiated update for federated contacts', ['count' => $count]);
 	}
 }

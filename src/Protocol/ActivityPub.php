@@ -7,7 +7,6 @@
 
 namespace Friendica\Protocol;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\DI;
@@ -87,12 +86,12 @@ class ActivityPub
 	{
 		header('Vary: Accept', false);
 		if (stristr($_SERVER['HTTP_ACCEPT'] ?? '', 'application/activity+json') || stristr($_SERVER['HTTP_ACCEPT'] ?? '', 'application/ld+json')) {
-			Logger::debug('Is AP request', ['accept' => $_SERVER['HTTP_ACCEPT'], 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
+			DI::logger()->debug('Is AP request', ['accept' => $_SERVER['HTTP_ACCEPT'], 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
 			return true;
 		}
 
 		if (stristr($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json')) {
-			Logger::debug('Is JSON request', ['accept' => $_SERVER['HTTP_ACCEPT'], 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
+			DI::logger()->debug('Is JSON request', ['accept' => $_SERVER['HTTP_ACCEPT'], 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
 			return true;
 		}
 
@@ -232,7 +231,7 @@ class ActivityPub
 		$start_timestamp = $start_timestamp ?: time();
 
 		if ((time() - $start_timestamp) > 60) {
-			Logger::info('Fetch time limit reached', ['url' => $url, 'uid' => $uid]);
+			DI::logger()->info('Fetch time limit reached', ['url' => $url, 'uid' => $uid]);
 			return [];
 		}
 
@@ -284,24 +283,24 @@ class ActivityPub
 
 		$signer = HTTPSignature::getSigner('', $_SERVER);
 		if (!$signer) {
-			Logger::debug('No signer or invalid signature', ['uid' => $uid, 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '', 'called_by' => $called_by]);
+			DI::logger()->debug('No signer or invalid signature', ['uid' => $uid, 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '', 'called_by' => $called_by]);
 			return false;
 		}
 
 		$apcontact = APContact::getByURL($signer);
 		if (empty($apcontact)) {
-			Logger::info('APContact not found', ['uid' => $uid, 'handle' => $signer, 'called_by' => $called_by]);
+			DI::logger()->info('APContact not found', ['uid' => $uid, 'handle' => $signer, 'called_by' => $called_by]);
 			return false;
 		}
 
 		if (empty($apcontact['gsid']) || empty($apcontact['baseurl'])) {
-			Logger::debug('No server found', ['uid' => $uid, 'signer' => $signer, 'called_by' => $called_by]);
+			DI::logger()->debug('No server found', ['uid' => $uid, 'signer' => $signer, 'called_by' => $called_by]);
 			return false;
 		}
 
 		$contact = Contact::getByURL($signer, false, ['id', 'baseurl', 'gsid']);
 		if (!empty($contact) && Contact\User::isBlocked($contact['id'], $uid)) {
-			Logger::info('Requesting contact is blocked', ['uid' => $uid, 'id' => $contact['id'], 'signer' => $signer, 'baseurl' => $contact['baseurl'], 'called_by' => $called_by]);
+			DI::logger()->info('Requesting contact is blocked', ['uid' => $uid, 'id' => $contact['id'], 'signer' => $signer, 'baseurl' => $contact['baseurl'], 'called_by' => $called_by]);
 			return false;
 		}
 
@@ -318,7 +317,7 @@ class ActivityPub
 			return false;
 		}
 
-		Logger::debug('Server is an accepted requester', ['uid' => $uid, 'id' => $apcontact['gsid'], 'url' => $apcontact['baseurl'], 'signer' => $signer, 'called_by' => $called_by]);
+		DI::logger()->debug('Server is an accepted requester', ['uid' => $uid, 'id' => $apcontact['gsid'], 'url' => $apcontact['baseurl'], 'signer' => $signer, 'called_by' => $called_by]);
 
 		return true;
 	}

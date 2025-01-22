@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -52,7 +51,7 @@ class PollContacts
 			$next_update = DateTimeFormat::utc($contact['last-update'] . ' + ' . $interval . ' minute');
 
 			if ($now < $next_update)  {
-				Logger::debug('No update', ['cid' => $contact['id'], 'interval' => $interval, 'next' => $next_update, 'now' => $now]);
+				DI::logger()->debug('No update', ['cid' => $contact['id'], 'interval' => $interval, 'next' => $next_update, 'now' => $now]);
 				continue;
 			}
 
@@ -64,7 +63,7 @@ class PollContacts
 				$priority = Worker::PRIORITY_LOW;
 			}
 
-			Logger::notice("Polling " . $contact["network"] . " " . $contact["id"] . " " . $contact['priority'] . " " . $contact["nick"] . " " . $contact["name"]);
+			DI::logger()->notice("Polling " . $contact["network"] . " " . $contact["id"] . " " . $contact['priority'] . " " . $contact["nick"] . " " . $contact["name"]);
 
 			Worker::add(['priority' => $priority, 'dont_fork' => true, 'force_priority' => true], 'OnePoll', (int)$contact['id']);
 			Worker::coolDown();

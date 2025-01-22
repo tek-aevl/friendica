@@ -8,7 +8,6 @@
 namespace Friendica\Content;
 
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Network\HTTPException;
 use Friendica\Util\ParseUrl;
@@ -28,7 +27,7 @@ class PageInfo
 	 */
 	public static function searchAndAppendToBody(string $body, bool $searchNakedUrls = false, bool $no_photos = false)
 	{
-		Logger::debug('add_page_info_to_body: fetch page info for body', ['body' => $body]);
+		DI::logger()->debug('add_page_info_to_body: fetch page info for body', ['body' => $body]);
 
 		$url = self::getRelevantUrlFromBody($body, $searchNakedUrls);
 		if (!$url) {
@@ -194,7 +193,7 @@ class PageInfo
 			}
 		}
 
-		Logger::debug('fetch page info for URL', ['url' => $url, 'data' => $data]);
+		DI::logger()->debug('fetch page info for URL', ['url' => $url, 'data' => $data]);
 
 		return $data;
 	}

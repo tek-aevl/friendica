@@ -9,7 +9,6 @@ namespace Friendica\Model\Contact;
 
 use Exception;
 use Friendica\Content\Widget;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -67,7 +66,7 @@ class Relation
 	{
 		$contact = Contact::selectFirst(['id', 'url', 'network'], ['id' => Contact::getPublicIdByUserId($uid)]);
 		if (empty($contact)) {
-			Logger::warning('Self contact for user not found', ['uid' => $uid]);
+			DI::logger()->warning('Self contact for user not found', ['uid' => $uid]);
 			return;
 		}
 
@@ -87,22 +86,22 @@ class Relation
 	{
 		$contact = Contact::getByURL($url);
 		if (empty($contact)) {
-			Logger::info('Contact not found', ['url' => $url]);
+			DI::logger()->info('Contact not found', ['url' => $url]);
 			return;
 		}
 
 		if (!self::isDiscoverable($url, $contact)) {
-			Logger::info('Contact is not discoverable', ['url' => $url]);
+			DI::logger()->info('Contact is not discoverable', ['url' => $url]);
 			return;
 		}
 
 		$uid = User::getIdForURL($url);
 		if (!empty($uid)) {
-			Logger::info('Fetch the followers/followings locally', ['url' => $url]);
+			DI::logger()->info('Fetch the followers/followings locally', ['url' => $url]);
 			$followers = self::getContacts($uid, [Contact::FOLLOWER, Contact::FRIEND]);
 			$followings = self::getContacts($uid, [Contact::SHARING, Contact::FRIEND]);
 		} elseif (!Contact::isLocal($url)) {
-			Logger::info('Fetch the followers/followings by polling the endpoints', ['url' => $url]);
+			DI::logger()->info('Fetch the followers/followings by polling the endpoints', ['url' => $url]);
 			$apcontact = APContact::getByURL($url, false);
 
 			if (!empty($apcontact['followers']) && is_string($apcontact['followers'])) {
@@ -117,7 +116,7 @@ class Relation
 				$followings = [];
 			}
 		} else {
-			Logger::warning('Contact seems to be local but could not be found here', ['url' => $url]);
+			DI::logger()->warning('Contact seems to be local but could not be found here', ['url' => $url]);
 			$followers = [];
 			$followings = [];
 		}
@@ -137,7 +136,7 @@ class Relation
 	{
 		if (empty($followers) && empty($followings)) {
 			Contact::update(['last-discovery' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
-			Logger::info('The contact does not offer discoverable data', ['id' => $contact['id'], 'url' => $contact['url'], 'network' => $contact['network']]);
+			DI::logger()->info('The contact does not offer discoverable data', ['id' => $contact['id'], 'url' => $contact['url'], 'network' => $contact['network']]);
 			return;
 		}
 
@@ -162,7 +161,7 @@ class Relation
 		$follower_counter = 0;
 		$following_counter = 0;
 
-		Logger::info('Discover contacts', ['id' => $target, 'url' => $url, 'contacts' => count($contacts)]);
+		DI::logger()->info('Discover contacts', ['id' => $target, 'url' => $url, 'contacts' => count($contacts)]);
 		foreach ($contacts as $contact) {
 			$actor = Contact::getIdForURL($contact);
 			if (!empty($actor)) {
@@ -186,7 +185,7 @@ class Relation
 		}
 
 		Contact::update(['last-discovery' => DateTimeFormat::utcNow()], ['id' => $target]);
-		Logger::info('Contacts discovery finished', ['id' => $target, 'url' => $url, 'follower' => $follower_counter, 'following' => $following_counter]);
+		DI::logger()->info('Contacts discovery finished', ['id' => $target, 'url' => $url, 'follower' => $follower_counter, 'following' => $following_counter]);
 		return;
 	}
 
@@ -260,34 +259,34 @@ class Relation
 		}
 
 		if ($contact['last-discovery'] > DateTimeFormat::utc('now - 1 month')) {
-			Logger::info('No discovery - Last was less than a month ago.', ['id' => $contact['id'], 'url' => $url, 'discovery' => $contact['last-discovery']]);
+			DI::logger()->info('No discovery - Last was less than a month ago.', ['id' => $contact['id'], 'url' => $url, 'discovery' => $contact['last-discovery']]);
 			return false;
 		}
 
 		if ($contact_discovery != self::DISCOVERY_ALL) {
 			$local = DBA::exists('contact', ["`nurl` = ? AND `uid` != ?", Strings::normaliseLink($url), 0]);
 			if (($contact_discovery == self::DISCOVERY_LOCAL) && !$local) {
-				Logger::info('No discovery - This contact is not followed/following locally.', ['id' => $contact['id'], 'url' => $url]);
+				DI::logger()->info('No discovery - This contact is not followed/following locally.', ['id' => $contact['id'], 'url' => $url]);
 				return false;
 			}
 
 			if ($contact_discovery == self::DISCOVERY_INTERACTOR) {
 				$interactor = DBA::exists('contact-relation', ["`relation-cid` = ? AND `last-interaction` > ?", $contact['id'], DBA::NULL_DATETIME]);
 				if (!$local && !$interactor) {
-					Logger::info('No discovery - This contact is not interacting locally.', ['id' => $contact['id'], 'url' => $url]);
+					DI::logger()->info('No discovery - This contact is not interacting locally.', ['id' => $contact['id'], 'url' => $url]);
 					return false;
 				}
 			}
 		} elseif ($contact['created'] > DateTimeFormat::utc('now - 1 day')) {
 			// Newly created contacts are not discovered to avoid DDoS attacks
-			Logger::info('No discovery - Contact record is less than a day old.', ['id' => $contact['id'], 'url' => $url, 'discovery' => $contact['created']]);
+			DI::logger()->info('No discovery - Contact record is less than a day old.', ['id' => $contact['id'], 'url' => $url, 'discovery' => $contact['created']]);
 			return false;
 		}
 
 		if (!in_array($contact['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN])) {
 			$apcontact = APContact::getByURL($url, false);
 			if (empty($apcontact)) {
-				Logger::info('No discovery - The contact does not seem to speak ActivityPub.', ['id' => $contact['id'], 'url' => $url, 'network' => $contact['network']]);
+				DI::logger()->info('No discovery - The contact does not seem to speak ActivityPub.', ['id' => $contact['id'], 'url' => $url, 'network' => $contact['network']]);
 				return false;
 			}
 		}
@@ -366,7 +365,7 @@ class Relation
 		$totallimit = $start + $limit;
 		$contacts = [];
 
-		Logger::info('Collecting suggestions', ['uid' => $uid, 'cid' => $cid, 'start' => $start, 'limit' => $limit]);
+		DI::logger()->info('Collecting suggestions', ['uid' => $uid, 'cid' => $cid, 'start' => $start, 'limit' => $limit]);
 
 		$diaspora = DI::config()->get('system', 'diaspora_enabled') ? Protocol::DIASPORA : Protocol::ACTIVITYPUB;
 
@@ -394,7 +393,7 @@ class Relation
 
 		DBA::close($results);
 
-		Logger::info('Contacts of contacts who are followed by the given user', ['uid' => $uid, 'cid' => $cid, 'count' => count($contacts)]);
+		DI::logger()->info('Contacts of contacts who are followed by the given user', ['uid' => $uid, 'cid' => $cid, 'count' => count($contacts)]);
 
 		if (count($contacts) >= $totallimit) {
 			return array_slice($contacts, $start, $limit);
@@ -419,7 +418,7 @@ class Relation
 		}
 		DBA::close($results);
 
-		Logger::info('Contacts of contacts who are following the given user', ['uid' => $uid, 'cid' => $cid, 'count' => count($contacts)]);
+		DI::logger()->info('Contacts of contacts who are following the given user', ['uid' => $uid, 'cid' => $cid, 'count' => count($contacts)]);
 
 		if (count($contacts) >= $totallimit) {
 			return array_slice($contacts, $start, $limit);
@@ -440,7 +439,7 @@ class Relation
 		}
 		DBA::close($results);
 
-		Logger::info('Followers that are not followed by the given user', ['uid' => $uid, 'cid' => $cid, 'count' => count($contacts)]);
+		DI::logger()->info('Followers that are not followed by the given user', ['uid' => $uid, 'cid' => $cid, 'count' => count($contacts)]);
 
 		if (count($contacts) >= $totallimit) {
 			return array_slice($contacts, $start, $limit);
@@ -461,7 +460,7 @@ class Relation
 		}
 		DBA::close($results);
 
-		Logger::info('Any contact', ['uid' => $uid, 'cid' => $cid, 'count' => count($contacts)]);
+		DI::logger()->info('Any contact', ['uid' => $uid, 'cid' => $cid, 'count' => count($contacts)]);
 
 		return array_slice($contacts, $start, $limit);
 	}
@@ -714,7 +713,7 @@ class Relation
 	public static function countCommonFollows(int $sourceId, int $targetId, array $condition = []): int
 	{
 		$condition = DBA::mergeConditions($condition,
-			['`id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`) 
+			['`id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`)
 			AND `id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`)',
 			$sourceId, $targetId]
 		);
@@ -737,7 +736,7 @@ class Relation
 	public static function listCommonFollows(int $sourceId, int $targetId, array $condition = [], int $count = 30, int $offset = 0, bool $shuffle = false)
 	{
 		$condition = DBA::mergeConditions($condition,
-			["`id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`) 
+			["`id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`)
 			AND `id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`)",
 			$sourceId, $targetId]
 		);
@@ -759,7 +758,7 @@ class Relation
 	public static function countCommonFollowers(int $sourceId, int $targetId, array $condition = []): int
 	{
 		$condition = DBA::mergeConditions($condition,
-			["`id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `follows`) 
+			["`id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `follows`)
 			AND `id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `follows`)",
 			$sourceId, $targetId]
 		);
@@ -782,7 +781,7 @@ class Relation
 	public static function listCommonFollowers(int $sourceId, int $targetId, array $condition = [], int $count = 30, int $offset = 0, bool $shuffle = false)
 	{
 		$condition = DBA::mergeConditions($condition,
-			["`id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `follows`) 
+			["`id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `follows`)
 			AND `id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `follows`)",
 			$sourceId, $targetId]
 		);
@@ -803,7 +802,7 @@ class Relation
 		$days = DI::config()->get('channel', 'interaction_score_days');
 		$contact_id = Contact::getPublicIdByUserId($uid);
 
-		Logger::debug('Calculation - start', ['uid' => $uid, 'cid' => $contact_id, 'days' => $days]);
+		DI::logger()->debug('Calculation - start', ['uid' => $uid, 'cid' => $contact_id, 'days' => $days]);
 
 		$follow = Verb::getID(Activity::FOLLOW);
 		$view = Verb::getID(Activity::VIEW);
@@ -814,7 +813,7 @@ class Relation
 		$total = DBA::fetchFirst("SELECT count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post`.`uri-id` = `post-user`.`thr-parent-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?)",
 			$contact_id, DateTimeFormat::utc('now - ' . $days . ' day'), $uid, $contact_id, $follow, $view, $read);
 
-		Logger::debug('Calculate relation-score', ['uid' => $uid, 'total' => $total['activity']]);
+		DI::logger()->debug('Calculate relation-score', ['uid' => $uid, 'total' => $total['activity']]);
 
 		$interactions = DBA::p("SELECT `post`.`author-id`, count(*) AS `activity`, EXISTS(SELECT `pid` FROM `account-user-view` WHERE `pid` = `post`.`author-id` AND `uid` = ? AND `rel` IN (?, ?)) AS `follows`
 			FROM `post-user` INNER JOIN `post` ON `post`.`uri-id` = `post-user`.`thr-parent-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?) GROUP BY `post`.`author-id`",
@@ -828,7 +827,7 @@ class Relation
 		$total = DBA::fetchFirst("SELECT count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post`.`uri-id` = `post-user`.`parent-uri-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?)",
 			$contact_id, DateTimeFormat::utc('now - ' . $days . ' day'), $uid, $contact_id, $follow, $view, $read);
 
-		Logger::debug('Calculate relation-thread-score', ['uid' => $uid, 'total' => $total['activity']]);
+		DI::logger()->debug('Calculate relation-thread-score', ['uid' => $uid, 'total' => $total['activity']]);
 
 		$interactions = DBA::p("SELECT `post`.`author-id`, count(*) AS `activity`, EXISTS(SELECT `pid` FROM `account-user-view` WHERE `pid` = `post`.`author-id` AND `uid` = ? AND `rel` IN (?, ?)) AS `follows`
 			FROM `post-user` INNER JOIN `post` ON `post`.`uri-id` = `post-user`.`parent-uri-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?) GROUP BY `post`.`author-id`",
@@ -842,7 +841,7 @@ class Relation
 		$total = DBA::fetchFirst("SELECT count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post-user`.`uri-id` = `post`.`thr-parent-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?)",
 			$contact_id, DateTimeFormat::utc('now - ' . $days . ' day'), $uid, $contact_id, $follow, $view, $read);
 
-		Logger::debug('Calculate score', ['uid' => $uid, 'total' => $total['activity']]);
+		DI::logger()->debug('Calculate score', ['uid' => $uid, 'total' => $total['activity']]);
 
 		$interactions = DBA::p("SELECT `post`.`author-id`, count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post-user`.`uri-id` = `post`.`thr-parent-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?) GROUP BY `post`.`author-id`",
 			$contact_id, DateTimeFormat::utc('now - ' . $days . ' day'), $uid, $contact_id, $follow, $view, $read);
@@ -855,7 +854,7 @@ class Relation
 		$total = DBA::fetchFirst("SELECT count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post-user`.`uri-id` = `post`.`parent-uri-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?)",
 			$contact_id, DateTimeFormat::utc('now - ' . $days . ' day'), $uid, $contact_id, $follow, $view, $read);
 
-		Logger::debug('Calculate thread-score', ['uid' => $uid, 'total' => $total['activity']]);
+		DI::logger()->debug('Calculate thread-score', ['uid' => $uid, 'total' => $total['activity']]);
 
 		$interactions = DBA::p("SELECT `post`.`author-id`, count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post-user`.`uri-id` = `post`.`parent-uri-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?) GROUP BY `post`.`author-id`",
 			$contact_id, DateTimeFormat::utc('now - ' . $days . ' day'), $uid, $contact_id, $follow, $view, $read);
@@ -868,7 +867,7 @@ class Relation
 		$total = DBA::fetchFirst("SELECT count(*) AS `posts` FROM `post-thread-user` WHERE EXISTS(SELECT `cid` FROM `contact-relation` WHERE `cid` = `post-thread-user`.`author-id` AND `relation-cid` = ? AND `follows`) AND `uid` = ? AND `created` > ?",
 			$contact_id, $uid, DateTimeFormat::utc('now - ' . $days . ' day'));
 
-		Logger::debug('Calculate post-score', ['uid' => $uid, 'total' => $total['posts']]);
+		DI::logger()->debug('Calculate post-score', ['uid' => $uid, 'total' => $total['posts']]);
 
 		$posts = DBA::p("SELECT `author-id`, count(*) AS `posts` FROM `post-thread-user` WHERE EXISTS(SELECT `cid` FROM `contact-relation` WHERE `cid` = `post-thread-user`.`author-id` AND `relation-cid` = ? AND `follows`) AND `uid` = ? AND `created` > ? GROUP BY `author-id`",
 			$contact_id, $uid, DateTimeFormat::utc('now - ' . $days . ' day'));
@@ -878,6 +877,6 @@ class Relation
 		}
 		DBA::close($posts);
 
-		Logger::debug('Calculation - end', ['uid' => $uid]);
+		DI::logger()->debug('Calculation - end', ['uid' => $uid]);
 	}
 }

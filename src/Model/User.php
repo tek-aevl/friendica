@@ -15,7 +15,6 @@ use Friendica\App;
 use Friendica\Content\Pager;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Search;
 use Friendica\Core\System;
@@ -857,7 +856,7 @@ class User
 			$fields['login_date'] = DateTimeFormat::utcNow();
 		}
 
-		Logger::debug('Set last activity for user', ['uid' => $user['uid'], 'fields' => $fields]);
+		DI::logger()->debug('Set last activity for user', ['uid' => $user['uid'], 'fields' => $fields]);
 		self::update($fields, $user['uid']);
 		// Set the last activity for all identities of the user
 		DBA::update('user', $fields, ['parent-uid' => $user['uid'], 'verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false]);
@@ -898,7 +897,7 @@ class User
 
 			return $passwordExposedChecker->passwordExposed($password) === PasswordExposed\Enums\PasswordStatus::EXPOSED;
 		} catch (Exception $e) {
-			Logger::error('Password Exposed Exception: ' . $e->getMessage(), [
+			DI::logger()->error('Password Exposed Exception: ' . $e->getMessage(), [
 				'code' => $e->getCode(),
 				'file' => $e->getFile(),
 				'line' => $e->getLine(),
@@ -1246,7 +1245,7 @@ class User
 		$username_max_length = max(1, min(64, intval(DI::config()->get('system', 'username_max_length', 48))));
 
 		if ($username_min_length > $username_max_length) {
-			Logger::error(DI::l10n()->t('system.username_min_length (%s) and system.username_max_length (%s) are excluding each other, swapping values.', $username_min_length, $username_max_length));
+			DI::logger()->error(DI::l10n()->t('system.username_min_length (%s) and system.username_max_length (%s) are excluding each other, swapping values.', $username_min_length, $username_max_length));
 			$tmp = $username_min_length;
 			$username_min_length = $username_max_length;
 			$username_max_length = $tmp;
@@ -1409,7 +1408,7 @@ class User
 			try {
 				$curlResult = DI::httpClient()->get($photo, HttpClientAccept::IMAGE, [HttpClientOptions::REQUEST => HttpClientRequest::CONTENTTYPE]);
 				if ($curlResult->isSuccess()) {
-					Logger::debug('Got picture', ['Content-Type' => $curlResult->getHeader('Content-Type'), 'url' => $photo]);
+					DI::logger()->debug('Got picture', ['Content-Type' => $curlResult->getHeader('Content-Type'), 'url' => $photo]);
 					$img_str = $curlResult->getBodyString();
 					$type = $curlResult->getContentType();
 				} else {
@@ -1417,7 +1416,7 @@ class User
 					$type = '';
 				}
 			} catch (\Throwable $th) {
-				Logger::notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
+				DI::logger()->notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
 				$img_str = '';
 				$type = '';
 			}
@@ -1777,7 +1776,7 @@ class User
 			throw new \InvalidArgumentException('uid needs to be greater than 0');
 		}
 
-		Logger::notice('Removing user', ['user' => $uid]);
+		DI::logger()->notice('Removing user', ['user' => $uid]);
 
 		$user = self::getById($uid);
 		if (!$user) {
@@ -2086,19 +2085,19 @@ class User
 
 		$register_policy = DI::config()->get('config', 'register_policy');
 		if (!in_array($register_policy, [Module\Register::OPEN, Module\Register::CLOSED])) {
-			Logger::debug('Unsupported register policy.', ['policy' => $register_policy]);
+			DI::logger()->debug('Unsupported register policy.', ['policy' => $register_policy]);
 			return;
 		}
 
 		$users = DBA::count('user', ['blocked' => false, 'account_removed' => false, 'account_expired' => false]);
 		if (($users >= $max_registered_users) && ($register_policy == Module\Register::OPEN)) {
 			DI::config()->set('config', 'register_policy', Module\Register::CLOSED);
-			Logger::notice('Max users reached, registration is closed.', ['users' => $users, 'max' => $max_registered_users]);
+			DI::logger()->notice('Max users reached, registration is closed.', ['users' => $users, 'max' => $max_registered_users]);
 		} elseif (($users < $max_registered_users) && ($register_policy == Module\Register::CLOSED)) {
 			DI::config()->set('config', 'register_policy', Module\Register::OPEN);
-			Logger::notice('Below maximum users, registration is opened.', ['users' => $users, 'max' => $max_registered_users]);
+			DI::logger()->notice('Below maximum users, registration is opened.', ['users' => $users, 'max' => $max_registered_users]);
 		} else {
-			Logger::debug('Unchanged register policy', ['policy' => $register_policy, 'users' => $users, 'max' => $max_registered_users]);
+			DI::logger()->debug('Unchanged register policy', ['policy' => $register_policy, 'users' => $users, 'max' => $max_registered_users]);
 		}
 	}
 }

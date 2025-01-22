@@ -7,7 +7,6 @@
 
 namespace Friendica\Content\Text;
 
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Contact;
 
@@ -97,7 +96,7 @@ class Markdown
 	{
 		// @TODO Temporary until we find the source of the null value to finally set the correct type-hint
 		if (is_null($s)) {
-			Logger::warning('Received null value');
+			DI::logger()->warning('Received null value');
 			return '';
 		}
 

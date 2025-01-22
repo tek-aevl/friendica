@@ -16,7 +16,6 @@ use Friendica\Content\OEmbed;
 use Friendica\Content\PageInfo;
 use Friendica\Content\Smilies;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
@@ -328,7 +327,7 @@ class BBCode
 		// than the maximum, then don't waste time looking for the images
 		if ($maxlen && (strlen($body) > $maxlen)) {
 
-			Logger::info('the total body length exceeds the limit', ['maxlen' => $maxlen, 'body_len' => strlen($body)]);
+			DI::logger()->info('the total body length exceeds the limit', ['maxlen' => $maxlen, 'body_len' => strlen($body)]);
 
 			$orig_body = $body;
 			$new_body = '';
@@ -348,7 +347,7 @@ class BBCode
 
 					if (($textlen + $img_start) > $maxlen) {
 						if ($textlen < $maxlen) {
-							Logger::debug('the limit happens before an embedded image');
+							DI::logger()->debug('the limit happens before an embedded image');
 							$new_body = $new_body . substr($orig_body, 0, $maxlen - $textlen);
 							$textlen = $maxlen;
 						}
@@ -362,7 +361,7 @@ class BBCode
 
 					if (($textlen + $img_end) > $maxlen) {
 						if ($textlen < $maxlen) {
-							Logger::debug('the limit happens before the end of a non-embedded image');
+							DI::logger()->debug('the limit happens before the end of a non-embedded image');
 							$new_body = $new_body . substr($orig_body, 0, $maxlen - $textlen);
 							$textlen = $maxlen;
 						}
@@ -385,11 +384,11 @@ class BBCode
 
 			if (($textlen + strlen($orig_body)) > $maxlen) {
 				if ($textlen < $maxlen) {
-					Logger::debug('the limit happens after the end of the last image');
+					DI::logger()->debug('the limit happens after the end of the last image');
 					$new_body = $new_body . substr($orig_body, 0, $maxlen - $textlen);
 				}
 			} else {
-				Logger::debug('the text size with embedded images extracted did not violate the limit');
+				DI::logger()->debug('the text size with embedded images extracted did not violate the limit');
 				$new_body = $new_body . $orig_body;
 			}
 
@@ -2107,7 +2106,7 @@ class BBCode
 		try {
 			return (string)Uri::fromParts($parts);
 		} catch (\Throwable $th) {
-			Logger::notice('Exception on unparsing url', ['url' => $url, 'parts' => $parts, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
+			DI::logger()->notice('Exception on unparsing url', ['url' => $url, 'parts' => $parts, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
 			return $url;
 		}
 	}

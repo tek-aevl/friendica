@@ -7,7 +7,6 @@
 
 namespace Friendica\Util;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -72,7 +71,7 @@ class HTTPSignature
 		$sig_block = self::parseSigheader($headers['authorization']);
 
 		if (!$sig_block) {
-			Logger::notice('no signature provided.');
+			DI::logger()->notice('no signature provided.');
 			return $result;
 		}
 
@@ -102,7 +101,7 @@ class HTTPSignature
 			$key = $key($sig_block['keyId']);
 		}
 
-		Logger::info('Got keyID ' . $sig_block['keyId']);
+		DI::logger()->info('Got keyID ' . $sig_block['keyId']);
 
 		if (!$key) {
 			return $result;
@@ -110,7 +109,7 @@ class HTTPSignature
 
 		$x = Crypto::rsaVerify($signed_data, $sig_block['signature'], $key, $algorithm);
 
-		Logger::info('verified: ' . $x);
+		DI::logger()->info('verified: ' . $x);
 
 		if (!$x) {
 			return $result;
@@ -293,7 +292,7 @@ class HTTPSignature
 		$postResult = DI::httpClient()->post($target, $content, $headers, DI::config()->get('system', 'curl_timeout'), HttpClientRequest::ACTIVITYPUB);
 		$return_code = $postResult->getReturnCode();
 
-		Logger::info('Transmit to ' . $target . ' returned ' . $return_code);
+		DI::logger()->info('Transmit to ' . $target . ' returned ' . $return_code);
 
 		self::setInboxStatus($target, ($return_code >= 200) && ($return_code <= 299));
 
@@ -327,7 +326,7 @@ class HTTPSignature
 			return false;
 		}
 
-		Logger::debug('Process directly', ['uid' => $uid, 'target' => $target, 'type' => $type]);
+		DI::logger()->debug('Process directly', ['uid' => $uid, 'target' => $target, 'type' => $type]);
 		return Receiver::routeActivities($object_data, $type, true, true, $uid);
 	}
 
@@ -371,7 +370,7 @@ class HTTPSignature
 		try {
 			$postResult = self::post($data, $target, $owner);
 		} catch (\Throwable $th) {
-			Logger::notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
+			DI::logger()->notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
 			return false;
 		}
 		$return_code = $postResult->getReturnCode();
@@ -402,7 +401,7 @@ class HTTPSignature
 
 			$status = DBA::selectFirst('inbox-status', [], ['url' => $url]);
 			if (empty($status)) {
-				Logger::warning('Unable to insert inbox-status row', $insertFields);
+				DI::logger()->warning('Unable to insert inbox-status row', $insertFields);
 				return;
 			}
 		}
@@ -476,12 +475,12 @@ class HTTPSignature
 		try {
 			$curlResult = self::fetchRaw($request, $uid);
 		} catch (\Exception $exception) {
-			Logger::notice('Error fetching url', ['url' => $request, 'exception' => $exception]);
+			DI::logger()->notice('Error fetching url', ['url' => $request, 'exception' => $exception]);
 			return [];
 		}
 
 		if (!$curlResult->isSuccess() || empty($curlResult->getBodyString())) {
-			Logger::debug('Fetching was unsuccessful', ['url' => $request, 'return-code' => $curlResult->getReturnCode(), 'error-number' => $curlResult->getErrorNumber(), 'error' => $curlResult->getError()]);
+			DI::logger()->debug('Fetching was unsuccessful', ['url' => $request, 'return-code' => $curlResult->getReturnCode(), 'error-number' => $curlResult->getErrorNumber(), 'error' => $curlResult->getError()]);
 			return [];
 		}
 
@@ -510,7 +509,7 @@ class HTTPSignature
 		}
 
 		if (current(explode(';', $contentType)) == 'application/json') {
-			Logger::notice('Unexpected content type, possibly from a remote system that is not standard compliant.', ['content-type' => $contentType, 'url' => $url]);
+			DI::logger()->notice('Unexpected content type, possibly from a remote system that is not standard compliant.', ['content-type' => $contentType, 'url' => $url]);
 		}
 		return false;
 	}
@@ -572,7 +571,7 @@ class HTTPSignature
 		}
 		$return_code = $curlResult->getReturnCode();
 
-		Logger::info('Fetched for user ' . $uid . ' from ' . $request . ' returned ' . $return_code);
+		DI::logger()->info('Fetched for user ' . $uid . ' from ' . $request . ' returned ' . $return_code);
 
 		return $curlResult;
 	}
@@ -587,14 +586,14 @@ class HTTPSignature
 	public static function getKeyIdContact(array $http_headers): array
 	{
 		if (empty($http_headers['HTTP_SIGNATURE'])) {
-			Logger::debug('No HTTP_SIGNATURE header', ['header' => $http_headers]);
+			DI::logger()->debug('No HTTP_SIGNATURE header', ['header' => $http_headers]);
 			return [];
 		}
 
 		$sig_block = self::parseSigHeader($http_headers['HTTP_SIGNATURE']);
 
 		if (empty($sig_block['keyId'])) {
-			Logger::debug('No keyId', ['sig_block' => $sig_block]);
+			DI::logger()->debug('No keyId', ['sig_block' => $sig_block]);
 			return [];
 		}
 
@@ -614,14 +613,14 @@ class HTTPSignature
 	public static function getSigner(string $content, array $http_headers)
 	{
 		if (empty($http_headers['HTTP_SIGNATURE'])) {
-			Logger::debug('No HTTP_SIGNATURE header');
+			DI::logger()->debug('No HTTP_SIGNATURE header');
 			return false;
 		}
 
 		if (!empty($content)) {
 			$object = json_decode($content, true);
 			if (empty($object)) {
-				Logger::info('No object');
+				DI::logger()->info('No object');
 				return false;
 			}
 
@@ -659,7 +658,7 @@ class HTTPSignature
 		}
 
 		if (empty($sig_block) || empty($sig_block['headers']) || empty($sig_block['keyId'])) {
-			Logger::info('No headers or keyId');
+			DI::logger()->info('No headers or keyId');
 			return false;
 		}
 
@@ -668,13 +667,13 @@ class HTTPSignature
 			if (array_key_exists($h, $headers)) {
 				$signed_data .= $h . ': ' . $headers[$h] . "\n";
 			} else {
-				Logger::info('Requested header field not found', ['field' => $h, 'header' => $headers]);
+				DI::logger()->info('Requested header field not found', ['field' => $h, 'header' => $headers]);
 			}
 		}
 		$signed_data = rtrim($signed_data, "\n");
 
 		if (empty($signed_data)) {
-			Logger::info('Signed data is empty');
+			DI::logger()->info('Signed data is empty');
 			return false;
 		}
 
@@ -697,18 +696,18 @@ class HTTPSignature
 		}
 
 		if (empty($algorithm)) {
-			Logger::info('No algorithm');
+			DI::logger()->info('No algorithm');
 			return false;
 		}
 
 		$key = self::fetchKey($sig_block['keyId'], $actor);
 		if (empty($key)) {
-			Logger::info('Empty key');
+			DI::logger()->info('Empty key');
 			return false;
 		}
 
 		if (!empty($key['url']) && !empty($key['type']) && ($key['type'] == 'Tombstone')) {
-			Logger::info('Actor is a tombstone', ['key' => $key]);
+			DI::logger()->info('Actor is a tombstone', ['key' => $key]);
 
 			if (!Contact::isLocal($key['url'])) {
 				// We now delete everything that we possibly knew from this actor
@@ -718,12 +717,12 @@ class HTTPSignature
 		}
 
 		if (empty($key['pubkey'])) {
-			Logger::info('Empty pubkey');
+			DI::logger()->info('Empty pubkey');
 			return false;
 		}
 
 		if (!Crypto::rsaVerify($signed_data, $sig_block['signature'], $key['pubkey'], $algorithm)) {
-			Logger::info('Verification failed', ['signed_data' => $signed_data, 'algorithm' => $algorithm, 'header' => $sig_block['headers'], 'http_headers' => $http_headers]);
+			DI::logger()->info('Verification failed', ['signed_data' => $signed_data, 'algorithm' => $algorithm, 'header' => $sig_block['headers'], 'http_headers' => $http_headers]);
 			return false;
 		}
 
@@ -742,7 +741,7 @@ class HTTPSignature
 			/// @todo add all hashes from the rfc
 
 			if (!empty($hashalg) && base64_encode(hash($hashalg, $content, true)) != $digest[1]) {
-				Logger::info('Digest does not match');
+				DI::logger()->info('Digest does not match');
 				return false;
 			}
 
@@ -769,23 +768,23 @@ class HTTPSignature
 
 			// Calculate with a grace period of 60 seconds to avoid slight time differences between the servers
 			if (($created - 60) > $current) {
-				Logger::notice('Signature created in the future', ['created' => date(DateTimeFormat::MYSQL, $created), 'expired' => date(DateTimeFormat::MYSQL, $expired), 'current' => date(DateTimeFormat::MYSQL, $current)]);
+				DI::logger()->notice('Signature created in the future', ['created' => date(DateTimeFormat::MYSQL, $created), 'expired' => date(DateTimeFormat::MYSQL, $expired), 'current' => date(DateTimeFormat::MYSQL, $current)]);
 				return false;
 			}
 
 			if ($current > $expired) {
-				Logger::notice('Signature expired', ['created' => date(DateTimeFormat::MYSQL, $created), 'expired' => date(DateTimeFormat::MYSQL, $expired), 'current' => date(DateTimeFormat::MYSQL, $current)]);
+				DI::logger()->notice('Signature expired', ['created' => date(DateTimeFormat::MYSQL, $created), 'expired' => date(DateTimeFormat::MYSQL, $expired), 'current' => date(DateTimeFormat::MYSQL, $current)]);
 				return false;
 			}
 
-			Logger::debug('Valid creation date', ['created' => date(DateTimeFormat::MYSQL, $created), 'expired' => date(DateTimeFormat::MYSQL, $expired), 'current' => date(DateTimeFormat::MYSQL, $current)]);
+			DI::logger()->debug('Valid creation date', ['created' => date(DateTimeFormat::MYSQL, $created), 'expired' => date(DateTimeFormat::MYSQL, $expired), 'current' => date(DateTimeFormat::MYSQL, $current)]);
 			$hasGoodSignedContent = true;
 		}
 
 		// Check the content-length when it is part of the signed data
 		if (in_array('content-length', $sig_block['headers'])) {
 			if (strlen($content) != $headers['content-length']) {
-				Logger::info('Content length does not match');
+				DI::logger()->info('Content length does not match');
 				return false;
 			}
 		}
@@ -793,7 +792,7 @@ class HTTPSignature
 		// Ensure that the authentication had been done with some content
 		// Without this check someone could authenticate with fakeable data
 		if (!$hasGoodSignedContent) {
-			Logger::info('No good signed content');
+			DI::logger()->info('No good signed content');
 			return false;
 		}
 
@@ -815,17 +814,17 @@ class HTTPSignature
 
 		$profile = APContact::getByURL($url);
 		if (!empty($profile)) {
-			Logger::info('Taking key from id', ['id' => $id]);
+			DI::logger()->info('Taking key from id', ['id' => $id]);
 			return ['url' => $url, 'pubkey' => $profile['pubkey'], 'type' => $profile['type']];
 		} elseif ($url != $actor) {
 			$profile = APContact::getByURL($actor);
 			if (!empty($profile)) {
-				Logger::info('Taking key from actor', ['actor' => $actor]);
+				DI::logger()->info('Taking key from actor', ['actor' => $actor]);
 				return ['url' => $actor, 'pubkey' => $profile['pubkey'], 'type' => $profile['type']];
 			}
 		}
 
-		Logger::notice('Key could not be fetched', ['url' => $url, 'actor' => $actor]);
+		DI::logger()->notice('Key could not be fetched', ['url' => $url, 'actor' => $actor]);
 		return [];
 	}
 }

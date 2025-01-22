@@ -13,7 +13,6 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Core\ACL;
 use Friendica\Core\Addon;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -277,7 +276,7 @@ function photos_post()
 		}
 
 		if (!empty($_POST['rotate']) && (intval($_POST['rotate']) == 1 || intval($_POST['rotate']) == 2)) {
-			Logger::debug('rotate');
+			DI::logger()->debug('rotate');
 
 			$photo = Photo::getPhotoForUser($page_owner_uid, $resource_id);
 

@@ -12,7 +12,6 @@ use DOMXPath;
 use Friendica\Content\Text\HTML;
 use Friendica\Protocol\HTTP\MediaType;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -68,13 +67,13 @@ class ParseUrl
 			try {
 				$curlResult = DI::httpClient()->get($url, $accept, array_merge([HttpClientOptions::CONTENT_LENGTH => 1000000], $options));
 			} catch (\Throwable $th) {
-				Logger::notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
+				DI::logger()->notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
 				return [];
 			}
 		}
 
 		if (!$curlResult->isSuccess()) {
-			Logger::debug('Got HTTP Error', ['http error' => $curlResult->getReturnCode(), 'url' => $url]);
+			DI::logger()->debug('Got HTTP Error', ['http error' => $curlResult->getReturnCode(), 'url' => $url]);
 			return [];
 		}
 
@@ -208,7 +207,7 @@ class ParseUrl
 		];
 
 		if ($count > 10) {
-			Logger::warning('Endless loop detected', ['url' => $url]);
+			DI::logger()->warning('Endless loop detected', ['url' => $url]);
 			return $siteinfo;
 		}
 
@@ -217,25 +216,25 @@ class ParseUrl
 		} else {
 			$type = self::getContentType($url);
 		}
-		Logger::info('Got content-type', ['content-type' => $type, 'url' => $url]);
+		DI::logger()->info('Got content-type', ['content-type' => $type, 'url' => $url]);
 		if (!empty($type) && in_array($type[0], ['image', 'video', 'audio'])) {
 			$siteinfo['type'] = $type[0];
 			return $siteinfo;
 		}
 
 		if ((count($type) >= 2) && (($type[0] != 'text') || ($type[1] != 'html'))) {
-			Logger::info('Unparseable content-type, quitting here, ', ['content-type' => $type, 'url' => $url]);
+			DI::logger()->info('Unparseable content-type, quitting here, ', ['content-type' => $type, 'url' => $url]);
 			return $siteinfo;
 		}
 
 		try {
 			$curlResult = DI::httpClient()->get($url, HttpClientAccept::HTML, [HttpClientOptions::CONTENT_LENGTH => 1000000, HttpClientOptions::REQUEST => HttpClientRequest::SITEINFO]);
 		} catch (\Throwable $th) {
-			Logger::info('Exception when fetching', ['url' => $url, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
+			DI::logger()->info('Exception when fetching', ['url' => $url, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
 			return $siteinfo;
 		}
 		if (!$curlResult->isSuccess() || empty($curlResult->getBodyString())) {
-			Logger::info('Empty body or error when fetching', ['url' => $url, 'success' => $curlResult->isSuccess(), 'code' => $curlResult->getReturnCode()]);
+			DI::logger()->info('Empty body or error when fetching', ['url' => $url, 'success' => $curlResult->isSuccess(), 'code' => $curlResult->getReturnCode()]);
 			return $siteinfo;
 		}
 
@@ -269,7 +268,7 @@ class ParseUrl
 			// See https://github.com/friendica/friendica/issues/5470#issuecomment-418351211
 			$charset = str_ireplace('latin-1', 'latin1', $charset);
 
-			Logger::info('detected charset', ['charset' => $charset]);
+			DI::logger()->info('detected charset', ['charset' => $charset]);
 			$body = iconv($charset, 'UTF-8//TRANSLIT', $body);
 		}
 
@@ -496,7 +495,7 @@ class ParseUrl
 			}
 		}
 
-		Logger::info('Siteinfo fetched', ['url' => $url, 'siteinfo' => $siteinfo]);
+		DI::logger()->info('Siteinfo fetched', ['url' => $url, 'siteinfo' => $siteinfo]);
 
 		Hook::callAll('getsiteinfo', $siteinfo);
 
@@ -750,7 +749,7 @@ class ParseUrl
 	{
 		$type = JsonLD::fetchElement($jsonld, '@type');
 		if (empty($type)) {
-			Logger::info('Empty type', ['url' => $siteinfo['url']]);
+			DI::logger()->info('Empty type', ['url' => $siteinfo['url']]);
 			return $siteinfo;
 		}
 
@@ -827,7 +826,7 @@ class ParseUrl
 			case 'ImageObject':
 				return self::parseJsonLdMediaObject($siteinfo, $jsonld, 'images');
 			default:
-				Logger::info('Unknown type', ['type' => $type, 'url' => $siteinfo['url']]);
+				DI::logger()->info('Unknown type', ['type' => $type, 'url' => $siteinfo['url']]);
 				return $siteinfo;
 		}
 	}
@@ -911,7 +910,7 @@ class ParseUrl
 			$jsonldinfo['author_name'] = trim($jsonld['author']);
 		}
 
-		Logger::info('Fetched Author information', ['fetched' => $jsonldinfo]);
+		DI::logger()->info('Fetched Author information', ['fetched' => $jsonldinfo]);
 
 		return array_merge($siteinfo, $jsonldinfo);
 	}
@@ -981,7 +980,7 @@ class ParseUrl
 
 		$jsonldinfo = self::parseJsonLdAuthor($jsonldinfo, $jsonld);
 
-		Logger::info('Fetched article information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
+		DI::logger()->info('Fetched article information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
 
 		return array_merge($siteinfo, $jsonldinfo);
 	}
@@ -1021,7 +1020,7 @@ class ParseUrl
 
 		$jsonldinfo = self::parseJsonLdAuthor($jsonldinfo, $jsonld);
 
-		Logger::info('Fetched WebPage information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
+		DI::logger()->info('Fetched WebPage information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
 
 		return array_merge($siteinfo, $jsonldinfo);
 	}
@@ -1061,7 +1060,7 @@ class ParseUrl
 
 		$jsonldinfo = self::parseJsonLdAuthor($jsonldinfo, $jsonld);
 
-		Logger::info('Fetched WebSite information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
+		DI::logger()->info('Fetched WebSite information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
 		return array_merge($siteinfo, $jsonldinfo);
 	}
 
@@ -1110,7 +1109,7 @@ class ParseUrl
 			$jsonldinfo['publisher_url'] = Network::sanitizeUrl($content);
 		}
 
-		Logger::info('Fetched Organization information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
+		DI::logger()->info('Fetched Organization information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
 		return array_merge($siteinfo, $jsonldinfo);
 	}
 
@@ -1149,14 +1148,14 @@ class ParseUrl
 
 		$content = JsonLD::fetchElement($jsonld, 'image', 'url', '@type', 'ImageObject');
 		if (!empty($content) && !is_string($content)) {
-			Logger::notice('Unexpected return value for the author image', ['content' => $content]);
+			DI::logger()->notice('Unexpected return value for the author image', ['content' => $content]);
 		}
 
 		if (!empty($content) && is_string($content)) {
 			$jsonldinfo['author_img'] = trim($content);
 		}
 
-		Logger::info('Fetched Person information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
+		DI::logger()->info('Fetched Person information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
 		return array_merge($siteinfo, $jsonldinfo);
 	}
 
@@ -1232,7 +1231,7 @@ class ParseUrl
 			}
 		}
 
-		Logger::info('Fetched Media information', ['url' => $siteinfo['url'], 'fetched' => $media]);
+		DI::logger()->info('Fetched Media information', ['url' => $siteinfo['url'], 'fetched' => $media]);
 		$siteinfo[$name][] = $media;
 		return $siteinfo;
 	}

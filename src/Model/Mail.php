@@ -8,7 +8,6 @@
 namespace Friendica\Model;
 
 use Friendica\Core\ACL;
-use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -58,7 +57,7 @@ class Mail
 
 		if (DBA::exists('mail', ['uri' => $msg['uri'], 'uid' => $msg['uid']])) {
 			DBA::unlock();
-			Logger::info('duplicate message already delivered.');
+			DI::logger()->info('duplicate message already delivered.');
 			return false;
 		}
 
@@ -94,7 +93,7 @@ class Mail
 
 			DI::notify()->createFromArray($notif_params);
 
-			Logger::info('Mail is processed, notification was sent.', ['id' => $msg['id'], 'uri' => $msg['uri']]);
+			DI::logger()->info('Mail is processed, notification was sent.', ['id' => $msg['id'], 'uri' => $msg['uri']]);
 		}
 
 		return $msg['id'];
@@ -170,7 +169,7 @@ class Mail
 		}
 
 		if (!$convid) {
-			Logger::warning('conversation not found.');
+			DI::logger()->warning('conversation not found.');
 			return -4;
 		}
 

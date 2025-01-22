@@ -8,8 +8,6 @@
 namespace Friendica\Module\ActivityPub;
 
 use Friendica\BaseModule;
-use Friendica\Core\Logger;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -39,7 +37,7 @@ class Objects extends BaseModule
 		$itemuri = DBA::selectFirst('item-uri', ['id'], ['guid' => $this->parameters['guid']]);
 
 		if (DBA::isResult($itemuri)) {
-			Logger::info('Provided GUID found.', ['guid' => $this->parameters['guid'], 'uri-id' => $itemuri['id']]);
+			$this->logger->info('Provided GUID found.', ['guid' => $this->parameters['guid'], 'uri-id' => $itemuri['id']]);
 		} else {
 			// The item URI does not always contain the GUID. This means that we have to search the URL instead
 			$url = DI::baseUrl() . '/' . DI::args()->getQueryString();
@@ -48,9 +46,9 @@ class Objects extends BaseModule
 
 			$itemuri = DBA::selectFirst('item-uri', ['guid', 'id'], ['uri' => [$url, $nurl, $ssl_url]]);
 			if (DBA::isResult($itemuri)) {
-				Logger::info('URL found.', ['url' => $url, 'guid' => $itemuri['guid'], 'uri-id' => $itemuri['id']]);
+				$this->logger->info('URL found.', ['url' => $url, 'guid' => $itemuri['guid'], 'uri-id' => $itemuri['id']]);
 			} else {
-				Logger::info('URL not found.', ['url' => $url]);
+				$this->logger->info('URL not found.', ['url' => $url]);
 				throw new HTTPException\NotFoundException();
 			}
 		}
