@@ -194,12 +194,22 @@ class App
 
 		$this->registerErrorHandler();
 
+		$this->load(
+			$serverParams,
+			$this->container->create(DbaDefinition::class),
+			$this->container->create(ViewDefinition::class),
+			$this->container->create(Mode::class),
+			$this->container->create(IManageConfigValues::class),
+			$this->container->create(Profiler::class),
+			$this->container->create(AppHelper::class),
+		);
+
 		$this->registerTemplateEngine();
 
 		(\Friendica\Core\Console::create($this->container, $argv))->execute();
 	}
 
-	public function processEjabberd(): void
+	public function processEjabberd(array $serverParams): void
 	{
 		$this->setupContainerForAddons();
 
@@ -208,6 +218,16 @@ class App
 		$this->setupLegacyServiceLocator();
 
 		$this->registerErrorHandler();
+
+		$this->load(
+			$serverParams,
+			$this->container->create(DbaDefinition::class),
+			$this->container->create(ViewDefinition::class),
+			$this->container->create(Mode::class),
+			$this->container->create(IManageConfigValues::class),
+			$this->container->create(Profiler::class),
+			$this->container->create(AppHelper::class),
+		);
 
 		/** @var BasePath */
 		$basePath = $this->container->create(BasePath::class);
