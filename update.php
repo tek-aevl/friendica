@@ -30,7 +30,6 @@
 
 use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
 use Friendica\Core\Config\ValueObject\Cache;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Storage\Capability\ICanReadFromStorage;
 use Friendica\Core\Storage\Type\Database as DatabaseStorage;
@@ -95,7 +94,7 @@ function update_1298()
 					$fail++;
 				} else {
 					DBA::update('profile', [$translateKey => $key], ['id' => $data['id']]);
-					Logger::notice('Updated contact', ['action' => 'update', 'contact' => $data['id'], "$translateKey" => $key,
+					DI::logger()->notice('Updated contact', ['action' => 'update', 'contact' => $data['id'], "$translateKey" => $key,
 						'was' => $data[$translateKey]]);
 
 					Contact::updateSelfFromUserID($data['id']);
@@ -105,7 +104,7 @@ function update_1298()
 			}
 		}
 
-		Logger::notice($translateKey . ' fix completed', ['action' => 'update', 'translateKey' => $translateKey, 'Success' => $success, 'Fail' => $fail ]);
+		DI::logger()->notice($translateKey . ' fix completed', ['action' => 'update', 'translateKey' => $translateKey, 'Success' => $success, 'Fail' => $fail ]);
 	}
 	return Update::SUCCESS;
 }
@@ -126,7 +125,7 @@ function update_1309()
 
 		$deliver_options = ['priority' => Worker::PRIORITY_MEDIUM, 'dont_fork' => true];
 		Worker::add($deliver_options, 'Delivery', Delivery::POST, $item['id'], $entry['cid']);
-		Logger::info('Added delivery worker', ['item' => $item['id'], 'contact' => $entry['cid']]);
+		DI::logger()->info('Added delivery worker', ['item' => $item['id'], 'contact' => $entry['cid']]);
 		DBA::delete('queue', ['id' => $entry['id']]);
 	}
 	return Update::SUCCESS;
@@ -1388,7 +1387,7 @@ function update_1535()
 		DI::config()->set('system', 'compute_circle_counts', true);
 	}
 	DI::config()->delete('system', 'compute_group_counts');
-	
+
 	return Update::SUCCESS;
 }
 

@@ -9,7 +9,6 @@ namespace Friendica\Model;
 
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Cache\Enum\Duration;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -95,12 +94,12 @@ class APContact
 	public static function getByURL(string $url, bool $update = null): array
 	{
 		if (empty($url) || Network::isUrlBlocked($url)) {
-			Logger::info('Domain is blocked', ['url' => $url]);
+			DI::logger()->info('Domain is blocked', ['url' => $url]);
 			return [];
 		}
 
 		if (!Network::isValidHttpUrl($url) && !filter_var($url, FILTER_VALIDATE_EMAIL)) {
-			Logger::info('Invalid URL', ['url' => $url]);
+			DI::logger()->info('Invalid URL', ['url' => $url]);
 			return [];
 		}
 
@@ -156,7 +155,7 @@ class APContact
 		$cachekey = 'apcontact:' . ItemURI::getIdByURI($url);
 		$result = DI::cache()->get($cachekey);
 		if (!is_null($result)) {
-			Logger::info('Multiple requests for the address', ['url' => $url, 'update' => $update, 'result' => $result]);
+			DI::logger()->info('Multiple requests for the address', ['url' => $url, 'update' => $update, 'result' => $result]);
 			if (!empty($fetched_contact)) {
 				return $fetched_contact;
 			}
@@ -192,7 +191,7 @@ class APContact
 					$failed = true;
 				}
 			} catch (\Exception $exception) {
-				Logger::notice('Error fetching url', ['url' => $url, 'exception' => $exception]);
+				DI::logger()->notice('Error fetching url', ['url' => $url, 'exception' => $exception]);
 				$failed = true;
 			}
 
@@ -291,7 +290,7 @@ class APContact
 			try {
 				$apcontact['addr'] = $apcontact['nick'] . '@' . (new Uri($apcontact['url']))->getAuthority();
 			} catch (\Throwable $e) {
-				Logger::warning('Unable to coerce APContact URL into a UriInterface object', ['url' => $apcontact['url'], 'error' => $e->getMessage()]);
+				DI::logger()->warning('Unable to coerce APContact URL into a UriInterface object', ['url' => $apcontact['url'], 'error' => $e->getMessage()]);
 				$apcontact['addr'] = '';
 			}
 		}
@@ -371,7 +370,7 @@ class APContact
 			$apcontact['photo'] = Network::addBasePath($apcontact['photo'], $apcontact['url']);
 
 			if (!Network::isValidHttpUrl($apcontact['photo'])) {
-				Logger::warning('Invalid URL for photo', ['url' => $apcontact['url'], 'photo' => $apcontact['photo']]);
+				DI::logger()->warning('Invalid URL for photo', ['url' => $apcontact['url'], 'photo' => $apcontact['photo']]);
 				$apcontact['photo'] = '';
 			}
 		}
@@ -457,9 +456,9 @@ class APContact
 				if (in_array($name, APContact\Endpoint::ENDPOINT_NAMES)) {
 					$key = array_search($name, APContact\Endpoint::ENDPOINT_NAMES);
 					APContact\Endpoint::update($apcontact['uri-id'], $key, $endpoint['@id']);
-					Logger::debug('Store endpoint', ['key' => $key, 'name' => $name, 'endpoint' => $endpoint['@id']]);
+					DI::logger()->debug('Store endpoint', ['key' => $key, 'name' => $name, 'endpoint' => $endpoint['@id']]);
 				} elseif (!in_array($name, ['as:sharedInbox', 'as:uploadMedia', 'as:oauthTokenEndpoint', 'as:oauthAuthorizationEndpoint', 'litepub:oauthRegistrationEndpoint'])) {
-					Logger::debug('Unknown endpoint', ['name' => $name, 'endpoint' => $endpoint['@id']]);
+					DI::logger()->debug('Unknown endpoint', ['name' => $name, 'endpoint' => $endpoint['@id']]);
 				}
 			}
 		}
@@ -468,7 +467,7 @@ class APContact
 
 		// We delete the old entry when the URL is changed
 		if ($url != $apcontact['url']) {
-			Logger::info('Delete changed profile url', ['old' => $url, 'new' => $apcontact['url']]);
+			DI::logger()->info('Delete changed profile url', ['old' => $url, 'new' => $apcontact['url']]);
 			DBA::delete('apcontact', ['url' => $url]);
 		}
 
@@ -481,7 +480,7 @@ class APContact
 			DBA::replace('apcontact', $apcontact);
 		}
 
-		Logger::info('Updated profile', ['url' => $url]);
+		DI::logger()->info('Updated profile', ['url' => $url]);
 
 		return DBA::selectFirst('apcontact', [], ['url' => $apcontact['url']]) ?: [];
 	}
@@ -532,7 +531,7 @@ class APContact
 	public static function markForArchival(array $apcontact)
 	{
 		if (!empty($apcontact['inbox'])) {
-			Logger::info('Set inbox status to failure', ['inbox' => $apcontact['inbox']]);
+			DI::logger()->info('Set inbox status to failure', ['inbox' => $apcontact['inbox']]);
 			HTTPSignature::setInboxStatus($apcontact['inbox'], false, false, $apcontact['gsid']);
 		}
 
@@ -542,7 +541,7 @@ class APContact
 				$apcontact['sharedinbox']]);
 			if (!$available) {
 				// If all known personal inboxes are failing then set their shared inbox to failure as well
-				Logger::info('Set shared inbox status to failure', ['sharedinbox' => $apcontact['sharedinbox']]);
+				DI::logger()->info('Set shared inbox status to failure', ['sharedinbox' => $apcontact['sharedinbox']]);
 				HTTPSignature::setInboxStatus($apcontact['sharedinbox'], false, true, $apcontact['gsid']);
 			}
 		}
@@ -557,11 +556,11 @@ class APContact
 	public static function unmarkForArchival(array $apcontact)
 	{
 		if (!empty($apcontact['inbox'])) {
-			Logger::info('Set inbox status to success', ['inbox' => $apcontact['inbox']]);
+			DI::logger()->info('Set inbox status to success', ['inbox' => $apcontact['inbox']]);
 			HTTPSignature::setInboxStatus($apcontact['inbox'], true, false, $apcontact['gsid']);
 		}
 		if (!empty($apcontact['sharedinbox'])) {
-			Logger::info('Set shared inbox status to success', ['sharedinbox' => $apcontact['sharedinbox']]);
+			DI::logger()->info('Set shared inbox status to success', ['sharedinbox' => $apcontact['sharedinbox']]);
 			HTTPSignature::setInboxStatus($apcontact['sharedinbox'], true, true, $apcontact['gsid']);
 		}
 	}

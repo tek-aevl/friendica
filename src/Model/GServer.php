@@ -10,7 +10,6 @@ namespace Friendica\Model;
 use DOMDocument;
 use DOMXPath;
 use Exception;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\Database;
@@ -114,7 +113,7 @@ class GServer
 
 		$gserver = DBA::selectFirst('gserver', ['id'], ['nurl' => Strings::normaliseLink($url)]);
 		if (DBA::isResult($gserver)) {
-			Logger::debug('Got ID for URL', ['id' => $gserver['id'], 'url' => $url]);
+			DI::logger()->debug('Got ID for URL', ['id' => $gserver['id'], 'url' => $url]);
 
 			if (Network::isUrlBlocked($url)) {
 				self::setBlockedById($gserver['id']);
@@ -336,7 +335,7 @@ class GServer
 		}
 
 		if (Network::isUrlBlocked($server_url)) {
-			Logger::info('Server is blocked', ['url' => $server_url]);
+			DI::logger()->info('Server is blocked', ['url' => $server_url]);
 			self::setBlockedByUrl($server_url);
 			return false;
 		}
@@ -350,12 +349,12 @@ class GServer
 			}
 
 			if (!$force && (strtotime($gserver['next_contact']) > time())) {
-				Logger::info('No update needed', ['server' => $server_url]);
+				DI::logger()->info('No update needed', ['server' => $server_url]);
 				return (!$gserver['failed']);
 			}
-			Logger::info('Server is outdated. Start discovery.', ['Server' => $server_url, 'Force' => $force]);
+			DI::logger()->info('Server is outdated. Start discovery.', ['Server' => $server_url, 'Force' => $force]);
 		} else {
-			Logger::info('Server is unknown. Start discovery.', ['Server' => $server_url]);
+			DI::logger()->info('Server is unknown. Start discovery.', ['Server' => $server_url]);
 		}
 
 		return self::detect($server_url, $network, $only_nodeinfo);
@@ -381,7 +380,7 @@ class GServer
 				$fields['network'] = $network;
 			}
 			self::update($fields, ['id' => $gsid]);
-			Logger::info('Reset failed status for server', ['url' => $gserver['url']]);
+			DI::logger()->info('Reset failed status for server', ['url' => $gserver['url']]);
 
 			if (strtotime($gserver['next_contact']) < time()) {
 				UpdateGServer::add(Worker::PRIORITY_LOW, $gserver['url']);
@@ -403,7 +402,7 @@ class GServer
 		$gserver = DBA::selectFirst('gserver', ['url', 'failed', 'next_contact'], ['id' => $gsid]);
 		if (DBA::isResult($gserver) && !$gserver['failed']) {
 			self::update(['failed' => true, 'blocked' => Network::isUrlBlocked($gserver['url']), 'last_failure' => DateTimeFormat::utcNow()], ['id' => $gsid]);
-			Logger::info('Set failed status for server', ['url' => $gserver['url']]);
+			DI::logger()->info('Set failed status for server', ['url' => $gserver['url']]);
 
 			if (strtotime($gserver['next_contact']) < time()) {
 				UpdateGServer::add(Worker::PRIORITY_LOW, $gserver['url']);
@@ -416,7 +415,7 @@ class GServer
 		$gserver = DBA::selectFirst('gserver', ['url'], ["(`blocked` OR `blocked` IS NULL) AND `id` = ?", $gsid]);
 		if (DBA::isResult($gserver)) {
 			self::update(['blocked' => false], ['id' => $gsid]);
-			Logger::info('Set unblocked status for server', ['url' => $gserver['url']]);
+			DI::logger()->info('Set unblocked status for server', ['url' => $gserver['url']]);
 		}
 	}
 
@@ -425,7 +424,7 @@ class GServer
 		$gserver = DBA::selectFirst('gserver', ['url'], ["(NOT `blocked` OR `blocked` IS NULL) AND `id` = ?", $gsid]);
 		if (DBA::isResult($gserver)) {
 			self::update(['blocked' => true, 'failed' => true], ['id' => $gsid]);
-			Logger::info('Set blocked status for server', ['url' => $gserver['url']]);
+			DI::logger()->info('Set blocked status for server', ['url' => $gserver['url']]);
 		}
 	}
 
@@ -434,7 +433,7 @@ class GServer
 		$gserver = DBA::selectFirst('gserver', ['url', 'id'], ["(NOT `blocked` OR `blocked` IS NULL) AND `nurl` = ?", Strings::normaliseLink($url)]);
 		if (DBA::isResult($gserver)) {
 			self::update(['blocked' => true, 'failed' => true], ['id' => $gserver['id']]);
-			Logger::info('Set blocked status for server', ['url' => $gserver['url']]);
+			DI::logger()->info('Set blocked status for server', ['url' => $gserver['url']]);
 		}
 	}
 
@@ -454,7 +453,7 @@ class GServer
 			self::update(['url' => $url, 'failed' => true, 'blocked' => Network::isUrlBlocked($url), 'last_failure' => DateTimeFormat::utcNow(),
 			'next_contact' => $next_update, 'network' => Protocol::PHANTOM, 'detection-method' => null],
 			['nurl' => $nurl]);
-			Logger::info('Set failed status for existing server', ['url' => $url]);
+			DI::logger()->info('Set failed status for existing server', ['url' => $url]);
 			if (self::isDefunct($gserver)) {
 				self::archiveContacts($gserver['id']);
 			}
@@ -464,7 +463,7 @@ class GServer
 		self::insert(['url' => $url, 'nurl' => $nurl,
 			'network' => Protocol::PHANTOM, 'created' => DateTimeFormat::utcNow(),
 			'failed' => true, 'last_failure' => DateTimeFormat::utcNow()]);
-		Logger::info('Set failed status for new server', ['url' => $url]);
+		DI::logger()->info('Set failed status for new server', ['url' => $url]);
 	}
 
 	/**
@@ -493,7 +492,7 @@ class GServer
 		try {
 			return (string)self::cleanUri(new Uri($dirtyUrl));
 		} catch (\Throwable $e) {
-			Logger::warning('Invalid URL', ['dirtyUrl' => $dirtyUrl]);
+			DI::logger()->warning('Invalid URL', ['dirtyUrl' => $dirtyUrl]);
 			return '';
 		}
 	}
@@ -533,14 +532,14 @@ class GServer
 	 */
 	private static function detect(string $url, string $network = '', bool $only_nodeinfo = false): bool
 	{
-		Logger::info('Detect server type', ['server' => $url]);
+		DI::logger()->info('Detect server type', ['server' => $url]);
 
 		$original_url = $url;
 
 		// Remove URL content that is not supposed to exist for a server url
 		$url = rtrim(self::cleanURL($url), '/');
 		if (empty($url)) {
-			Logger::notice('Empty URL.');
+			DI::logger()->notice('Empty URL.');
 			return false;
 		}
 
@@ -566,7 +565,7 @@ class GServer
 			// Some systems have got redirects on their landing page to a single account page. This check handles it.
 			if (((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) && (parse_url($url, PHP_URL_PATH) == parse_url($valid_url, PHP_URL_PATH))) ||
 			(((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) || (parse_url($url, PHP_URL_PATH) != parse_url($valid_url, PHP_URL_PATH))) && empty(parse_url($valid_url, PHP_URL_PATH)))) {
-				Logger::debug('Found redirect. Mark old entry as failure', ['old' => $url, 'new' => $valid_url]);
+				DI::logger()->debug('Found redirect. Mark old entry as failure', ['old' => $url, 'new' => $valid_url]);
 				self::setFailureByUrl($url);
 				if (!self::getID($valid_url, true) && !Network::isUrlBlocked($valid_url)) {
 					self::detect($valid_url, $network, $only_nodeinfo);
@@ -576,7 +575,7 @@ class GServer
 
 			if ((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) && (parse_url($url, PHP_URL_PATH) != parse_url($valid_url, PHP_URL_PATH)) &&
 			(parse_url($url, PHP_URL_PATH) == '')) {
-				Logger::debug('Found redirect. Mark old entry as failure and redirect to the basepath.', ['old' => $url, 'new' => $valid_url]);
+				DI::logger()->debug('Found redirect. Mark old entry as failure and redirect to the basepath.', ['old' => $url, 'new' => $valid_url]);
 				$parts = (array)parse_url($valid_url);
 				unset($parts['path']);
 				$valid_url = (string)Uri::fromParts($parts);
@@ -587,7 +586,7 @@ class GServer
 				}
 				return false;
 			}
-			Logger::debug('Found redirect, but ignore it.', ['old' => $url, 'new' => $valid_url]);
+			DI::logger()->debug('Found redirect, but ignore it.', ['old' => $url, 'new' => $valid_url]);
 		}
 
 		if ((parse_url($url, PHP_URL_HOST) == parse_url($valid_url, PHP_URL_HOST)) &&
@@ -617,7 +616,7 @@ class GServer
 		}
 
 		if ($only_nodeinfo && empty($serverdata)) {
-			Logger::info('Invalid nodeinfo in nodeinfo-mode, server is marked as failure', ['url' => $url]);
+			DI::logger()->info('Invalid nodeinfo in nodeinfo-mode, server is marked as failure', ['url' => $url]);
 			self::setFailureByUrl($url);
 			return false;
 		} elseif (empty($serverdata)) {
@@ -820,14 +819,14 @@ class GServer
 			$contacts = DBA::count('contact', ['uid' => 0, 'gsid' => $id, 'failed' => false]);
 			$max_users = max($apcontacts, $contacts);
 			if ($max_users > $serverdata['registered-users']) {
-				Logger::info('Update registered users', ['id' => $id, 'url' => $serverdata['nurl'], 'registered-users' => $max_users]);
+				DI::logger()->info('Update registered users', ['id' => $id, 'url' => $serverdata['nurl'], 'registered-users' => $max_users]);
 				self::update(['registered-users' => $max_users], ['id' => $id]);
 			}
 
 			if (empty($serverdata['active-month-users'])) {
 				$contacts = DBA::count('contact', ["`uid` = ? AND `gsid` = ? AND NOT `failed` AND `last-item` > ?", 0, $id, DateTimeFormat::utc('now - 30 days')]);
 				if ($contacts > 0) {
-					Logger::info('Update monthly users', ['id' => $id, 'url' => $serverdata['nurl'], 'monthly-users' => $contacts]);
+					DI::logger()->info('Update monthly users', ['id' => $id, 'url' => $serverdata['nurl'], 'monthly-users' => $contacts]);
 					self::update(['active-month-users' => $contacts], ['id' => $id]);
 				}
 			}
@@ -835,7 +834,7 @@ class GServer
 			if (empty($serverdata['active-halfyear-users'])) {
 				$contacts = DBA::count('contact', ["`uid` = ? AND `gsid` = ? AND NOT `failed` AND `last-item` > ?", 0, $id, DateTimeFormat::utc('now - 180 days')]);
 				if ($contacts > 0) {
-					Logger::info('Update halfyear users', ['id' => $id, 'url' => $serverdata['nurl'], 'halfyear-users' => $contacts]);
+					DI::logger()->info('Update halfyear users', ['id' => $id, 'url' => $serverdata['nurl'], 'halfyear-users' => $contacts]);
 					self::update(['active-halfyear-users' => $contacts], ['id' => $id]);
 				}
 			}
@@ -847,7 +846,7 @@ class GServer
 
 		if (!empty($systemactor)) {
 			$contact = Contact::getByURL($systemactor, true, ['gsid', 'baseurl', 'id', 'network', 'url', 'name']);
-			Logger::debug('Fetched system actor',  ['url' => $url, 'gsid' => $id, 'contact' => $contact]);
+			DI::logger()->debug('Fetched system actor',  ['url' => $url, 'gsid' => $id, 'contact' => $contact]);
 		}
 
 		return $ret;
@@ -864,7 +863,7 @@ class GServer
 	 */
 	private static function discoverRelay(string $server_url)
 	{
-		Logger::info('Discover relay data', ['server' => $server_url]);
+		DI::logger()->info('Discover relay data', ['server' => $server_url]);
 
 		$curlResult = DI::httpClient()->get($server_url . '/.well-known/x-social-relay', HttpClientAccept::JSON, [HttpClientOptions::REQUEST => HttpClientRequest::SERVERINFO]);
 		if (!$curlResult->isSuccess()) {
@@ -947,7 +946,7 @@ class GServer
 			}
 		}
 
-		Logger::info('Discovery ended', ['server' => $server_url, 'data' => $fields]);
+		DI::logger()->info('Discovery ended', ['server' => $server_url, 'data' => $fields]);
 
 		Relay::updateContact($gserver, $fields);
 	}
@@ -1072,7 +1071,7 @@ class GServer
 
 		foreach ($nodeinfo['links'] as $link) {
 			if (!is_array($link) || empty($link['rel']) || empty($link['href'])) {
-				Logger::info('Invalid nodeinfo format', ['url' => $url]);
+				DI::logger()->info('Invalid nodeinfo format', ['url' => $url]);
 				continue;
 			}
 
@@ -2277,7 +2276,7 @@ class GServer
 				$serverdata['register_policy'] = Register::CLOSED;
 				break;
 			default:
-				Logger::info('Register policy is invalid', ['policy' => $register_policy, 'server' => $url]);
+				DI::logger()->info('Register policy is invalid', ['policy' => $register_policy, 'server' => $url]);
 				$serverdata['register_policy'] = Register::CLOSED;
 				break;
 		}
@@ -2507,10 +2506,10 @@ class GServer
 			['order' => ['RAND()']]);
 
 		while ($gserver = DBA::fetch($gservers)) {
-			Logger::info('Update peer list', ['server' => $gserver['url'], 'id' => $gserver['id']]);
+			DI::logger()->info('Update peer list', ['server' => $gserver['url'], 'id' => $gserver['id']]);
 			Worker::add(Worker::PRIORITY_LOW, 'UpdateServerPeers', $gserver['url']);
 
-			Logger::info('Update directory', ['server' => $gserver['url'], 'id' => $gserver['id']]);
+			DI::logger()->info('Update directory', ['server' => $gserver['url'], 'id' => $gserver['id']]);
 			Worker::add(Worker::PRIORITY_LOW, 'UpdateServerDirectory', $gserver);
 
 			$fields = ['last_poco_query' => DateTimeFormat::utcNow()];
@@ -2651,7 +2650,7 @@ class GServer
 			}
 		}
 
-		Logger::info('Protocol for server', ['protocol' => $protocol, 'old' => $old, 'id' => $gsid, 'url' => $gserver['url']]);
+		DI::logger()->info('Protocol for server', ['protocol' => $protocol, 'old' => $old, 'id' => $gsid, 'url' => $gserver['url']]);
 		self::update(['protocol' => $protocol], ['id' => $gsid]);
 	}
 

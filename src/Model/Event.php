@@ -10,7 +10,6 @@ namespace Friendica\Model;
 use Friendica\Content\Feature;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -219,7 +218,7 @@ class Event
 		}
 
 		DBA::delete('event', ['id' => $event_id]);
-		Logger::info("Deleted event", ['id' => $event_id]);
+		DI::logger()->info("Deleted event", ['id' => $event_id]);
 	}
 
 	/**

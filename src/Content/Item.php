@@ -14,7 +14,6 @@ use Friendica\Content\Text\BBCode\Video;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
@@ -520,18 +519,18 @@ class Item
 				$only_to_group = ($tag[1] == Tag::TAG_CHARACTER[Tag::EXCLUSIVE_MENTION]);
 				$private_id = $contact['id'];
 				$group_contact = $contact;
-				Logger::info('Private group or exclusive mention', ['url' => $tag[2], 'mention' => $tag[1]]);
+				DI::logger()->info('Private group or exclusive mention', ['url' => $tag[2], 'mention' => $tag[1]]);
 			} elseif ($item['allow_cid'] == '<' . $contact['id'] . '>') {
 				$private_group = false;
 				$only_to_group = true;
 				$private_id = $contact['id'];
 				$group_contact = $contact;
-				Logger::info('Public group', ['url' => $tag[2], 'mention' => $tag[1]]);
+				DI::logger()->info('Public group', ['url' => $tag[2], 'mention' => $tag[1]]);
 			} else {
-				Logger::info('Post with group mention will not be converted to a group post', ['url' => $tag[2], 'mention' => $tag[1]]);
+				DI::logger()->info('Post with group mention will not be converted to a group post', ['url' => $tag[2], 'mention' => $tag[1]]);
 			}
 		}
-		Logger::info('Got inform', ['inform' => $item['inform']]);
+		DI::logger()->info('Got inform', ['inform' => $item['inform']]);
 
 		if (($item['gravity'] == ItemModel::GRAVITY_PARENT) && !empty($group_contact) && ($private_group || $only_to_group)) {
 			// we tagged a group in a top level post. Now we change the post
@@ -638,7 +637,7 @@ class Item
 		$fields = ['uri-id', 'uri', 'body', 'title', 'author-name', 'author-link', 'author-avatar', 'guid', 'created', 'plink', 'network', 'quote-uri-id'];
 		$shared_item = Post::selectFirst($fields, ['uri-id' => $item['quote-uri-id'], 'uid' => [$item['uid'], 0], 'private' => [ItemModel::PUBLIC, ItemModel::UNLISTED]]);
 		if (!DBA::isResult($shared_item)) {
-			Logger::notice('Post does not exist.', ['uri-id' => $item['quote-uri-id'], 'uid' => $item['uid']]);
+			DI::logger()->notice('Post does not exist.', ['uri-id' => $item['quote-uri-id'], 'uid' => $item['uid']]);
 			return $body;
 		}
 
@@ -654,7 +653,7 @@ class Item
 		$shared_item = Post::selectFirst($fields, ['guid' => $guid, 'uid' => 0, 'private' => [ItemModel::PUBLIC, ItemModel::UNLISTED]]);
 
 		if (!DBA::isResult($shared_item)) {
-			Logger::notice('Post does not exist.', ['guid' => $guid]);
+			DI::logger()->notice('Post does not exist.', ['guid' => $guid]);
 			return '';
 		}
 
@@ -1087,7 +1086,7 @@ class Item
 			$expire_date = time() - ($expire_interval * 86400);
 			$created_date = strtotime($created);
 			if ($created_date < $expire_date) {
-				Logger::notice('Item created before expiration interval.', ['created' => date('c', $created_date), 'expired' => date('c', $expire_date)]);
+				DI::logger()->notice('Item created before expiration interval.', ['created' => date('c', $created_date), 'expired' => date('c', $expire_date)]);
 				return true;
 			}
 		}

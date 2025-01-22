@@ -8,6 +8,7 @@
 namespace Friendica\Core;
 
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ActivityPub;
@@ -123,7 +124,7 @@ class Protocol
 
 		if ($protocol == self::DIASPORA) {
 			$contact = Diaspora::sendShare($owner, $contact);
-			Logger::notice('share returns: ' . $contact);
+			DI::logger()->notice('share returns: ' . $contact);
 		} elseif (in_array($protocol, [self::ACTIVITYPUB, self::DFRN])) {
 			$activity_id = ActivityPub\Transmitter::activityIDFromContact($contact['id']);
 			if (empty($activity_id)) {
@@ -132,7 +133,7 @@ class Protocol
 			}
 
 			$success = ActivityPub\Transmitter::sendActivity('Follow', $contact['url'], $owner['uid'], $activity_id);
-			Logger::notice('Follow returns: ' . $success);
+			DI::logger()->notice('Follow returns: ' . $success);
 		}
 
 		return true;
@@ -150,7 +151,7 @@ class Protocol
 	public static function unfollow(array $contact, array $owner): ?bool
 	{
 		if (empty($contact['network'])) {
-			Logger::notice('Contact has got no network, we quit here', ['id' => $contact['id']]);
+			DI::logger()->notice('Contact has got no network, we quit here', ['id' => $contact['id']]);
 			return null;
 		}
 

@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\OAuth;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Model\User;
 use Friendica\Module\BaseApi;
@@ -69,7 +68,7 @@ class Token extends BaseApi
 		$grant_type = (string) $request['grant_type'];
 
 		if (!in_array($grant_type, ['client_credentials', 'authorization_code'])) {
-			Logger::warning('Unsupported or missing grant type', ['request' => $_REQUEST]);
+			$this->logger->warning('Unsupported or missing grant type', ['request' => $_REQUEST]);
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity($this->t('Unsupported or missing grant type')));
 		}
 

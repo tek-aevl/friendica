@@ -7,7 +7,7 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
+use Friendica\DI;
 use Friendica\Model\Post;
 
 class DelayedPublish
@@ -26,6 +26,6 @@ class DelayedPublish
 	public static function execute(array $item, int $notify = 0, array $taglist = [], array $attachments = [], int $preparation_mode = Post\Delayed::PREPARED, string $uri = '')
 	{
 		$id = Post\Delayed::publish($item, $notify, $taglist, $attachments, $preparation_mode, $uri);
-		Logger::notice('Post published', ['id' => $id, 'uid' => $item['uid'], 'notify' => $notify, 'unprepared' => $preparation_mode]);
+		DI::logger()->notice('Post published', ['id' => $id, 'uid' => $item['uid'], 'notify' => $notify, 'unprepared' => $preparation_mode]);
 	}
 }

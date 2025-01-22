@@ -7,8 +7,8 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
+use Friendica\DI;
 use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Protocol\ActivityPub;
@@ -29,7 +29,7 @@ class APDelivery
 	public static function execute(string $cmd, int $item_id, string $inbox, int $uid, array $receivers = [], int $uri_id = 0)
 	{
 		if (ActivityPub\Transmitter::archivedInbox($inbox)) {
-			Logger::info('Inbox is archived', ['cmd' => $cmd, 'inbox' => $inbox, 'id' => $item_id, 'uri-id' => $uri_id, 'uid' => $uid]);
+			DI::logger()->info('Inbox is archived', ['cmd' => $cmd, 'inbox' => $inbox, 'id' => $item_id, 'uri-id' => $uri_id, 'uid' => $uid]);
 			if (empty($uri_id) && !empty($item_id)) {
 				$item = Post::selectFirst(['uri-id'], ['id' => $item_id]);
 				$uri_id = $item['uri-id'] ?? 0;
@@ -48,7 +48,7 @@ class APDelivery
 			return;
 		}
 
-		Logger::debug('Invoked', ['cmd' => $cmd, 'inbox' => $inbox, 'id' => $item_id, 'uri-id' => $uri_id, 'uid' => $uid]);
+		DI::logger()->debug('Invoked', ['cmd' => $cmd, 'inbox' => $inbox, 'id' => $item_id, 'uri-id' => $uri_id, 'uid' => $uid]);
 
 		if (empty($uri_id)) {
 			$result  = ActivityPub\Delivery::deliver($inbox);

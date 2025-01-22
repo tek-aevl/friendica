@@ -8,7 +8,6 @@
 namespace Friendica\Module;
 
 use Friendica\Contact\Header;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -105,11 +104,11 @@ class Photo extends BaseApi
 			}
 
 			if (empty($id)) {
-				Logger::notice('No picture id was detected', ['parameters' => $this->parameters, 'query' => DI::args()->getQueryString()]);
+				$this->logger->notice('No picture id was detected', ['parameters' => $this->parameters, 'query' => DI::args()->getQueryString()]);
 				throw new HTTPException\NotFoundException(DI::l10n()->t('The Photo is not available.'));
 			}
 
-			$photo = self::getPhotoById($id, $this->parameters['type'], $customsize ?: Proxy::PIXEL_SMALL);
+			$photo = $this->getPhotoById($id, $this->parameters['type'], $customsize ?: Proxy::PIXEL_SMALL);
 		} else {
 			$photoid = pathinfo($this->parameters['name'], PATHINFO_FILENAME);
 			$scale   = 0;
@@ -173,7 +172,7 @@ class Photo extends BaseApi
 		$data = microtime(true) - $stamp;
 
 		if (empty($imgdata)) {
-			Logger::warning('Invalid photo', ['id' => $photo['id']]);
+			$this->logger->warning('Invalid photo', ['id' => $photo['id']]);
 			if (in_array($photo['backend-class'], [ExternalResource::NAME])) {
 				$reference = json_decode($photo['backend-ref'], true);
 				$error     = DI::l10n()->t('Invalid external resource with url %s.', $reference['url']);
@@ -233,7 +232,7 @@ class Photo extends BaseApi
 		$rest  = $total - ($fetch + $data + $checksum + $output);
 
 		if (!is_null($scale) && ($scale < 4)) {
-			Logger::debug('Performance:', [
+			$this->logger->debug('Performance:', [
 				'scale'  => $scale, 'resource' => $photo['resource-id'],
 				'total'  => number_format($total, 3), 'fetch' => number_format($fetch, 3),
 				'data'   => number_format($data, 3), 'checksum' => number_format($checksum, 3),
@@ -252,7 +251,7 @@ class Photo extends BaseApi
 	 * @param int $customsize Custom size (?)
 	 * @return array|bool Array on success, false on error
 	 */
-	private static function getPhotoById(int $id, string $type, int $customsize)
+	private function getPhotoById(int $id, string $type, int $customsize)
 	{
 		switch ($type) {
 			case 'preview':
@@ -360,25 +359,25 @@ class Photo extends BaseApi
 						if ($update) {
 							$curlResult = DI::httpClient()->head($url, [HttpClientOptions::ACCEPT_CONTENT => HttpClientAccept::IMAGE, HttpClientOptions::REQUEST => HttpClientRequest::CONTENTTYPE]);
 							$update     = !$curlResult->isSuccess() && ($curlResult->getReturnCode() == 404);
-							Logger::debug('Got return code for avatar', ['return code' => $curlResult->getReturnCode(), 'cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
+							$this->logger->debug('Got return code for avatar', ['return code' => $curlResult->getReturnCode(), 'cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
 						}
 						if ($update) {
 							try {
 								UpdateContact::add(Worker::PRIORITY_LOW, $id);
-								Logger::info('Invalid file, contact update initiated', ['cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
+								$this->logger->info('Invalid file, contact update initiated', ['cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
 							} catch (\InvalidArgumentException $e) {
-								Logger::notice($e->getMessage(), ['id' => $id, 'contact' => $contact]);
+								$this->logger->notice($e->getMessage(), ['id' => $id, 'contact' => $contact]);
 							}
 						} else {
-							Logger::info('Invalid file', ['cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
+							$this->logger->info('Invalid file', ['cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
 						}
 					}
 					if (!empty($mimetext) && ($mime[0] != 'image') && ($mimetext != 'application/octet-stream')) {
-						Logger::info('Unexpected Content-Type', ['mime' => $mimetext, 'url' => $url]);
+						$this->logger->info('Unexpected Content-Type', ['mime' => $mimetext, 'url' => $url]);
 						$mimetext = '';
 					}
 					if (!empty($mimetext)) {
-						Logger::debug('Expected Content-Type', ['mime' => $mimetext, 'url' => $url]);
+						$this->logger->debug('Expected Content-Type', ['mime' => $mimetext, 'url' => $url]);
 					}
 				}
 

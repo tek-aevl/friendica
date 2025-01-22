@@ -8,10 +8,10 @@
 namespace Friendica\Protocol;
 
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Protocol;
+use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Util\Strings;
 use IMAP\Connection;
@@ -38,12 +38,12 @@ class Email
 
 		$errors = imap_errors();
 		if (!empty($errors)) {
-			Logger::notice('IMAP Errors occurred', ['errors' => $errors]);
+			DI::logger()->notice('IMAP Errors occurred', ['errors' => $errors]);
 		}
 
 		$alerts = imap_alerts();
 		if (!empty($alerts)) {
-			Logger::notice('IMAP Alerts occurred: ', ['alerts' => $alerts]);
+			DI::logger()->notice('IMAP Alerts occurred: ', ['alerts' => $alerts]);
 		}
 
 		if (empty($errors) && empty($alerts)) {
@@ -67,7 +67,7 @@ class Email
 		if (!$search1) {
 			$search1 = [];
 		} else {
-			Logger::debug("Found mails from ".$email_addr);
+			DI::logger()->debug("Found mails from ".$email_addr);
 			Item::incrementInbound(Protocol::MAIL);
 		}
 
@@ -75,7 +75,7 @@ class Email
 		if (!$search2) {
 			$search2 = [];
 		} else {
-			Logger::debug("Found mails to ".$email_addr);
+			DI::logger()->debug("Found mails to ".$email_addr);
 			Item::incrementInbound(Protocol::MAIL);
 		}
 
@@ -83,7 +83,7 @@ class Email
 		if (!$search3) {
 			$search3 = [];
 		} else {
-			Logger::debug("Found mails cc ".$email_addr);
+			DI::logger()->debug("Found mails cc ".$email_addr);
 			Item::incrementInbound(Protocol::MAIL);
 		}
 
@@ -131,7 +131,7 @@ class Email
 		$struc = (($mbox && $uid) ? @imap_fetchstructure($mbox, $uid, FT_UID) : null);
 
 		if (!$struc) {
-			Logger::notice("IMAP structure couldn't be fetched", ['uid' => $uid]);
+			DI::logger()->notice("IMAP structure couldn't be fetched", ['uid' => $uid]);
 			return $ret;
 		}
 
@@ -395,7 +395,7 @@ class Email
 
 		//$message = '<html><body>' . $html . '</body></html>';
 		//$message = html2plain($html);
-		Logger::notice('notifier: email delivery to ' . $addr);
+		DI::logger()->notice('notifier: email delivery to ' . $addr);
 		$success = mail($addr, $subject, $body, $headers);
 		if ($success) {
 			Item::incrementOutbound(Protocol::MAIL);

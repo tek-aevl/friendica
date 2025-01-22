@@ -7,7 +7,6 @@
 
 namespace Friendica\Database;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -141,22 +140,22 @@ class PostUpdate
 		$max_item_delivery_data = DBA::selectFirst('item-delivery-data', ['iid'], ['queue_count > 0 OR queue_done > 0'], ['order' => ['iid']]);
 		$max_iid = $max_item_delivery_data['iid'] ?? 0;
 
-		Logger::info('Start update1297 with max iid: ' . $max_iid);
+		DI::logger()->info('Start update1297 with max iid: ' . $max_iid);
 
 		$condition = ['`queue_count` = 0 AND `iid` < ?', $max_iid];
 
 		DBA::update('item-delivery-data', ['queue_count' => -1], $condition);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error ' . DBA::errorNo() . ':' . DBA::errorMessage());
+			DI::logger()->error('Database error ' . DBA::errorNo() . ':' . DBA::errorMessage());
 			return false;
 		}
 
-		Logger::info('Processed rows: ' . DBA::affectedRows());
+		DI::logger()->info('Processed rows: ' . DBA::affectedRows());
 
 		DI::keyValue()->set('post_update_version', 1297);
 
-		Logger::info('Done');
+		DI::logger()->info('Done');
 
 		return true;
 	}
@@ -173,7 +172,7 @@ class PostUpdate
 			return true;
 		}
 
-		Logger::info('Start');
+		DI::logger()->info('Start');
 
 		$contacts = DBA::p("SELECT `nurl`, `uid` FROM `contact`
 			WHERE EXISTS (SELECT `nurl` FROM `contact` AS `c2`
@@ -183,14 +182,14 @@ class PostUpdate
 			Protocol::DIASPORA, Protocol::OSTATUS, Protocol::ACTIVITYPUB, 0);
 
 		while ($contact = DBA::fetch($contacts)) {
-			Logger::info('Remove duplicates', ['nurl' => $contact['nurl'], 'uid' => $contact['uid']]);
+			DI::logger()->info('Remove duplicates', ['nurl' => $contact['nurl'], 'uid' => $contact['uid']]);
 			Contact::removeDuplicates($contact['nurl'], $contact['uid']);
 		}
 
 		DBA::close($contact);
 		DI::keyValue()->set('post_update_version', 1322);
 
-		Logger::info('Done');
+		DI::logger()->info('Done');
 
 		return true;
 	}
@@ -215,7 +214,7 @@ class PostUpdate
 
 		$id = DI::keyValue()->get('post_update_version_1329_id') ?? 0;
 
-		Logger::info('Start', ['item' => $id]);
+		DI::logger()->info('Start', ['item' => $id]);
 
 		$start_id = $id;
 		$rows = 0;
@@ -224,7 +223,7 @@ class PostUpdate
 		$items = DBA::select('item', ['id', 'uri-id', 'uid'], $condition, $params);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -239,11 +238,11 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1329_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		if ($start_id == $id) {
 			DI::keyValue()->set('post_update_version', 1329);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -270,7 +269,7 @@ class PostUpdate
 
 		$id = DI::keyValue()->get('post_update_version_1341_id') ?? 0;
 
-		Logger::info('Start', ['item' => $id]);
+		DI::logger()->info('Start', ['item' => $id]);
 
 		$rows = 0;
 
@@ -279,7 +278,7 @@ class PostUpdate
 			ORDER BY `uri-id` LIMIT 100000", '%#%', '%@%', '%!%', $id);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -295,13 +294,13 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1341_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		// When there are less than 1,000 items processed this means that we reached the end
 		// The other entries will then be processed with the regular functionality
 		if ($rows < 1000) {
 			DI::keyValue()->set('post_update_version', 1341);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -328,7 +327,7 @@ class PostUpdate
 
 		$id = DI::keyValue()->get('post_update_version_1342_id') ?? 0;
 
-		Logger::info('Start', ['item' => $id]);
+		DI::logger()->info('Start', ['item' => $id]);
 
 		$rows = 0;
 
@@ -340,7 +339,7 @@ class PostUpdate
 			Tag::HASHTAG, Tag::MENTION, Tag::EXCLUSIVE_MENTION, Tag::IMPLICIT_MENTION, $id);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -371,13 +370,13 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1342_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		// When there are less than 1,000 items processed this means that we reached the end
 		// The other entries will then be processed with the regular functionality
 		if ($rows < 1000) {
 			DI::keyValue()->set('post_update_version', 1342);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -404,7 +403,7 @@ class PostUpdate
 
 		$id = DI::keyValue()->get('post_update_version_1345_id') ?? 0;
 
-		Logger::info('Start', ['item' => $id]);
+		DI::logger()->info('Start', ['item' => $id]);
 
 		$rows = 0;
 
@@ -415,7 +414,7 @@ class PostUpdate
 			WHERE `iid` >= ? ORDER BY `iid` LIMIT 10000", $id);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -429,13 +428,13 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1345_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		// When there are less than 100 items processed this means that we reached the end
 		// The other entries will then be processed with the regular functionality
 		if ($rows < 100) {
 			DI::keyValue()->set('post_update_version', 1345);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -487,7 +486,7 @@ class PostUpdate
 
 		$id = DI::keyValue()->get('post_update_version_1346_id') ?? 0;
 
-		Logger::info('Start', ['item' => $id]);
+		DI::logger()->info('Start', ['item' => $id]);
 
 		$rows = 0;
 
@@ -496,7 +495,7 @@ class PostUpdate
 			['order' => ['oid'], 'limit' => 1000, 'group_by' => ['oid']]);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -521,13 +520,13 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1346_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		// When there are less than 10 items processed this means that we reached the end
 		// The other entries will then be processed with the regular functionality
 		if ($rows < 10) {
 			DI::keyValue()->set('post_update_version', 1346);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -555,7 +554,7 @@ class PostUpdate
 
 		$id = DI::keyValue()->get('post_update_version_1347_id') ?? 0;
 
-		Logger::info('Start', ['item' => $id]);
+		DI::logger()->info('Start', ['item' => $id]);
 
 		$start_id = $id;
 		$rows = 0;
@@ -566,7 +565,7 @@ class PostUpdate
 			WHERE `item`.`id` >= ? AND `item`.`vid` IS NULL ORDER BY `item`.`id` LIMIT 10000", Item::GRAVITY_ACTIVITY, $id);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -590,11 +589,11 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1347_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		if ($start_id == $id) {
 			DI::keyValue()->set('post_update_version', 1347);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -617,7 +616,7 @@ class PostUpdate
 
 		$id = DI::keyValue()->get('post_update_version_1348_id') ?? 0;
 
-		Logger::info('Start', ['contact' => $id]);
+		DI::logger()->info('Start', ['contact' => $id]);
 
 		$start_id = $id;
 		$rows = 0;
@@ -626,7 +625,7 @@ class PostUpdate
 		$contacts = DBA::select('contact', ['id', 'baseurl'], $condition, $params);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -643,11 +642,11 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1348_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		if ($start_id == $id) {
 			DI::keyValue()->set('post_update_version', 1348);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -670,7 +669,7 @@ class PostUpdate
 
 		$id = DI::keyValue()->get('post_update_version_1349_id') ?? '';
 
-		Logger::info('Start', ['apcontact' => $id]);
+		DI::logger()->info('Start', ['apcontact' => $id]);
 
 		$start_id = $id;
 		$rows = 0;
@@ -679,7 +678,7 @@ class PostUpdate
 		$apcontacts = DBA::select('apcontact', ['url', 'baseurl'], $condition, $params);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -696,11 +695,11 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1349_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		if ($start_id == $id) {
 			DI::keyValue()->set('post_update_version', 1349);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -721,7 +720,7 @@ class PostUpdate
 			return true;
 		}
 
-		Logger::info('Start');
+		DI::logger()->info('Start');
 
 		$deleted = 0;
 		$avatar = [4 => 'photo', 5 => 'thumb', 6 => 'micro'];
@@ -744,7 +743,7 @@ class PostUpdate
 		DBA::close($photos);
 
 		DI::keyValue()->set('post_update_version', 1383);
-		Logger::info('Done', ['deleted' => $deleted]);
+		DI::logger()->info('Done', ['deleted' => $deleted]);
 		return true;
 	}
 
@@ -763,13 +762,13 @@ class PostUpdate
 		}
 
 		$condition = ["`hash` IS NULL"];
-		Logger::info('Start', ['rest' => DBA::count('photo', $condition)]);
+		DI::logger()->info('Start', ['rest' => DBA::count('photo', $condition)]);
 
 		$rows = 0;
 		$photos = DBA::select('photo', [], $condition, ['limit' => 100]);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -782,11 +781,11 @@ class PostUpdate
 		}
 		DBA::close($photos);
 
-		Logger::info('Processed', ['rows' => $rows]);
+		DI::logger()->info('Processed', ['rows' => $rows]);
 
 		if ($rows <= 100) {
 			DI::keyValue()->set('post_update_version', 1384);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -813,13 +812,13 @@ class PostUpdate
 		}
 
 		$condition = ["`extid` != ? AND EXISTS(SELECT `id` FROM `post-user` WHERE `uri-id` = `item`.`uri-id` AND `uid` = `item`.`uid` AND `external-id` IS NULL)", ''];
-		Logger::info('Start', ['rest' => DBA::count('item', $condition)]);
+		DI::logger()->info('Start', ['rest' => DBA::count('item', $condition)]);
 
 		$rows = 0;
 		$items = DBA::select('item', ['uri-id', 'uid', 'extid'], $condition, ['order' => ['id'], 'limit' => 10000]);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -829,11 +828,11 @@ class PostUpdate
 		}
 		DBA::close($items);
 
-		Logger::info('Processed', ['rows' => $rows]);
+		DI::logger()->info('Processed', ['rows' => $rows]);
 
 		if ($rows <= 100) {
 			DI::keyValue()->set('post_update_version', 1400);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -855,13 +854,13 @@ class PostUpdate
 		}
 
 		$condition = ["`uri-id` IS NULL"];
-		Logger::info('Start', ['rest' => DBA::count('contact', $condition)]);
+		DI::logger()->info('Start', ['rest' => DBA::count('contact', $condition)]);
 
 		$rows = 0;
 		$contacts = DBA::select('contact', ['id', 'url'], $condition, ['limit' => 1000]);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -871,11 +870,11 @@ class PostUpdate
 		}
 		DBA::close($contacts);
 
-		Logger::info('Processed', ['rows' => $rows]);
+		DI::logger()->info('Processed', ['rows' => $rows]);
 
 		if ($rows <= 100) {
 			DI::keyValue()->set('post_update_version', 1424);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -902,13 +901,13 @@ class PostUpdate
 		}
 
 		$condition = ["`uri-id` IS NULL"];
-		Logger::info('Start', ['rest' => DBA::count('fcontact', $condition)]);
+		DI::logger()->info('Start', ['rest' => DBA::count('fcontact', $condition)]);
 
 		$rows = 0;
 		$fcontacts = DBA::select('fcontact', ['id', 'url', 'guid'], $condition, ['limit' => 1000]);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -923,11 +922,11 @@ class PostUpdate
 		}
 		DBA::close($fcontacts);
 
-		Logger::info('Processed', ['rows' => $rows]);
+		DI::logger()->info('Processed', ['rows' => $rows]);
 
 		if ($rows <= 100) {
 			DI::keyValue()->set('post_update_version', 1425);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -949,13 +948,13 @@ class PostUpdate
 		}
 
 		$condition = ["`uri-id` IS NULL"];
-		Logger::info('Start', ['rest' => DBA::count('apcontact', $condition)]);
+		DI::logger()->info('Start', ['rest' => DBA::count('apcontact', $condition)]);
 
 		$rows = 0;
 		$apcontacts = DBA::select('apcontact', ['url', 'uuid'], $condition, ['limit' => 1000]);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -970,11 +969,11 @@ class PostUpdate
 		}
 		DBA::close($apcontacts);
 
-		Logger::info('Processed', ['rows' => $rows]);
+		DI::logger()->info('Processed', ['rows' => $rows]);
 
 		if ($rows <= 100) {
 			DI::keyValue()->set('post_update_version', 1426);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -996,13 +995,13 @@ class PostUpdate
 		}
 
 		$condition = ["`uri-id` IS NULL"];
-		Logger::info('Start', ['rest' => DBA::count('event', $condition)]);
+		DI::logger()->info('Start', ['rest' => DBA::count('event', $condition)]);
 
 		$rows = 0;
 		$events = DBA::select('event', ['id', 'uri', 'guid'], $condition, ['limit' => 1000]);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -1017,11 +1016,11 @@ class PostUpdate
 		}
 		DBA::close($events);
 
-		Logger::info('Processed', ['rows' => $rows]);
+		DI::logger()->info('Processed', ['rows' => $rows]);
 
 		if ($rows <= 100) {
 			DI::keyValue()->set('post_update_version', 1427);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -1049,7 +1048,7 @@ class PostUpdate
 
 		$id = DI::keyValue()->get('post_update_version_1452_id') ?? 0;
 
-		Logger::info('Start', ['uri-id' => $id]);
+		DI::logger()->info('Start', ['uri-id' => $id]);
 
 		$rows     = 0;
 		$received = '';
@@ -1060,7 +1059,7 @@ class PostUpdate
 			Conversation::PARCEL_ACTIVITYPUB, $id, 1000);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -1088,11 +1087,11 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1452_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id, 'last-received' => $received]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id, 'last-received' => $received]);
 
 		if ($rows <= 100) {
 			DI::keyValue()->set('post_update_version', 1452);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -1114,7 +1113,7 @@ class PostUpdate
 			return true;
 		}
 
-		Logger::info('Start');
+		DI::logger()->info('Start');
 
 		$posts = DBA::select('post-view', ['uri-id'], ['conversation' => './']);
 		while ($post = DBA::fetch($posts)) {
@@ -1127,7 +1126,7 @@ class PostUpdate
 		DBA::close($posts);
 
 		DI::keyValue()->set('post_update_version', 1483);
-		Logger::info('Done');
+		DI::logger()->info('Done');
 		return true;
 	}
 
@@ -1147,14 +1146,14 @@ class PostUpdate
 
 		$id = DI::keyValue()->get('post_update_version_1484_id') ?? 0;
 
-		Logger::info('Start', ['id' => $id]);
+		DI::logger()->info('Start', ['id' => $id]);
 
 		$rows = 0;
 
 		$contacts = DBA::select('contact', ['id', 'uid', 'uri-id', 'url'], ["`id` > ?", $id], ['order' => ['id'], 'limit' => 1000]);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -1171,11 +1170,11 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1484_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		if ($rows <= 100) {
 			DI::keyValue()->set('post_update_version', 1484);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -1198,7 +1197,7 @@ class PostUpdate
 
 		$id = DI::keyValue()->get('post_update_version_1506_id') ?? 0;
 
-		Logger::info('Start', ['contact' => $id]);
+		DI::logger()->info('Start', ['contact' => $id]);
 
 		$start_id = $id;
 		$rows = 0;
@@ -1207,7 +1206,7 @@ class PostUpdate
 		$contacts = DBA::select('contact', ['id', 'url'], $condition, $params);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -1228,11 +1227,11 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1506_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		if ($start_id == $id) {
 			DI::keyValue()->set('post_update_version', 1506);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -1255,7 +1254,7 @@ class PostUpdate
 
 		$id = DI::keyValue()->get('post_update_version_1507_id') ?? '';
 
-		Logger::info('Start', ['apcontact' => $id]);
+		DI::logger()->info('Start', ['apcontact' => $id]);
 
 		$start_id = $id;
 		$rows = 0;
@@ -1264,7 +1263,7 @@ class PostUpdate
 		$apcontacts = DBA::select('apcontact', ['url', 'gsid', 'sharedinbox', 'inbox'], $condition, $params);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -1283,11 +1282,11 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1507_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		if ($start_id == $id) {
 			DI::keyValue()->set('post_update_version', 1507);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -1314,14 +1313,14 @@ class PostUpdate
 			$id = (int)($post['uri-id'] ?? 0);
 		}
 
-		Logger::info('Start', ['uri-id' => $id]);
+		DI::logger()->info('Start', ['uri-id' => $id]);
 
 		$rows = 0;
 
 		$posts = Post::selectPosts(['uri-id', 'parent-uri-id'], ["`uri-id` < ? AND `gravity` IN (?, ?)", $id, Item::GRAVITY_COMMENT, Item::GRAVITY_PARENT], ['order' => ['uri-id' => true], 'limit' => 1000]);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -1334,11 +1333,11 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1544_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		if ($rows <= 100) {
 			DI::keyValue()->set('post_update_version', 1544);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 
@@ -1368,7 +1367,7 @@ class PostUpdate
 			try {
 				Post\Engagement::storeFromItem($item);
 			} catch (\Throwable $th) {
-				Logger::notice('Exception on storing engagement', ['uri-id' => $engagement['uri-id'], 'code' => $th->getCode(), 'message' => $th->getMessage()]);
+				DI::logger()->notice('Exception on storing engagement', ['uri-id' => $engagement['uri-id'], 'code' => $th->getCode(), 'message' => $th->getMessage()]);
 			}
 		}
 		DBA::close($engagements);
@@ -1379,7 +1378,7 @@ class PostUpdate
 			$id = (int)($post['uri-id'] ?? 0);
 		}
 
-		Logger::info('Start', ['uri-id' => $id]);
+		DI::logger()->info('Start', ['uri-id' => $id]);
 
 		$rows = 0;
 
@@ -1393,7 +1392,7 @@ class PostUpdate
 		$posts = Post::selectPosts(['uri-id', 'created'], $condition, ['order' => ['uri-id' => true], 'limit' => 1000]);
 
 		if (DBA::errorNo() != 0) {
-			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
 			return false;
 		}
 
@@ -1406,11 +1405,11 @@ class PostUpdate
 
 		DI::keyValue()->set('post_update_version_1550_id', $id);
 
-		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		if ($rows <= 100) {
 			DI::keyValue()->set('post_update_version', 1550);
-			Logger::info('Done');
+			DI::logger()->info('Done');
 			return true;
 		}
 

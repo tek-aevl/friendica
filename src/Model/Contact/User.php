@@ -8,7 +8,6 @@
 namespace Friendica\Model\Contact;
 
 use Exception;
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -41,7 +40,7 @@ class User
 		}
 
 		if (empty($contact['uri-id']) && empty($contact['url'])) {
-			Logger::info('Missing contact details', ['contact' => $contact]);
+			DI::logger()->info('Missing contact details', ['contact' => $contact]);
 			return false;
 		}
 
@@ -53,7 +52,7 @@ class User
 		if (!empty($contact['uri-id']) && DBA::isResult($pcontact)) {
 			$pcid = $pcontact['id'];
 		} elseif (empty($contact['url']) || !($pcid = Contact::getIdForURL($contact['url'], 0, false))) {
-			Logger::info('Public contact for user not found', ['uri-id' => $contact['uri-id'], 'uid' => $contact['uid']]);
+			DI::logger()->info('Public contact for user not found', ['uri-id' => $contact['uri-id'], 'uid' => $contact['uid']]);
 			return false;
 		}
 
@@ -64,7 +63,7 @@ class User
 
 		$ret = DBA::insert('user-contact', $fields, Database::INSERT_UPDATE);
 
-		Logger::info('Inserted user contact', ['uid' => $contact['uid'], 'cid' => $pcid, 'uri-id' => $contact['uri-id'], 'ret' => $ret]);
+		DI::logger()->info('Inserted user contact', ['uid' => $contact['uid'], 'cid' => $pcid, 'uri-id' => $contact['uri-id'], 'ret' => $ret]);
 
 		return $ret;
 	}
@@ -91,7 +90,7 @@ class User
 				}
 				$update_fields['cid'] = $contact['pid'];
 				$ret = DBA::update('user-contact', $update_fields, ['uri-id' => $contact['uri-id'], 'uid' => $contact['uid']], true);
-				Logger::info('Updated user contact', ['uid' => $contact['uid'], 'id' => $contact['pid'], 'uri-id' => $contact['uri-id'], 'ret' => $ret]);
+				DI::logger()->info('Updated user contact', ['uid' => $contact['uid'], 'id' => $contact['pid'], 'uri-id' => $contact['uri-id'], 'ret' => $ret]);
 			}
 
 			DBA::close($contacts);

@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\DI;
 use Friendica\Protocol\Delivery;
@@ -35,7 +34,7 @@ class ProfileUpdate {
 		$inboxes = ActivityPub\Transmitter::fetchTargetInboxesforUser($uid);
 
 		foreach ($inboxes as $inbox => $receivers) {
-			Logger::info('Profile update for user ' . $uid . ' to ' . $inbox .' via ActivityPub');
+			DI::logger()->info('Profile update for user ' . $uid . ' to ' . $inbox .' via ActivityPub');
 			Worker::add(['priority' => $appHelper->getQueueValue('priority'), 'created' => $appHelper->getQueueValue('created'), 'dont_fork' => true],
 				'APDelivery',
 				Delivery::PROFILEUPDATE,

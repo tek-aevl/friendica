@@ -15,7 +15,6 @@ use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
 use Friendica\Content\PageInfo;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -56,15 +55,15 @@ class Feed
 		$dryRun = empty($importer) && empty($contact);
 
 		if ($dryRun) {
-			Logger::info("Test Atom/RSS feed");
+			DI::logger()->info("Test Atom/RSS feed");
 		} else {
-			Logger::info('Import Atom/RSS feed "' . $contact['name'] . '" (Contact ' . $contact['id'] . ') for user ' . $importer['uid']);
+			DI::logger()->info('Import Atom/RSS feed "' . $contact['name'] . '" (Contact ' . $contact['id'] . ') for user ' . $importer['uid']);
 		}
 
 		$xml = trim($xml);
 
 		if (empty($xml)) {
-			Logger::info('XML is empty.');
+			DI::logger()->info('XML is empty.');
 			return [];
 		}
 
@@ -274,7 +273,7 @@ class Feed
 		$datarray['direction'] = Conversation::PULL;
 
 		if (!is_object($entries)) {
-			Logger::info("There are no entries in this feed.");
+			DI::logger()->info("There are no entries in this feed.");
 			return [];
 		}
 
@@ -383,7 +382,7 @@ class Feed
 				try {
 					$item['plink'] = DI::httpClient()->finalUrl($item['plink']);
 				} catch (TransferException $exception) {
-					Logger::notice('Item URL couldn\'t get expanded', ['url' => $item['plink'], 'exception' => $exception]);
+					DI::logger()->notice('Item URL couldn\'t get expanded', ['url' => $item['plink'], 'exception' => $exception]);
 				}
 			}
 
@@ -442,7 +441,7 @@ class Feed
 				if (DBA::isResult($previous)) {
 					// Use the creation date when the post had been stored. It can happen this date changes in the feed.
 					$creation_dates[] = $previous['created'];
-					Logger::info('Item with URI ' . $item['uri'] . ' for user ' . $importer['uid'] . ' already existed under id ' . $previous['id']);
+					DI::logger()->info('Item with URI ' . $item['uri'] . ' for user ' . $importer['uid'] . ' already existed under id ' . $previous['id']);
 					continue;
 				}
 				$creation_dates[] = DateTimeFormat::utc($item['created']);
@@ -550,10 +549,10 @@ class Feed
 				$items[] = $item;
 				break;
 			} elseif (!Item::isValid($item)) {
-				Logger::info('Feed item is invalid', ['created' => $item['created'], 'uid' => $item['uid'], 'uri' => $item['uri']]);
+				DI::logger()->info('Feed item is invalid', ['created' => $item['created'], 'uid' => $item['uid'], 'uri' => $item['uri']]);
 				continue;
 			} elseif (DI::contentItem()->isTooOld($item['created'], $item['uid'])) {
-				Logger::info('Feed is too old', ['created' => $item['created'], 'uid' => $item['uid'], 'uri' => $item['uri']]);
+				DI::logger()->info('Feed is too old', ['created' => $item['created'], 'uid' => $item['uid'], 'uri' => $item['uri']]);
 				continue;
 			}
 
@@ -673,7 +672,7 @@ class Feed
 				$item['post-type'] = Item::PT_NOTE;
 			}
 
-			Logger::info('Stored feed', ['item' => $item]);
+			DI::logger()->info('Stored feed', ['item' => $item]);
 
 			$notify = Item::isRemoteSelf($contact, $item);
 			$item['wall'] = (bool)$notify;
@@ -702,7 +701,7 @@ class Feed
 					];
 				}
 			} else {
-				Logger::info('Post already created or exists in the delayed posts queue', ['uid' => $item['uid'], 'uri' => $item['uri']]);
+				DI::logger()->info('Post already created or exists in the delayed posts queue', ['uid' => $item['uid'], 'uri' => $item['uri']]);
 			}
 		}
 
@@ -713,7 +712,7 @@ class Feed
 				// Posts shouldn't be delayed more than a day
 				$interval = min(1440, self::getPollInterval($contact));
 				$delay = max(round(($interval * 60) / $total), 60 * $min_posting);
-				Logger::info('Got posting delay', ['delay' => $delay, 'interval' => $interval, 'items' => $total, 'cid' => $contact['id'], 'url' => $contact['url']]);
+				DI::logger()->info('Got posting delay', ['delay' => $delay, 'interval' => $interval, 'items' => $total, 'cid' => $contact['id'], 'url' => $contact['url']]);
 			} else {
 				$delay = 0;
 			}
@@ -790,7 +789,7 @@ class Feed
 	private static function adjustPollFrequency(array $contact, array $creation_dates)
 	{
 		if ($contact['network'] != Protocol::FEED) {
-			Logger::info('Contact is no feed, skip.', ['id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url'], 'network' => $contact['network']]);
+			DI::logger()->info('Contact is no feed, skip.', ['id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url'], 'network' => $contact['network']]);
 			return;
 		}
 
@@ -831,22 +830,22 @@ class Feed
 			}
 
 			if (count($creation_dates) == 1) {
-				Logger::info('Feed had posted a single time, switching to daily polling', ['newest' => $newest_date, 'id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
+				DI::logger()->info('Feed had posted a single time, switching to daily polling', ['newest' => $newest_date, 'id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
 				$priority = 8; // Poll once a day
 			}
 
 			if (empty($priority) && (((time() / 86400) - $newest) > 730)) {
-				Logger::info('Feed had not posted for two years, switching to monthly polling', ['newest' => $newest_date, 'id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
+				DI::logger()->info('Feed had not posted for two years, switching to monthly polling', ['newest' => $newest_date, 'id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
 				$priority = 10; // Poll every month
 			}
 
 			if (empty($priority) && (((time() / 86400) - $newest) > 365)) {
-				Logger::info('Feed had not posted for a year, switching to weekly polling', ['newest' => $newest_date, 'id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
+				DI::logger()->info('Feed had not posted for a year, switching to weekly polling', ['newest' => $newest_date, 'id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
 				$priority = 9; // Poll every week
 			}
 
 			if (empty($priority) && empty($frequency)) {
-				Logger::info('Feed had not posted for at least a week, switching to daily polling', ['newest' => $newest_date, 'id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
+				DI::logger()->info('Feed had not posted for at least a week, switching to daily polling', ['newest' => $newest_date, 'id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
 				$priority = 8; // Poll once a day
 			}
 
@@ -883,15 +882,15 @@ class Feed
 				} else {
 					$priority = 7; // Poll twice a day
 				}
-				Logger::info('Calculated priority by the posts per day', ['priority' => $priority, 'max' => round($max, 2), 'id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
+				DI::logger()->info('Calculated priority by the posts per day', ['priority' => $priority, 'max' => round($max, 2), 'id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
 			}
 		} else {
-			Logger::info('No posts, switching to daily polling', ['id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
+			DI::logger()->info('No posts, switching to daily polling', ['id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
 			$priority = 8; // Poll once a day
 		}
 
 		if ($contact['rating'] != $priority) {
-			Logger::notice('Adjusting priority', ['old' => $contact['rating'], 'new' => $priority, 'id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
+			DI::logger()->notice('Adjusting priority', ['old' => $contact['rating'], 'new' => $priority, 'id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url']]);
 			Contact::update(['rating' => $priority], ['id' => $contact['id']]);
 		}
 	}
@@ -1066,7 +1065,7 @@ class Feed
 
 		$feeddata = trim($doc->saveXML());
 
-		Logger::info('Feed duration', ['seconds' => number_format(microtime(true) - $stamp, 3), 'nick' => $owner['nickname'], 'filter' => $filter, 'created' => $previous_created]);
+		DI::logger()->info('Feed duration', ['seconds' => number_format(microtime(true) - $stamp, 3), 'nick' => $owner['nickname'], 'filter' => $filter, 'created' => $previous_created]);
 
 		return $feeddata;
 	}
@@ -1153,7 +1152,7 @@ class Feed
 	private static function noteEntry(DOMDocument $doc, array $item, array $owner): DOMElement
 	{
 		if (($item['gravity'] != Item::GRAVITY_PARENT) && (Strings::normaliseLink($item['author-link']) != Strings::normaliseLink($owner['url']))) {
-			Logger::info('Feed entry author does not match feed owner', ['owner' => $owner['url'], 'author' => $item['author-link']]);
+			DI::logger()->info('Feed entry author does not match feed owner', ['owner' => $owner['url'], 'author' => $item['author-link']]);
 		}
 
 		$entry = self::entryHeader($doc, $owner, $item, false);
@@ -1307,7 +1306,7 @@ class Feed
 		if (!HTML::isHTML($body)) {
 			$html = BBCode::convert($body, false, BBCode::EXTERNAL);
 			if ($body != $html) {
-				Logger::debug('Body contained no HTML', ['original' => $body, 'converted' => $html]);
+				DI::logger()->debug('Body contained no HTML', ['original' => $body, 'converted' => $html]);
 				$body = $html;
 			}
 		}

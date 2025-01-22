@@ -9,7 +9,6 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Content\Pager;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\DI;

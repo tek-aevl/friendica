@@ -7,7 +7,7 @@
 
 namespace Friendica\Util;
 
-use Friendica\Core\Logger;
+use Friendica\DI;
 use Friendica\Model\APContact;
 
 /**
@@ -55,7 +55,7 @@ class LDSignature
 		$dhash = self::hash(self::signableData($data));
 
 		$x = Crypto::rsaVerify($ohash . $dhash, base64_decode($data['signature']['signatureValue']), $pubkey);
-		Logger::info('LD-verify', ['verified' => (int)$x, 'actor' => $profile['url']]);
+		DI::logger()->info('LD-verify', ['verified' => (int)$x, 'actor' => $profile['url']]);
 
 		if (empty($x)) {
 			return false;

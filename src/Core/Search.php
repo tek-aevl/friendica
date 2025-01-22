@@ -16,7 +16,6 @@ use Friendica\Network\HTTPException;
 use Friendica\Object\Search\ContactResult;
 use Friendica\Object\Search\ResultList;
 use Friendica\Util\Network;
-use Friendica\Util\Strings;
 use GuzzleHttp\Psr7\Uri;
 
 /**
@@ -160,7 +159,7 @@ class Search
 	 */
 	public static function getContactsFromLocalDirectory(string $search, int $type = self::TYPE_ALL, int $start = 0, int $itemPage = 80): ResultList
 	{
-		Logger::info('Searching', ['search' => $search, 'type' => $type, 'start' => $start, 'itempage' => $itemPage]);
+		DI::logger()->info('Searching', ['search' => $search, 'type' => $type, 'start' => $start, 'itempage' => $itemPage]);
 
 		$contacts = Contact::searchByName($search, $type == self::TYPE_GROUP ? 'community' : '', true);
 
@@ -200,7 +199,7 @@ class Search
 	 */
 	public static function searchContact(string $search, string $mode, int $page = 1): array
 	{
-		Logger::info('Searching', ['search' => $search, 'mode' => $mode, 'page' => $page]);
+		DI::logger()->info('Searching', ['search' => $search, 'mode' => $mode, 'page' => $page]);
 
 		if (DI::config()->get('system', 'block_public') && !DI::userSession()->isAuthenticated()) {
 			return [];
@@ -223,7 +222,7 @@ class Search
 			try {
 				$curlResult = DI::httpClient()->get(self::getGlobalDirectory() . '/search/people?' . $p . '&q=' . urlencode($search), HttpClientAccept::JSON, [HttpClientOptions::REQUEST => HttpClientRequest::CONTACTDISCOVER]);
 			} catch (\Throwable $th) {
-				Logger::notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
+				DI::logger()->notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
 				return [];
 			}
 			if ($curlResult->isSuccess()) {
