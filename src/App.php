@@ -163,6 +163,7 @@ class App
 			$this->container->create(DbaDefinition::class),
 			$this->container->create(ViewDefinition::class),
 			$this->mode,
+			$this->config,
 		);
 
 		$this->registerTemplateEngine();
@@ -272,14 +273,19 @@ class App
 	/**
 	 * Load the whole app instance
 	 */
-	private function load(array $serverParams, DbaDefinition $dbaDefinition, ViewDefinition $viewDefinition, Mode $mode)
-	{
-		if ($this->config->get('system', 'ini_max_execution_time') !== false) {
-			set_time_limit((int)$this->config->get('system', 'ini_max_execution_time'));
+	private function load(
+		array $serverParams,
+		DbaDefinition $dbaDefinition,
+		ViewDefinition $viewDefinition,
+		Mode $mode,
+		IManageConfigValues $config
+	): void {
+		if ($config->get('system', 'ini_max_execution_time') !== false) {
+			set_time_limit((int) $config->get('system', 'ini_max_execution_time'));
 		}
 
-		if ($this->config->get('system', 'ini_pcre_backtrack_limit') !== false) {
-			ini_set('pcre.backtrack_limit', (int)$this->config->get('system', 'ini_pcre_backtrack_limit'));
+		if ($config->get('system', 'ini_pcre_backtrack_limit') !== false) {
+			ini_set('pcre.backtrack_limit', (int) $config->get('system', 'ini_pcre_backtrack_limit'));
 		}
 
 		// Normally this constant is defined - but not if "pcntl" isn't installed
