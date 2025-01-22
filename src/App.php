@@ -308,7 +308,7 @@ class App
 			$viewDefinition->load(true);
 		}
 
-		$this->loadDefaultTimezone();
+		$this->loadDefaultTimezone($config);
 	}
 
 	/**
@@ -318,10 +318,10 @@ class App
 	 *
 	 * @global string $default_timezone
 	 */
-	private function loadDefaultTimezone()
+	private function loadDefaultTimezone(IManageConfigValues $config)
 	{
-		if ($this->config->get('system', 'default_timezone')) {
-			$timezone = $this->config->get('system', 'default_timezone', 'UTC');
+		if ($config->get('system', 'default_timezone')) {
+			$timezone = $config->get('system', 'default_timezone', 'UTC');
 		} else {
 			global $default_timezone;
 			$timezone = $default_timezone ?? '' ?: 'UTC';
