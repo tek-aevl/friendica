@@ -11,7 +11,6 @@ namespace Friendica\Console;
 
 use Asika\SimpleConsole\Console;
 use Friendica\App\Mode;
-use Friendica\Core\Logger\Capability\LogChannel;
 use Friendica\Core\Update;
 use Friendica\Core\Worker as CoreWorker;
 use Friendica\Core\Worker\Repository\Process as ProcessRepository;
@@ -22,8 +21,6 @@ use Friendica\Util\BasePath;
  */
 final class Worker extends Console
 {
-	public const LOG_CHANNEL = LogChannel::WORKER;
-
 	private Mode $mode;
 	private BasePath $basePath;
 	private ProcessRepository $processRepo;

@@ -15,7 +15,6 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
 use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
-use Friendica\Core\Logger\Capability\LogChannel;
 use Friendica\Protocol\ATProtocol\Jetstream;
 use Friendica\System\Daemon as SysDaemon;
 use RuntimeException;
@@ -25,8 +24,6 @@ use RuntimeException;
  */
 final class JetstreamDaemon extends Console
 {
-	public const LOG_CHANNEL = LogChannel::DAEMON;
-
 	private Mode $mode;
 	private IManageConfigValues $config;
 	private IManageKeyValuePairs $keyValue;
