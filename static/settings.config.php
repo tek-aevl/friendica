@@ -74,7 +74,7 @@ return [
 
 		// curl_timeout (Integer)
 		// Value is in seconds. Set to 0 for unlimited (not recommended).
-		'curl_timeout' =>  60,
+		'curl_timeout' => 60,
 
 		// dbclean (Boolean)
 		// Remove old remote items, orphaned database records and old content from some other helper tables.
