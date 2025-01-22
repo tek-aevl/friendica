@@ -604,14 +604,14 @@ class HTTPSignature
 	/**
 	 * Gets a signer from a given HTTP request
 	 *
-	 * @param string   $content
-	 * @param array    $http_headers
+	 * @param string   $content      Body of the request
+	 * @param array    $http_headers array containing the HTTP headers
 	 * @param ?boolean $update true = always update, false = never update, null = update when not found or outdated
 	 *
 	 * @return string|null|false Signer
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function getSigner(string $content, array $http_headers, bool $update = null)
+	public static function getSigner(string $content, array $http_headers, ?bool $update = null)
 	{
 		if (empty($http_headers['HTTP_SIGNATURE'])) {
 			DI::logger()->debug('No HTTP_SIGNATURE header');
@@ -803,14 +803,14 @@ class HTTPSignature
 	/**
 	 * fetches a key for a given id and actor
 	 *
-	 * @param string   $id
-	 * @param string   $actor
+	 * @param string   $id    keyId of the signature block
+	 * @param string   $actor Actor URI
 	 * @param ?boolean $update true = always update, false = never update, null = update when not found or outdated
 	 *
 	 * @return array with actor url and public key
 	 * @throws \Exception
 	 */
-	private static function fetchKey(string $id, string $actor, bool $update = null): array
+	private static function fetchKey(string $id, string $actor, ?bool $update = null): array
 	{
 		$url = (strpos($id, '#') ? substr($id, 0, strpos($id, '#')) : $id);
 
