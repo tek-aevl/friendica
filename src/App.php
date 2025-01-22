@@ -181,8 +181,11 @@ class App
 		);
 	}
 
-	public function processConsole(array $argv): void
+
+	public function processConsole(array $serverParams): void
 	{
+		$argv = $serverParams['argv'] ?? [];
+
 		$this->setupContainerForAddons();
 
 		$this->setupLogChannel($this->determineLogChannel($argv));

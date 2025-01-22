@@ -21,11 +21,13 @@ chdir(dirname(__DIR__));
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
+// BC: Add console command as second argument
 $argv = $_SERVER['argv'] ?? [];
 array_splice($argv, 1, 0, "worker");
+$_SERVER['argv'] = $argv;
 
 $container = \Friendica\Core\DiceContainer::fromBasePath(dirname(__DIR__));
 
 $app = \Friendica\App::fromContainer($container);
 
-$app->processConsole($argv);
+$app->processConsole($_SERVER);
