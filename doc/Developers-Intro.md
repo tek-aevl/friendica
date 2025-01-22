@@ -164,7 +164,7 @@ If you are interested in improving those clients, please contact the developers 
 Friendica can be extended by addons.
 These addons relies on many classes and conventions from Friendica.
 As developers our work on Friendica should not break things in the addons without giving the addon maintainers a chance to fix their addons.
-Our goal is to build trust for the addon maintainers but also allow Friendica developers to move on. 
+Our goal is to build trust for the addon maintainers but also allow Friendica developers to move on.
 This is called the Backward Compatibility Promise.
 
 Inspired by the [Symonfy BC promise](https://symfony.com/doc/current/contributing/code/bc.html) we promise BC for every class, interface, trait, enum, function, constant, etc., but with the exception of:
@@ -208,12 +208,12 @@ As long as the code that is labeled with `@deprecated` is used inside Friendica 
 
 If the deprecated code is no longer used inside Friendica or the official addons it MUST be hard deprecated.
 The code MUST NOT be deleted.
-Starting from the next release, it MUST be stay for at least 6 months.
-Hard deprecated code COULD remain longer than 6 months, depending on when a release appears.
-Addon developer MUST NOT consider that they have more than 6 months to adjust their code.
+Starting from the next release, it MUST be stay for at least 5 months.
+Hard deprecated code COULD remain longer than 5 months, depending on when a release appears.
+Addon developer MUST NOT consider that they have more than 5 months to adjust their code.
 
 Hard deprecation code means that the code triggers an `E_USER_DEPRECATION` error if it is called.
-For instance with the deprecated class `Friendica\Core\Logger` the call of every method should be trigger an error:
+For instance with the deprecated class `Friendica\Core\Logger` the call of every method should trigger an error:
 
 ```php
 /**
@@ -224,7 +224,7 @@ For instance with the deprecated class `Friendica\Core\Logger` the call of every
 class Logger {
 	public static function info(string $message, array $context = [])
 	{
-		trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.05 and will be removed after 6 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+		trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.05 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		self::getInstance()->info($message, $context);
 	}
@@ -234,19 +234,19 @@ class Logger {
 ```
 
 This way the maintainer or users of addons will be notified that the addon will stop working in one of the next releases.
-The addon maintainer now has at least 6 months to fix the deprecations.
+The addon maintainer now has at least 5 months or at least one release to fix the deprecations.
 
 Please note that the deprecation message contains the release that will be released next.
-In the example the code was hard deprecated in `2025.05` and COULD be removed earliest with the `2025.11` release.
+In the example the code was hard deprecated with release `2025.05`, so it COULD be removed earliest with the `2025.11` release.
 
 **3. Code Removing**
 
-We promise BC for deprecated code for at least 6 months, starting from the release the deprecation was announced.
+We promise BC for deprecated code for at least 5 months, starting from the release the deprecation was announced.
 After this time the deprecated code COULD be remove within the next release.
 
 Breaking changes MUST be happen only in a new release but MUST be hard deprecated first.
 The BC promise refers only to releases, respective the `stable` branch.
 Deprecated code on other branches like `develop` or RC branches could be removed earlier.
-This is not a BC break as long as the release is published 6 months after the deprecation.
+This is not a BC break as long as the release will be published 5 months after the hard deprecation.
 
-If a release breaks BC without deprecation or earlier than 6 months, this SHOULD considered as a bug and BC SHOULD be restored in a bugfix release.
+If a release breaks BC without deprecation or earlier than 5 months, this SHOULD considered as a bug and BC SHOULD be restored in a bugfix release.
