@@ -115,11 +115,7 @@ class ParseUrl
 
 		$urlHash = hash('sha256', $url);
 
-		$parsed_url = DBA::selectFirst(
-			'parsed_url',
-			['content'],
-			['url_hash' => $urlHash, 'oembed' => false]
-		);
+		$parsed_url = DBA::selectFirst('parsed_url', ['content'], ['url_hash' => $urlHash, 'oembed' => false]);
 		if (!empty($parsed_url['content'])) {
 			$data = unserialize($parsed_url['content']);
 			return $data;
@@ -246,12 +242,14 @@ class ParseUrl
 
 		if ($cacheControlHeader = $curlResult->getHeader('Cache-Control')[0] ?? '') {
 			if (preg_match('/max-age=([0-9]+)/i', $cacheControlHeader, $matches)) {
-				$maxAge              = max(86400, (int)array_pop($matches));
+				$maxAge = max(86400, (int)array_pop($matches));
+
 				$siteinfo['expires'] = DateTimeFormat::utc("now + $maxAge seconds");
 			}
 		}
 
-		$body             = $curlResult->getBodyString();
+		$body = $curlResult->getBodyString();
+
 		$siteinfo['size'] = mb_strlen($body);
 
 		$charset = '';
@@ -308,10 +306,9 @@ class ParseUrl
 			}
 
 			if (@$meta_tag['http-equiv'] == 'refresh') {
-				$path     = $meta_tag['content'];
-				$pathinfo = explode(';', $path);
-				$content  = '';
-				foreach ($pathinfo as $value) {
+				$path    = $meta_tag['content'];
+				$content = '';
+				foreach (explode(';', $path) as $value) {
 					if (substr(strtolower($value), 0, 4) == 'url=') {
 						$content = substr($value, 4);
 					}
@@ -457,7 +454,8 @@ class ParseUrl
 		$list = $xpath->query("//script[@type='application/ld+json']");
 		foreach ($list as $node) {
 			if (!empty($node->nodeValue)) {
-				if ($jsonld = json_decode($node->nodeValue, true)) {
+				$jsonld = json_decode($node->nodeValue, true);
+				if (is_array($jsonld)) {
 					$siteinfo = self::parseParts($siteinfo, $jsonld);
 				}
 			}
@@ -490,7 +488,8 @@ class ParseUrl
 
 		if (!empty($siteinfo['text']) && mb_strlen($siteinfo['text']) > self::MAX_DESC_COUNT) {
 			$siteinfo['text'] = mb_substr($siteinfo['text'], 0, self::MAX_DESC_COUNT) . '…';
-			$pos              = mb_strrpos($siteinfo['text'], '.');
+
+			$pos = mb_strrpos($siteinfo['text'], '.');
 			if ($pos > self::MIN_DESC_COUNT) {
 				$siteinfo['text'] = mb_substr($siteinfo['text'], 0, $pos + 1);
 			}
@@ -524,7 +523,8 @@ class ParseUrl
 				 */
 				if (!empty($image['url'])) {
 					$image['url'] = self::completeUrl($image['url'], $page_url);
-					$photodata    = Images::getInfoFromURLCached($image['url']);
+
+					$photodata = Images::getInfoFromURLCached($image['url']);
 					if (($photodata) && ($photodata[0] > 50) && ($photodata[1] > 50)) {
 						$image['src']         = $image['url'];
 						$image['width']       = $photodata[0];
@@ -554,7 +554,8 @@ class ParseUrl
 					foreach (['embed', 'content', 'url'] as $field) {
 						if (!empty($media[$field])) {
 							$media[$field] = self::completeUrl($media[$field], $page_url);
-							$type          = self::getContentType($media[$field]);
+
+							$type = self::getContentType($media[$field]);
 							if (($type[0] ?? '') == 'text') {
 								if ($field == 'embed') {
 									$embed = $media[$field];
@@ -956,8 +957,7 @@ class ParseUrl
 			$content = JsonLD::fetchElement($jsonld, 'keywords');
 			if (!empty($content)) {
 				$siteinfo['keywords'] = [];
-				$keywords             = explode(',', $content);
-				foreach ($keywords as $keyword) {
+				foreach (explode(',', $content) as $keyword) {
 					$siteinfo['keywords'][] = trim($keyword);
 				}
 			}
