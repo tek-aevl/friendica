@@ -165,6 +165,7 @@ class App
 			$this->mode,
 			$this->config,
 			$this->profiler,
+			$this->appHelper,
 		);
 
 		$this->registerTemplateEngine();
@@ -280,7 +281,8 @@ class App
 		ViewDefinition $viewDefinition,
 		Mode $mode,
 		IManageConfigValues $config,
-		Profiler $profiler
+		Profiler $profiler,
+		AppHelper $appHelper
 	): void {
 		if ($config->get('system', 'ini_max_execution_time') !== false) {
 			set_time_limit((int) $config->get('system', 'ini_max_execution_time'));
@@ -302,7 +304,7 @@ class App
 
 		if ($mode->has(Mode::DBAVAILABLE)) {
 			Core\Hook::loadHooks();
-			$loader = (new Config())->createConfigFileManager($this->appHelper->getBasePath(), $serverParams);
+			$loader = (new Config())->createConfigFileManager($appHelper->getBasePath(), $serverParams);
 			Core\Hook::callAll('load_config', $loader);
 
 			// Hooks are now working, reload the whole definitions with hook enabled
