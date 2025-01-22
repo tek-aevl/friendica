@@ -166,8 +166,6 @@ class App
 
 		$this->registerTemplateEngine();
 
-		$this->mode->setExecutor(Mode::INDEX);
-
 		$this->runFrontend(
 			$this->container->create(IManagePersonalConfigValues::class),
 			$this->container->create(Page::class),
@@ -348,6 +346,8 @@ class App
 		float $start_time,
 		ServerRequestInterface $request
 	) {
+		$this->mode->setExecutor(Mode::INDEX);
+
 		$httpInput  = new HTTPInputData($request->getServerParams());
 		$serverVars = $request->getServerParams();
 		$queryVars  = $request->getQueryParams();
