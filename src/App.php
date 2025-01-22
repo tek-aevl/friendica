@@ -162,6 +162,7 @@ class App
 			$request->getServerParams(),
 			$this->container->create(DbaDefinition::class),
 			$this->container->create(ViewDefinition::class),
+			$this->mode,
 		);
 
 		$this->registerTemplateEngine();
@@ -270,7 +271,7 @@ class App
 	/**
 	 * Load the whole app instance
 	 */
-	private function load(array $serverParams, DbaDefinition $dbaDefinition, ViewDefinition $viewDefinition)
+	private function load(array $serverParams, DbaDefinition $dbaDefinition, ViewDefinition $viewDefinition, Mode $mode)
 	{
 		if ($this->config->get('system', 'ini_max_execution_time') !== false) {
 			set_time_limit((int)$this->config->get('system', 'ini_max_execution_time'));
@@ -290,7 +291,7 @@ class App
 
 		$this->profiler->reset();
 
-		if ($this->mode->has(Mode::DBAVAILABLE)) {
+		if ($mode->has(Mode::DBAVAILABLE)) {
 			Core\Hook::loadHooks();
 			$loader = (new Config())->createConfigFileManager($this->appHelper->getBasePath(), $serverParams);
 			Core\Hook::callAll('load_config', $loader);
