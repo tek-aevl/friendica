@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Friendica\Console;
 
+use Asika\SimpleConsole\Console;
 use Friendica\App\Mode;
 use Friendica\Core\Addon;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -22,7 +23,7 @@ use RuntimeException;
 /**
  * Console command for interacting with the daemon
  */
-final class JetstreamDaemon extends AbstractConsole
+final class JetstreamDaemon extends Console
 {
 	public const LOG_CHANNEL = LogChannel::DAEMON;
 
@@ -79,8 +80,6 @@ HELP;
 
 	protected function doExecute()
 	{
-		$this->checkDeprecated('jetstream');
-
 		if ($this->mode->isInstall()) {
 			throw new RuntimeException("Friendica isn't properly installed yet");
 		}

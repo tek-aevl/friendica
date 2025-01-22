@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Friendica\Console;
 
+use Asika\SimpleConsole\Console;
 use Friendica\App\Mode;
 use Friendica\Core\Logger\Capability\LogChannel;
 use Friendica\Core\Update;
@@ -19,7 +20,7 @@ use Friendica\Util\BasePath;
 /**
  * Console command for starting worker
  */
-final class Worker extends AbstractConsole
+final class Worker extends Console
 {
 	public const LOG_CHANNEL = LogChannel::WORKER;
 
@@ -69,8 +70,6 @@ HELP;
 
 	protected function doExecute()
 	{
-		$this->checkDeprecated('worker');
-
 		$this->mode->setExecutor(Mode::WORKER);
 
 		// Check the database structure and possibly fixes it
