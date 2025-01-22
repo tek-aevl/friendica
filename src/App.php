@@ -158,15 +158,17 @@ class App
 		$this->session   = $this->container->create(IHandleUserSessions::class);
 		$this->appHelper = $this->container->create(AppHelper::class);
 
-		$this->loadSetupForFrontend(
-			$request,
+		$this->load(
+			$request->getServerParams(),
 			$this->container->create(DbaDefinition::class),
 			$this->container->create(ViewDefinition::class),
+			$this->mode,
+			$this->config,
+			$this->profiler,
+			$this->appHelper,
 		);
 
 		$this->registerTemplateEngine();
-
-		$this->mode->setExecutor(Mode::INDEX);
 
 		$this->runFrontend(
 			$this->container->create(IManagePersonalConfigValues::class),
@@ -178,8 +180,11 @@ class App
 		);
 	}
 
-	public function processConsole(array $argv): void
+
+	public function processConsole(array $serverParams): void
 	{
+		$argv = $serverParams['argv'] ?? [];
+
 		$this->setupContainerForAddons();
 
 		$this->setupLogChannel($this->determineLogChannel($argv));
@@ -188,12 +193,22 @@ class App
 
 		$this->registerErrorHandler();
 
+		$this->load(
+			$serverParams,
+			$this->container->create(DbaDefinition::class),
+			$this->container->create(ViewDefinition::class),
+			$this->container->create(Mode::class),
+			$this->container->create(IManageConfigValues::class),
+			$this->container->create(Profiler::class),
+			$this->container->create(AppHelper::class),
+		);
+
 		$this->registerTemplateEngine();
 
 		(\Friendica\Core\Console::create($this->container, $argv))->execute();
 	}
 
-	public function processEjabberd(): void
+	public function processEjabberd(array $serverParams): void
 	{
 		$this->setupContainerForAddons();
 
@@ -202,6 +217,16 @@ class App
 		$this->setupLegacyServiceLocator();
 
 		$this->registerErrorHandler();
+
+		$this->load(
+			$serverParams,
+			$this->container->create(DbaDefinition::class),
+			$this->container->create(ViewDefinition::class),
+			$this->container->create(Mode::class),
+			$this->container->create(IManageConfigValues::class),
+			$this->container->create(Profiler::class),
+			$this->container->create(AppHelper::class),
+		);
 
 		/** @var BasePath */
 		$basePath = $this->container->create(BasePath::class);
@@ -272,14 +297,21 @@ class App
 	/**
 	 * Load the whole app instance
 	 */
-	private function loadSetupForFrontend(ServerRequestInterface $request, DbaDefinition $dbaDefinition, ViewDefinition $viewDefinition)
-	{
-		if ($this->config->get('system', 'ini_max_execution_time') !== false) {
-			set_time_limit((int)$this->config->get('system', 'ini_max_execution_time'));
+	private function load(
+		array $serverParams,
+		DbaDefinition $dbaDefinition,
+		ViewDefinition $viewDefinition,
+		Mode $mode,
+		IManageConfigValues $config,
+		Profiler $profiler,
+		AppHelper $appHelper
+	): void {
+		if ($config->get('system', 'ini_max_execution_time') !== false) {
+			set_time_limit((int) $config->get('system', 'ini_max_execution_time'));
 		}
 
-		if ($this->config->get('system', 'ini_pcre_backtrack_limit') !== false) {
-			ini_set('pcre.backtrack_limit', (int)$this->config->get('system', 'ini_pcre_backtrack_limit'));
+		if ($config->get('system', 'ini_pcre_backtrack_limit') !== false) {
+			ini_set('pcre.backtrack_limit', (int) $config->get('system', 'ini_pcre_backtrack_limit'));
 		}
 
 		// Normally this constant is defined - but not if "pcntl" isn't installed
@@ -290,11 +322,11 @@ class App
 		// Ensure that all "strtotime" operations do run timezone independent
 		date_default_timezone_set('UTC');
 
-		$this->profiler->reset();
+		$profiler->reset();
 
-		if ($this->mode->has(Mode::DBAVAILABLE)) {
+		if ($mode->has(Mode::DBAVAILABLE)) {
 			Core\Hook::loadHooks();
-			$loader = (new Config())->createConfigFileManager($this->appHelper->getBasePath(), $request->getServerParams());
+			$loader = (new Config())->createConfigFileManager($appHelper->getBasePath(), $serverParams);
 			Core\Hook::callAll('load_config', $loader);
 
 			// Hooks are now working, reload the whole definitions with hook enabled
@@ -302,7 +334,7 @@ class App
 			$viewDefinition->load(true);
 		}
 
-		$this->loadDefaultTimezone();
+		$this->loadDefaultTimezone($config, $appHelper);
 	}
 
 	/**
@@ -312,16 +344,16 @@ class App
 	 *
 	 * @global string $default_timezone
 	 */
-	private function loadDefaultTimezone()
+	private function loadDefaultTimezone(IManageConfigValues $config, AppHelper $appHelper)
 	{
-		if ($this->config->get('system', 'default_timezone')) {
-			$timezone = $this->config->get('system', 'default_timezone', 'UTC');
+		if ($config->get('system', 'default_timezone')) {
+			$timezone = $config->get('system', 'default_timezone', 'UTC');
 		} else {
 			global $default_timezone;
 			$timezone = $default_timezone ?? '' ?: 'UTC';
 		}
 
-		$this->appHelper->setTimeZone($timezone);
+		$appHelper->setTimeZone($timezone);
 	}
 
 	/**
@@ -348,6 +380,8 @@ class App
 		float $start_time,
 		ServerRequestInterface $request
 	) {
+		$this->mode->setExecutor(Mode::INDEX);
+
 		$httpInput  = new HTTPInputData($request->getServerParams());
 		$serverVars = $request->getServerParams();
 		$queryVars  = $request->getQueryParams();
