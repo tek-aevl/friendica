@@ -32,7 +32,7 @@ class Smilies extends BaseModule
 	protected function content(array $request = []): string
 	{
 		$smilies = Content\Smilies::getList();
-		$count = count($smilies['texts'] ?? []);
+		$count   = count($smilies['texts'] ?? []);
 
 		$tpl = Renderer::getMarkupTemplate('smilies.tpl');
 		return Renderer::replaceMacros($tpl, [

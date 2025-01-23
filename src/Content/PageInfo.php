@@ -59,7 +59,7 @@ class PageInfo
 			$body = substr_replace($body, "\n[bookmark=" . $data['url'] . ']' . $linkTitle . "[/bookmark]\n", $existingAttachmentPos, 0);
 		} else {
 			$footer = self::getFooterFromData($data, $no_photos);
-			$body = self::stripTrailingUrlFromBody($body, $data['url']);
+			$body   = self::stripTrailingUrlFromBody($body, $data['url']);
 			$body .= "\n" . $footer;
 		}
 
@@ -215,8 +215,11 @@ class PageInfo
 
 		$taglist = [];
 		foreach ($data['keywords'] as $keyword) {
-			$hashtag = str_replace([' ', '+', '/', '.', '#', "'"],
-				['', '', '', '', '', ''], $keyword);
+			$hashtag = str_replace(
+				[' ', '+', '/', '.', '#', "'"],
+				['', '', '', '', '', ''],
+				$keyword
+			);
 
 			$taglist[] = $hashtag;
 		}
@@ -270,7 +273,7 @@ class PageInfo
 	protected static function stripTrailingUrlFromBody(string $body, string $url): string
 	{
 		$quotedUrl = preg_quote($url, '#');
-		$body = preg_replace_callback("#(?:
+		$body      = preg_replace_callback("#(?:
 			\[url]$quotedUrl\[/url]|
 			\[url=$quotedUrl]$quotedUrl\[/url]|
 			\[url=$quotedUrl]([^[]*?)\[/url]|

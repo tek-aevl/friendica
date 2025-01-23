@@ -47,42 +47,50 @@ class Notifier
 
 		DI::logger()->info('Invoked', ['cmd' => $cmd, 'target' => $post_uriid, 'sender_uid' => $sender_uid]);
 
-		$target_id = $post_uriid;
+		$target_id  = $post_uriid;
 		$recipients = [];
 
 		$delivery_contacts_stmt = null;
-		$target_item = [];
-		$parent = [];
-		$thr_parent = [];
-		$items = [];
-		$delivery_queue_count = 0;
-		$ap_contacts = [];
+		$target_item            = [];
+		$parent                 = [];
+		$thr_parent             = [];
+		$items                  = [];
+		$delivery_queue_count   = 0;
+		$ap_contacts            = [];
 
 		if ($cmd == Delivery::MAIL) {
 			$message = DBA::selectFirst('mail', ['uid', 'contact-id'], ['id' => $target_id]);
 			if (!DBA::isResult($message)) {
 				return;
 			}
-			$uid = $message['uid'];
+			$uid          = $message['uid'];
 			$recipients[] = $message['contact-id'];
 
 			$inboxes = ActivityPub\Transmitter::fetchTargetInboxesFromMail($target_id);
 			foreach ($inboxes as $inbox => $receivers) {
 				$ap_contacts = array_merge($ap_contacts, $receivers);
 				DI::logger()->info('Delivery via ActivityPub', ['cmd' => $cmd, 'target' => $target_id, 'inbox' => $inbox]);
-				Worker::add(['priority' => Worker::PRIORITY_HIGH, 'created' => $appHelper->getQueueValue('created'), 'dont_fork' => true],
-					'APDelivery', $cmd, $target_id, $inbox, $uid, $receivers, $post_uriid);
+				Worker::add(
+					['priority' => Worker::PRIORITY_HIGH, 'created' => $appHelper->getQueueValue('created'), 'dont_fork' => true],
+					'APDelivery',
+					$cmd,
+					$target_id,
+					$inbox,
+					$uid,
+					$receivers,
+					$post_uriid
+				);
 			}
 		} elseif ($cmd == Delivery::SUGGESTION) {
-			$suggest = DI::fsuggest()->selectOneById($target_id);
-			$uid = $suggest->uid;
+			$suggest      = DI::fsuggest()->selectOneById($target_id);
+			$uid          = $suggest->uid;
 			$recipients[] = $suggest->cid;
 		} elseif ($cmd == Delivery::REMOVAL) {
 			return self::notifySelfRemoval($target_id, $appHelper->getQueueValue('priority'), $appHelper->getQueueValue('created'));
 		} elseif ($cmd == Delivery::RELOCATION) {
 			$uid = $target_id;
 
-			$condition = ['uid' => $target_id, 'self' => false, 'network' => [Protocol::DFRN, Protocol::DIASPORA]];
+			$condition              = ['uid' => $target_id, 'self' => false, 'network' => [Protocol::DFRN, Protocol::DIASPORA]];
 			$delivery_contacts_stmt = DBA::select('contact', ['id', 'uri-id', 'url', 'addr', 'network', 'protocol', 'baseurl', 'gsid', 'batch'], $condition);
 		} else {
 			$post = Post::selectFirst(['id'], ['uri-id' => $post_uriid, 'uid' => $sender_uid]);
@@ -93,7 +101,7 @@ class Notifier
 			$target_id = $post['id'];
 
 			// find ancestors
-			$condition = ['id' => $target_id, 'visible' => true];
+			$condition   = ['id' => $target_id, 'visible' => true];
 			$target_item = Post::selectFirst(Item::DELIVER_FIELDLIST, $condition);
 			$target_item = Post\Media::addHTMLAttachmentToItem($target_item);
 
@@ -111,8 +119,8 @@ class Notifier
 				return;
 			}
 
-			$condition = ['parent' => $target_item['parent'], 'visible' => true];
-			$params = ['order' => ['id']];
+			$condition  = ['parent' => $target_item['parent'], 'visible' => true];
+			$params     = ['order' => ['id']];
 			$items_stmt = Post::select(Item::DELIVER_FIELDLIST, $condition, $params);
 			if (!DBA::isResult($items_stmt)) {
 				DI::logger()->info('No item found', ['cmd' => $cmd, 'target' => $target_id]);
@@ -145,14 +153,14 @@ class Notifier
 
 		$only_ap_delivery = false;
 
-		$followup = false;
+		$followup            = false;
 		$recipients_followup = [];
 
 		if (!empty($target_item) && !empty($items)) {
 			$parent = $items[0];
 
-			$fields = ['network', 'private', 'author-id', 'author-link', 'author-network', 'owner-id'];
-			$condition = ['uri' => $target_item['thr-parent'], 'uid' => $target_item['uid']];
+			$fields     = ['network', 'private', 'author-id', 'author-link', 'author-network', 'owner-id'];
+			$condition  = ['uri' => $target_item['thr-parent'], 'uid' => $target_item['uid']];
 			$thr_parent = Post::selectFirst($fields, $condition);
 			if (empty($thr_parent)) {
 				$thr_parent = $parent;
@@ -162,9 +170,9 @@ class Notifier
 
 			// Restrict distribution to AP, when there are no permissions.
 			if (!self::isRemovalActivity($cmd, $owner, Protocol::ACTIVITYPUB) && ($target_item['private'] == Item::PRIVATE) && empty($target_item['allow_cid']) && empty($target_item['allow_gid']) && empty($target_item['deny_cid']) && empty($target_item['deny_gid'])) {
-				$only_ap_delivery   = true;
-				$public_message     = false;
-				$diaspora_delivery  = false;
+				$only_ap_delivery  = true;
+				$public_message    = false;
+				$diaspora_delivery = false;
 			}
 
 			if (!$target_item['origin'] && $target_item['network'] == Protocol::ACTIVITYPUB) {
@@ -225,10 +233,10 @@ class Notifier
 
 			if ($relay_to_owner) {
 				// local followup to remote post
-				$followup = true;
-				$public_message = false; // not public
-				$recipients = [$parent['contact-id']];
-				$recipients_followup  = [$parent['contact-id']];
+				$followup            = true;
+				$public_message      = false; // not public
+				$recipients          = [$parent['contact-id']];
+				$recipients_followup = [$parent['contact-id']];
 
 				DI::logger()->info('Followup', ['target' => $target_id, 'guid' => $target_item['guid'], 'to' => $parent['contact-id']]);
 			} elseif ($exclusive_delivery) {
@@ -264,9 +272,9 @@ class Notifier
 
 				$aclFormatter = DI::aclFormatter();
 
-				$allow_people = $aclFormatter->expand($parent['allow_cid']);
+				$allow_people  = $aclFormatter->expand($parent['allow_cid']);
 				$allow_circles = Circle::expand($uid, $aclFormatter->expand($parent['allow_gid']), true);
-				$deny_people  = $aclFormatter->expand($parent['deny_cid']);
+				$deny_people   = $aclFormatter->expand($parent['deny_cid']);
 				$deny_circles  = Circle::expand($uid, $aclFormatter->expand($parent['deny_gid']));
 
 				foreach ($items as $item) {
@@ -283,7 +291,7 @@ class Notifier
 				}
 
 				$recipients = array_unique(array_merge($recipients, $allow_people, $allow_circles));
-				$deny = array_unique(array_merge($deny_people, $deny_circles));
+				$deny       = array_unique(array_merge($deny_people, $deny_circles));
 				$recipients = array_diff($recipients, $deny);
 
 				// If this is a public message and pubmail is set on the parent, include all your email contacts
@@ -320,21 +328,21 @@ class Notifier
 			$recipients = $recipients_followup;
 		}
 
-		$apdelivery = self::activityPubDelivery($cmd, $target_item, $parent, $thr_parent, $appHelper->getQueueValue('priority'), $appHelper->getQueueValue('created'), $recipients);
+		$apdelivery  = self::activityPubDelivery($cmd, $target_item, $parent, $thr_parent, $appHelper->getQueueValue('priority'), $appHelper->getQueueValue('created'), $recipients);
 		$ap_contacts = $apdelivery['contacts'];
 		$delivery_queue_count += $apdelivery['count'];
 
 		if (!$only_ap_delivery) {
 			if (empty($delivery_contacts_stmt)) {
 				$condition = ['id' => $recipients, 'self' => false, 'uid' => [0, $uid],
-					'blocked' => false, 'pending' => false, 'archive' => false];
+					'blocked'         => false, 'pending' => false, 'archive' => false];
 				if (!empty($networks)) {
 					$condition['network'] = $networks;
 				}
 				$delivery_contacts_stmt = DBA::select('contact', ['id', 'uri-id', 'addr', 'url', 'network', 'protocol', 'baseurl', 'gsid', 'batch'], $condition);
 			}
 
-			$conversants = [];
+			$conversants    = [];
 			$batch_delivery = false;
 
 			if ($public_message && !in_array($cmd, [Delivery::MAIL, Delivery::SUGGESTION]) && !$followup) {
@@ -343,9 +351,12 @@ class Notifier
 				if ($diaspora_delivery && !$unlisted) {
 					$batch_delivery = true;
 
-					$participants = DBA::selectToArray('contact', ['batch', 'network', 'protocol', 'baseurl', 'gsid', 'id', 'url', 'name'],
+					$participants = DBA::selectToArray(
+						'contact',
+						['batch', 'network', 'protocol', 'baseurl', 'gsid', 'id', 'url', 'name'],
 						["`network` = ? AND `batch` != '' AND `uid` = ? AND `rel` != ? AND NOT `blocked` AND NOT `pending` AND NOT `archive`", Protocol::DIASPORA, $owner['uid'], Contact::SHARING],
-						['group_by' => ['batch', 'network', 'protocol']]);
+						['group_by' => ['batch', 'network', 'protocol']]
+					);
 
 					// Fetch the participation list
 					// The function will ensure that there are no duplicates
@@ -415,7 +426,7 @@ class Notifier
 	 */
 	private static function delivery(string $cmd, int $post_uriid, int $sender_uid, array $target_item, array $parent, array $thr_parent, array $owner, bool $batch_delivery, bool $in_batch, array $contacts, array $ap_contacts, array $conversants = []): int
 	{
-		$appHelper = DI::appHelper();
+		$appHelper            = DI::appHelper();
 		$delivery_queue_count = 0;
 
 		if (!empty($target_item['verb']) && ($target_item['verb'] == Activity::ANNOUNCE)) {
@@ -617,8 +628,15 @@ class Notifier
 		$inboxes = ActivityPub\Transmitter::fetchTargetInboxesforUser($self_user_id);
 		foreach ($inboxes as $inbox => $receivers) {
 			DI::logger()->info('Account removal via ActivityPub', ['uid' => $self_user_id, 'inbox' => $inbox]);
-			Worker::add(['priority' => Worker::PRIORITY_NEGLIGIBLE, 'created' => $created, 'dont_fork' => true],
-				'APDelivery', Delivery::REMOVAL, 0, $inbox, $self_user_id, $receivers);
+			Worker::add(
+				['priority' => Worker::PRIORITY_NEGLIGIBLE, 'created' => $created, 'dont_fork' => true],
+				'APDelivery',
+				Delivery::REMOVAL,
+				0,
+				$inbox,
+				$self_user_id,
+				$receivers
+			);
 			Worker::coolDown();
 		}
 
@@ -665,7 +683,7 @@ class Notifier
 			return ['count' => 0, 'contacts' => []];
 		}
 
-		$inboxes = [];
+		$inboxes       = [];
 		$relay_inboxes = [];
 
 		$uid = $target_item['contact-uid'] ?: $target_item['uid'];
@@ -682,7 +700,7 @@ class Notifier
 			$inboxes = ActivityPub\Transmitter::fetchTargetInboxes($target_item, $uid);
 
 			if (in_array($target_item['private'], [Item::PUBLIC])) {
-				$inboxes = ActivityPub\Transmitter::addRelayServerInboxesForItem($target_item['id'], $inboxes);
+				$inboxes       = ActivityPub\Transmitter::addRelayServerInboxesForItem($target_item['id'], $inboxes);
 				$relay_inboxes = ActivityPub\Transmitter::addRelayServerInboxes();
 			}
 
@@ -727,7 +745,7 @@ class Notifier
 		}
 
 		$delivery_queue_count = 0;
-		$contacts = [];
+		$contacts             = [];
 
 		foreach ($inboxes as $inbox => $receivers) {
 			$contacts = array_merge($contacts, $receivers);
@@ -763,8 +781,16 @@ class Notifier
 				Post\Delivery::add($target_item['uri-id'], $uid, $inbox, $target_item['created'], $cmd, $receivers);
 				Worker::add([Worker::PRIORITY_HIGH, 'dont_fork' => true], 'APDelivery', '', 0, $inbox, 0);
 			} else {
-				if (Worker::add(['priority' => $priority, 'created' => $created, 'dont_fork' => true],
-						'APDelivery', $cmd, $target_item['id'], $inbox, $uid, $receivers, $target_item['uri-id'])) {
+				if (Worker::add(
+					['priority' => $priority, 'created' => $created, 'dont_fork' => true],
+					'APDelivery',
+					$cmd,
+					$target_item['id'],
+					$inbox,
+					$uid,
+					$receivers,
+					$target_item['uri-id']
+				)) {
 					$delivery_queue_count++;
 				}
 			}

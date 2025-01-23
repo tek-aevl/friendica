@@ -68,7 +68,7 @@ class RemoveUnusedContacts
 		}
 
 		$contacts = DBA::select('contact', ['id', 'uid', 'photo', 'thumb', 'micro'], $condition, ['limit' => 1000]);
-		$count = 0;
+		$count    = 0;
 		while ($contact = DBA::fetch($contacts)) {
 			++$count;
 			Photo::delete(['uid' => $contact['uid'], 'contact-id' => $contact['id']]);

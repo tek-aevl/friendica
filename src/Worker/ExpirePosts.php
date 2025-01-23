@@ -73,10 +73,10 @@ class ExpirePosts
 		DI::logger()->notice('Delete expired posts');
 		// physically remove anything that has been deleted for more than two months
 		$condition = ["`gravity` = ? AND `deleted` AND `edited` < ?", Item::GRAVITY_PARENT, DateTimeFormat::utc('now - 60 days')];
-		$pass = 0;
+		$pass      = 0;
 		do {
 			++$pass;
-			$rows = DBA::select('post-user', ['uri-id', 'uid'], $condition, ['limit' => $limit]);
+			$rows           = DBA::select('post-user', ['uri-id', 'uid'], $condition, ['limit' => $limit]);
 			$affected_count = 0;
 			while ($row = Post::fetch($rows)) {
 				DI::logger()->info('Delete expired item', ['pass' => $pass, 'uri-id' => $row['uri-id']]);
@@ -108,7 +108,7 @@ class ExpirePosts
 			}
 
 			DI::logger()->notice('Start collecting orphaned entries', ['table' => $table]);
-			$uris = DBA::select($table, ['uri-id'], ["NOT `uri-id` IN (SELECT `uri-id` FROM `post-user`)"]);
+			$uris           = DBA::select($table, ['uri-id'], ["NOT `uri-id` IN (SELECT `uri-id` FROM `post-user`)"]);
 			$affected_count = 0;
 			DI::logger()->notice('Deleting orphaned entries - start', ['table' => $table]);
 			while ($rows = DBA::toArray($uris, false, 100)) {
@@ -132,7 +132,7 @@ class ExpirePosts
 	{
 		DI::logger()->notice('Adding missing entries');
 
-		$rows = 0;
+		$rows      = 0;
 		$userposts = DBA::select('post-user', [], ["`uri-id` not in (select `uri-id` from `post`)"]);
 		while ($fields = DBA::fetch($userposts)) {
 			$post_fields = DI::dbaDefinition()->truncateFieldsForTable('post', $fields);
@@ -146,10 +146,10 @@ class ExpirePosts
 			DI::logger()->notice('No post entries added');
 		}
 
-		$rows = 0;
+		$rows      = 0;
 		$userposts = DBA::select('post-user', [], ["`gravity` = ? AND `uri-id` not in (select `uri-id` from `post-thread`)", Item::GRAVITY_PARENT]);
 		while ($fields = DBA::fetch($userposts)) {
-			$post_fields = DI::dbaDefinition()->truncateFieldsForTable('post-thread', $fields);
+			$post_fields              = DI::dbaDefinition()->truncateFieldsForTable('post-thread', $fields);
 			$post_fields['commented'] = $post_fields['changed'] = $post_fields['created'];
 			DBA::insert('post-thread', $post_fields, Database::INSERT_IGNORE);
 			$rows++;
@@ -161,10 +161,10 @@ class ExpirePosts
 			DI::logger()->notice('No post-thread entries added');
 		}
 
-		$rows = 0;
+		$rows      = 0;
 		$userposts = DBA::select('post-user', [], ["`gravity` = ? AND `id` not in (select `post-user-id` from `post-thread-user`)", Item::GRAVITY_PARENT]);
 		while ($fields = DBA::fetch($userposts)) {
-			$post_fields = DI::dbaDefinition()->truncateFieldsForTable('post-thread-user', $fields);
+			$post_fields              = DI::dbaDefinition()->truncateFieldsForTable('post-thread-user', $fields);
 			$post_fields['commented'] = $post_fields['changed'] = $post_fields['created'];
 			DBA::insert('post-thread-user', $post_fields, Database::INSERT_IGNORE);
 			$rows++;
@@ -223,7 +223,7 @@ class ExpirePosts
 		$pass = 0;
 		do {
 			++$pass;
-			$uris = DBA::select('item-uri', ['id'], $condition, ['limit' => $limit]);
+			$uris  = DBA::select('item-uri', ['id'], $condition, ['limit' => $limit]);
 			$total = DBA::numRows($uris);
 			DI::logger()->notice('Start deleting orphaned URI-ID', ['pass' => $pass, 'last-id' => $item['uri-id']]);
 			$affected_count = 0;
@@ -249,7 +249,7 @@ class ExpirePosts
 			return;
 		}
 
-		$expire_days = DI::config()->get('system', 'dbclean-expire-days');
+		$expire_days           = DI::config()->get('system', 'dbclean-expire-days');
 		$expire_days_unclaimed = DI::config()->get('system', 'dbclean-expire-unclaimed');
 		if (empty($expire_days_unclaimed)) {
 			$expire_days_unclaimed = $expire_days;
@@ -306,7 +306,7 @@ class ExpirePosts
 			$pass = 0;
 			do {
 				++$pass;
-				$uris = DBA::select('post-user', ['uri-id'], $condition, ['limit' => $limit]);
+				$uris  = DBA::select('post-user', ['uri-id'], $condition, ['limit' => $limit]);
 				$total = DBA::numRows($uris);
 				DI::logger()->notice('Start deleting unclaimed public items', ['pass' => $pass]);
 				$affected_count = 0;

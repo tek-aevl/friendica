@@ -20,8 +20,8 @@ class UpdateBlockedServers
 	public static function execute()
 	{
 		DI::logger()->info('Update blocked servers - start');
-		$gservers = DBA::select('gserver', ['id', 'url', 'blocked']);
-		$changed  = 0;
+		$gservers  = DBA::select('gserver', ['id', 'url', 'blocked']);
+		$changed   = 0;
 		$unchanged = 0;
 		while ($gserver = DBA::fetch($gservers)) {
 			$blocked = Network::isUrlBlocked($gserver['url']);
