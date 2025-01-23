@@ -9,6 +9,7 @@ namespace Friendica\Protocol;
 
 use DOMDocument;
 use DOMElement;
+use DOMNode;
 use DOMXPath;
 use Friendica\App;
 use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
@@ -386,23 +387,7 @@ class Feed
 				}
 			}
 
-			if (empty($item['title'])) {
-				$item['title'] = XML::getFirstNodeValue($xpath, $atomns . ':title/text()', $entry);
-			}
-
-			if (empty($item['title'])) {
-				$item['title'] = XML::getFirstNodeValue($xpath, 'title/text()', $entry);
-			}
-
-			if (empty($item['title'])) {
-				$item['title'] = XML::getFirstNodeValue($xpath, 'rss:title/text()', $entry);
-			}
-
-			if (empty($item['title'])) {
-				$item['title'] = XML::getFirstNodeValue($xpath, 'itunes:title/text()', $entry);
-			}
-
-			$item['title'] = trim(html_entity_decode($item['title'], ENT_QUOTES, 'UTF-8'));
+			$item['title'] = static::getTitleFromItemOrEntry($item, $xpath, $atomns, $entry);
 
 			$published = XML::getFirstNodeValue($xpath, $atomns . ':published/text()', $entry);
 
@@ -745,6 +730,31 @@ class Feed
 		}
 
 		return ['header' => $author, 'items' => $items];
+	}
+
+	private static function getTitleFromItemOrEntry(array $item, DOMXPath $xpath, string $atomns, ?DOMNode $entry): string
+	{
+		$title = (string) $item['title'];
+
+		if (empty($title)) {
+			$title = XML::getFirstNodeValue($xpath, $atomns . ':title/text()', $entry);
+		}
+
+		if (empty($title)) {
+			$title = XML::getFirstNodeValue($xpath, 'title/text()', $entry);
+		}
+
+		if (empty($title)) {
+			$title = XML::getFirstNodeValue($xpath, 'rss:title/text()', $entry);
+		}
+
+		if (empty($title)) {
+			$title = XML::getFirstNodeValue($xpath, 'itunes:title/text()', $entry);
+		}
+
+		$title = trim(html_entity_decode($title, ENT_QUOTES, 'UTF-8'));
+
+		return $title;
 	}
 
 	/**
