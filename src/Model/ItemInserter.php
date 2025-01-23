@@ -7,8 +7,11 @@
 
 namespace Friendica\Model;
 
+use Friendica\App\BaseURL;
 use Friendica\Content\Item as ItemContent;
 use Friendica\Protocol\Activity;
+use Friendica\Util\DateTimeFormat;
+use Psr\Log\LoggerInterface;
 
 /**
  * A helper class for inserting an Item Model
@@ -23,10 +26,20 @@ final class ItemInserter
 
 	private Activity $activity;
 
-	public function __construct(ItemContent $itemContent, Activity $activity)
-	{
+	private LoggerInterface $logger;
+
+	private string $baseUrl;
+
+	public function __construct(
+		ItemContent $itemContent,
+		Activity $activity,
+		LoggerInterface $logger,
+		BaseURL $baseURL,
+	) {
 		$this->itemContent = $itemContent;
 		$this->activity    = $activity;
+		$this->logger      = $logger;
+		$this->baseUrl     = $baseURL->__toString();
 	}
 
 	public function prepareOriginPost(array $item): array
@@ -58,12 +71,88 @@ final class ItemInserter
 		return $item;
 	}
 
+	public function validateItemData(array $item): array
+	{
+		$item['wall']          = intval($item['wall'] ?? 0);
+		$item['extid']         = trim($item['extid'] ?? '');
+		$item['author-name']   = trim($item['author-name'] ?? '');
+		$item['author-link']   = trim($item['author-link'] ?? '');
+		$item['author-avatar'] = trim($item['author-avatar'] ?? '');
+		$item['owner-name']    = trim($item['owner-name'] ?? '');
+		$item['owner-link']    = trim($item['owner-link'] ?? '');
+		$item['owner-avatar']  = trim($item['owner-avatar'] ?? '');
+		$item['received']      = (isset($item['received'])  ? DateTimeFormat::utc($item['received'])  : DateTimeFormat::utcNow());
+		$item['created']       = (isset($item['created'])   ? DateTimeFormat::utc($item['created'])   : $item['received']);
+		$item['edited']        = (isset($item['edited'])    ? DateTimeFormat::utc($item['edited'])    : $item['created']);
+		$item['changed']       = (isset($item['changed'])   ? DateTimeFormat::utc($item['changed'])   : $item['created']);
+		$item['commented']     = (isset($item['commented']) ? DateTimeFormat::utc($item['commented']) : $item['created']);
+		$item['title']         = substr(trim($item['title'] ?? ''), 0, 255);
+		$item['location']      = trim($item['location'] ?? '');
+		$item['coord']         = trim($item['coord'] ?? '');
+		$item['visible']       = (isset($item['visible']) ? intval($item['visible']) : 1);
+		$item['deleted']       = 0;
+		$item['verb']          = trim($item['verb'] ?? '');
+		$item['object-type']   = trim($item['object-type'] ?? '');
+		$item['object']        = trim($item['object'] ?? '');
+		$item['target-type']   = trim($item['target-type'] ?? '');
+		$item['target']        = trim($item['target'] ?? '');
+		$item['plink']         = substr(trim($item['plink'] ?? ''), 0, 255);
+		$item['allow_cid']     = trim($item['allow_cid'] ?? '');
+		$item['allow_gid']     = trim($item['allow_gid'] ?? '');
+		$item['deny_cid']      = trim($item['deny_cid'] ?? '');
+		$item['deny_gid']      = trim($item['deny_gid'] ?? '');
+		$item['private']       = intval($item['private'] ?? Item::PUBLIC);
+		$item['body']          = trim($item['body'] ?? '');
+		$item['raw-body']      = trim($item['raw-body'] ?? $item['body']);
+		$item['app']           = trim($item['app'] ?? '');
+		$item['origin']        = intval($item['origin'] ?? 0);
+		$item['postopts']      = trim($item['postopts'] ?? '');
+		$item['resource-id']   = trim($item['resource-id'] ?? '');
+		$item['event-id']      = intval($item['event-id'] ?? 0);
+		$item['inform']        = trim($item['inform'] ?? '');
+		$item['file']          = trim($item['file'] ?? '');
+
+		// Items cannot be stored before they happen ...
+		if ($item['created'] > DateTimeFormat::utcNow()) {
+			$item['created'] = DateTimeFormat::utcNow();
+		}
+
+		// We haven't invented time travel by now.
+		if ($item['edited'] > DateTimeFormat::utcNow()) {
+			$item['edited'] = DateTimeFormat::utcNow();
+		}
+
+		$item['plink'] = ($item['plink'] ?? '') ?: $this->baseUrl . '/display/' . urlencode($item['guid']);
+
+		$item['gravity'] = $this->getGravity($item);
+
+		if ($item['gravity'] === Item::GRAVITY_UNKNOWN) {
+			$this->logger->info('Unknown gravity for verb', ['verb' => $item['verb']]);
+		}
+
+		$default = [
+			'url'   => $item['author-link'], 'name' => $item['author-name'],
+			'photo' => $item['author-avatar'], 'network' => $item['network']
+		];
+		$item['author-id'] = ($item['author-id'] ?? 0) ?: Contact::getIdForURL($item['author-link'], 0, null, $default);
+
+		$default = [
+			'url'   => $item['owner-link'], 'name' => $item['owner-name'],
+			'photo' => $item['owner-avatar'], 'network' => $item['network']
+		];
+		$item['owner-id'] = ($item['owner-id'] ?? 0) ?: Contact::getIdForURL($item['owner-link'], 0, null, $default);
+
+		$item['post-reason'] = Item::getPostReason($item);
+
+		return $item;
+	}
+
 	/**
 	 * Get the gravity for the given item array
 	 *
 	 * @return int gravity
 	 */
-	public function getGravity(array $item): int
+	private function getGravity(array $item): int
 	{
 		if (isset($item['gravity'])) {
 			return intval($item['gravity']);
