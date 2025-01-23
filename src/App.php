@@ -57,6 +57,7 @@ use Psr\Log\LoggerInterface;
  * and anything else that might need to be passed around
  * before we spit the page out.
  *
+ * @final
  */
 class App
 {
@@ -64,6 +65,9 @@ class App
 	const CODENAME = 'Interrupted Fern';
 	const VERSION  = '2025.02-dev';
 
+	/**
+	 * @internal
+	 */
 	public static function fromContainer(Container $container): self
 	{
 		return new self($container);
@@ -130,6 +134,9 @@ class App
 		$this->container = $container;
 	}
 
+	/**
+	 * @internal
+	 */
 	public function processRequest(ServerRequestInterface $request, float $start_time): void
 	{
 		$this->container->addRule(Mode::class, [
@@ -180,7 +187,9 @@ class App
 		);
 	}
 
-
+	/**
+	 * @internal
+	 */
 	public function processConsole(array $serverParams): void
 	{
 		$argv = $serverParams['argv'] ?? [];
@@ -208,6 +217,9 @@ class App
 		(\Friendica\Core\Console::create($this->container, $argv))->execute();
 	}
 
+	/**
+	 * @internal
+	 */
 	public function processEjabberd(array $serverParams): void
 	{
 		$this->setupContainerForAddons();
