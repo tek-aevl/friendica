@@ -13,6 +13,8 @@ use Friendica\Protocol\Activity;
 /**
  * A helper class for inserting an Item Model
  *
+ * @internal only for use in Friendica\Content\Item class
+ *
  * @see Item::insert()
  */
 final class ItemInserter
