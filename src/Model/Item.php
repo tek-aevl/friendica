@@ -580,8 +580,6 @@ class Item
 		}
 	}
 
-
-
 	/**
 	 * Check if the item array is valid
 	 *
