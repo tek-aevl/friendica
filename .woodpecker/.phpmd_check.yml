@@ -9,14 +9,9 @@ when:
   event: [ pull_request, push ]
 
 steps:
-  composer_install:
-    image: php:8.3
+  phpmd:
+    image: friendicaci/php8.3:php8.3.3
     commands:
       - mkdir addon
-      - export COMPOSER_HOME=.composer
       - ./bin/composer.phar install
-
-  phpmd:
-    image: php:8.3
-    commands:
       - ./bin/composer.phar run phpmd
