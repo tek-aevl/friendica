@@ -77,6 +77,54 @@ final class ItemHelper
 		return $item;
 	}
 
+	/**
+	 * Check if the item array is a duplicate
+	 *
+	 * @private
+	 *
+	 * @param array $item Item record
+	 * @return boolean is it a duplicate?
+	 */
+	public function isDuplicate(array $item): bool
+	{
+		// Checking if there is already an item with the same guid
+		$condition = ['guid' => $item['guid'], 'network' => $item['network'], 'uid' => $item['uid']];
+		if (Post::exists($condition)) {
+			$this->logger->notice('Found already existing item', $condition);
+			return true;
+		}
+
+		$condition = [
+			'uri-id'  => $item['uri-id'], 'uid' => $item['uid'],
+			'network' => [$item['network'], Protocol::DFRN]
+		];
+		if (Post::exists($condition)) {
+			$this->logger->notice('duplicated item with the same uri found.', $condition);
+			return true;
+		}
+
+		// On Friendica and Diaspora the GUID is unique
+		if (in_array($item['network'], [Protocol::DFRN, Protocol::DIASPORA])) {
+			$condition = ['guid' => $item['guid'], 'uid' => $item['uid']];
+			if (Post::exists($condition)) {
+				$this->logger->notice('duplicated item with the same guid found.', $condition);
+				return true;
+			}
+		}
+
+		/*
+		 * Check for already added items.
+		 * There is a timing issue here that sometimes creates double postings.
+		 * An unique index would help - but the limitations of MySQL (maximum size of index values) prevent this.
+		 */
+		if (($item['uid'] == 0) && Post::exists(['uri-id' => $item['uri-id'], 'uid' => 0])) {
+			$this->logger->notice('Global item already stored.', ['uri-id' => $item['uri-id'], 'network' => $item['network']]);
+			return true;
+		}
+
+		return false;
+	}
+
 	public function validateItemData(array $item): array
 	{
 		$item['wall']          = intval($item['wall'] ?? 0);
