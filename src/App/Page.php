@@ -16,12 +16,12 @@ use Friendica\Content\Nav;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Model\UserSession;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
+use Friendica\DI;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
@@ -81,7 +81,7 @@ class Page implements ArrayAccess
 	public function __construct(string $basepath)
 	{
 		$this->timestamp = microtime(true);
-		$this->basePath = $basepath;
+		$this->basePath  = $basepath;
 	}
 
 	public function setLogging(string $method, string $module, string $command)
@@ -102,7 +102,7 @@ class Page implements ArrayAccess
 		$load      = number_format(System::currentLoad(), 2);
 		$runtime   = number_format(microtime(true) - $this->timestamp, 3);
 		if ($runtime > $config->get('system', 'runtime_loglimit')) {
-			Logger::debug('Runtime', ['method' => $this->method, 'module' => $this->module, 'runtime' => $runtime, 'load' => $load, 'origin' => $origin, 'signature' => $signature, 'request' => $_SERVER['REQUEST_URI'] ?? '']);
+			DI::logger()->debug('Runtime', ['method' => $this->method, 'module' => $this->module, 'runtime' => $runtime, 'load' => $load, 'origin' => $origin, 'signature' => $signature, 'request' => $_SERVER['REQUEST_URI'] ?? '']);
 		}
 	}
 
@@ -445,7 +445,7 @@ class Page implements ArrayAccess
 		$this->initContent($response, $mode);
 
 		// Load current theme info after module has been initialized as theme could have been set in module
-		$currentTheme = $appHelper->getCurrentTheme();
+		$currentTheme    = $appHelper->getCurrentTheme();
 		$theme_info_file = 'view/theme/' . $currentTheme . '/theme.php';
 		if (file_exists($theme_info_file)) {
 			require_once $theme_info_file;
@@ -479,7 +479,7 @@ class Page implements ArrayAccess
 		// Add the navigation (menu) template
 		if ($moduleName != 'install' && $moduleName != 'maintenance') {
 			$this->page['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('nav_head.tpl'), []);
-			$this->page['nav']      = $nav->getHtml();
+			$this->page['nav'] = $nav->getHtml();
 		}
 
 		// Build the page - now that we have all the components
@@ -512,7 +512,7 @@ class Page implements ArrayAccess
 			}
 		}
 
-		$page    = $this->page;
+		$page = $this->page;
 
 		// add and escape some common but crucial content for direct "echo" in HTML (security)
 		$page['title']   = htmlspecialchars($page['title'] ?? '');
