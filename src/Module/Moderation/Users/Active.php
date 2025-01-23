@@ -51,15 +51,12 @@ class Active extends BaseUsers
 		$action = (string) $this->parameters['action'] ?? '';
 		$uid    = (int) $this->parameters['uid'] ?? 0;
 
-		if ($uid === 0) {
-			$this->systemMessages->addNotice($this->t('User not found'));
-			$this->baseUrl->redirect('moderation/users');
-		}
-
-		$user = User::getById($uid, ['username', 'blocked']);
-		if (!is_array($user)) {
-			$this->systemMessages->addNotice($this->t('User not found'));
-			$this->baseUrl->redirect('moderation/users');
+		if ($uid !== 0) {
+			$user = User::getById($uid, ['username', 'blocked']);
+			if (!$user) {
+				$this->systemMessages->addNotice($this->t('User not found'));
+				$this->baseUrl->redirect('moderation/users');
+			}
 		}
 
 		switch ($action) {
