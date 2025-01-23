@@ -760,7 +760,7 @@ class Item
 	 */
 	public static function insert(array $item, int $notify = 0, bool $post_local = true): int
 	{
-		$itemInserter = new ItemInserter(
+		$itemHelper = new ItemHelper(
 			DI::contentItem(),
 			DI::activity(),
 			DI::logger(),
@@ -776,7 +776,7 @@ class Item
 
 		// If it is a posting where users should get notifications, then define it as wall posting
 		if ($notify) {
-			$item = $itemInserter->prepareOriginPost($item);
+			$item = $itemHelper->prepareOriginPost($item);
 
 			if (is_int($notify) && in_array($notify, Worker::PRIORITIES)) {
 				$priority = $notify;
@@ -789,7 +789,7 @@ class Item
 			$item['network'] = trim(($item['network'] ?? '') ?: Protocol::PHANTOM);
 		}
 
-		$item = $itemInserter->prepareItemData($item, (bool) $notify);
+		$item = $itemHelper->prepareItemData($item, (bool) $notify);
 
 		// Store conversation data
 		$source = $item['source'] ?? '';
@@ -830,7 +830,7 @@ class Item
 			}
 		}
 
-		$item = $itemInserter->validateItemData($item);
+		$item = $itemHelper->validateItemData($item);
 
 		// Ensure that there is an avatar cache
 		Contact::checkAvatarCache($item['author-id']);
@@ -851,13 +851,13 @@ class Item
 		}
 
 		if ($item['gravity'] !== self::GRAVITY_PARENT) {
-			$toplevel_parent = $itemInserter->getTopLevelParent($item);
+			$toplevel_parent = $itemHelper->getTopLevelParent($item);
 			if (empty($toplevel_parent)) {
 				return 0;
 			}
 
 			$parent_id     = (int) $toplevel_parent['id'];
-			$item          = $itemInserter->handleToplevelParent($item, $toplevel_parent, $defined_permissions);
+			$item          = $itemHelper->handleToplevelParent($item, $toplevel_parent, $defined_permissions);
 			$parent_origin = $toplevel_parent['origin'];
 		} else {
 			$parent_id     = 0;

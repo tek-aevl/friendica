@@ -16,13 +16,13 @@ use Friendica\Util\DateTimeFormat;
 use Psr\Log\LoggerInterface;
 
 /**
- * A helper class for inserting an Item Model
+ * A helper class for handling an Item Model
  *
  * @internal only for use in Friendica\Content\Item class
  *
  * @see Item::insert()
  */
-final class ItemInserter
+final class ItemHelper
 {
 	private ItemContent $itemContent;
 
