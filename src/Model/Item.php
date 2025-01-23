@@ -757,7 +757,7 @@ class Item
 	 * @return array item array with parent data
 	 * @throws \Exception
 	 */
-	private static function getTopLevelParent(array $item): array
+	private static function getTopLevelParent(array $item, ItemInserter $itemInserter): array
 	{
 		$fields = [
 			'uid', 'uri', 'parent-uri', 'id', 'deleted',
@@ -785,7 +785,7 @@ class Item
 			return [];
 		}
 
-		if (self::hasRestrictions($item, $parent['author-id'], $parent['restrictions'])) {
+		if ($itemInserter->hasRestrictions($item, $parent['author-id'], $parent['restrictions'])) {
 			DI::logger()->notice('Restrictions apply - ignoring item', ['restrictions' => $parent['restrictions'], 'verb' => $parent['verb'], 'uri-id' => $item['uri-id'], 'thr-parent-id' => $item['thr-parent-id'], 'uid' => $item['uid']]);
 			return [];
 		}
@@ -916,7 +916,7 @@ class Item
 		}
 
 		if ($item['gravity'] !== self::GRAVITY_PARENT) {
-			$toplevel_parent = self::getTopLevelParent($item);
+			$toplevel_parent = self::getTopLevelParent($item, $itemInserter);
 			if (empty($toplevel_parent)) {
 				return 0;
 			}
@@ -1388,33 +1388,6 @@ class Item
 		Contact\Relation::store($toplevel_parent['author-id'], $item['author-id'], $item['created']);
 
 		return $item;
-	}
-
-	private static function hasRestrictions(array $item, int $author_id, int $restrictions = null): bool
-	{
-		if (empty($restrictions) || ($author_id == $item['author-id'])) {
-			return false;
-		}
-
-		// We only have to apply restrictions if the post originates from our server or is federated.
-		// Every other time we can trust the remote system.
-		if (!in_array($item['network'], Protocol::FEDERATED) && !$item['origin']) {
-			return false;
-		}
-
-		if (($restrictions & self::CANT_REPLY) && ($item['verb'] == Activity::POST)) {
-			return true;
-		}
-
-		if (($restrictions & self::CANT_ANNOUNCE) && ($item['verb'] == Activity::ANNOUNCE)) {
-			return true;
-		}
-
-		if (($restrictions & self::CANT_LIKE) && in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE, Activity::ATTEND, Activity::ATTENDMAYBE, Activity::ATTENDNO])) {
-			return true;
-		}
-
-		return false;
 	}
 
 	private static function reshareChannelPost(int $uri_id, int $reshare_id = 0)

@@ -9,6 +9,7 @@ namespace Friendica\Model;
 
 use Friendica\App\BaseURL;
 use Friendica\Content\Item as ItemContent;
+use Friendica\Core\Protocol;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Psr\Log\LoggerInterface;
@@ -145,6 +146,33 @@ final class ItemInserter
 		$item['post-reason'] = Item::getPostReason($item);
 
 		return $item;
+	}
+
+	public function hasRestrictions(array $item, int $author_id, int $restrictions = null): bool
+	{
+		if (empty($restrictions) || ($author_id == $item['author-id'])) {
+			return false;
+		}
+
+		// We only have to apply restrictions if the post originates from our server or is federated.
+		// Every other time we can trust the remote system.
+		if (!in_array($item['network'], Protocol::FEDERATED) && !$item['origin']) {
+			return false;
+		}
+
+		if (($restrictions & Item::CANT_REPLY) && ($item['verb'] == Activity::POST)) {
+			return true;
+		}
+
+		if (($restrictions & Item::CANT_ANNOUNCE) && ($item['verb'] == Activity::ANNOUNCE)) {
+			return true;
+		}
+
+		if (($restrictions & Item::CANT_LIKE) && in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE, Activity::ATTEND, Activity::ATTENDMAYBE, Activity::ATTENDNO])) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
