@@ -35,7 +35,7 @@ final class ItemInserter
 		ItemContent $itemContent,
 		Activity $activity,
 		LoggerInterface $logger,
-		BaseURL $baseURL,
+		BaseURL $baseURL
 	) {
 		$this->itemContent = $itemContent;
 		$this->activity    = $activity;
