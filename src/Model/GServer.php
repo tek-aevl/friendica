@@ -805,8 +805,9 @@ class GServer
 		$gserver = DBA::selectFirst('gserver', ['network'], ['nurl' => Strings::normaliseLink($url)]);
 		if (!DBA::isResult($gserver)) {
 			$serverdata['created'] = DateTimeFormat::utcNow();
-			$ret                   = self::insert($serverdata);
-			$id                    = DBA::lastInsertId();
+
+			$ret = self::insert($serverdata);
+			$id  = DBA::lastInsertId();
 		} else {
 			$ret     = self::update($serverdata, ['nurl' => $serverdata['nurl']]);
 			$gserver = DBA::selectFirst('gserver', ['id'], ['nurl' => $serverdata['nurl']]);
@@ -983,7 +984,8 @@ class GServer
 		$serverdata['detection-method'] = self::DETECT_STATISTICS_JSON;
 
 		if (!empty($data['version'])) {
-			$valid                 = true;
+			$valid = true;
+
 			$serverdata['version'] = $data['version'];
 			// Version numbers on statistics.json are presented with additional info, e.g.:
 			// 0.6.3.0-p1702cc1c, 0.6.99.0-p1b9ab160 or 3.4.3-2-1191.
@@ -991,12 +993,14 @@ class GServer
 		}
 
 		if (!empty($data['name'])) {
-			$valid                   = true;
+			$valid = true;
+
 			$serverdata['site_name'] = $data['name'];
 		}
 
 		if (!empty($data['network'])) {
-			$valid                  = true;
+			$valid = true;
+
 			$serverdata['platform'] = strtolower($data['network']);
 
 			if ($serverdata['platform'] == 'diaspora') {
@@ -1011,22 +1015,26 @@ class GServer
 		}
 
 		if (!empty($data['total_users'])) {
-			$valid                          = true;
+			$valid = true;
+
 			$serverdata['registered-users'] = max($data['total_users'], 1);
 		}
 
 		if (!empty($data['active_users_monthly'])) {
-			$valid                            = true;
+			$valid = true;
+
 			$serverdata['active-month-users'] = max($data['active_users_monthly'], 0);
 		}
 
 		if (!empty($data['active_users_halfyear'])) {
-			$valid                               = true;
+			$valid = true;
+
 			$serverdata['active-halfyear-users'] = max($data['active_users_halfyear'], 0);
 		}
 
 		if (!empty($data['local_posts'])) {
-			$valid                     = true;
+			$valid = true;
+
 			$serverdata['local-posts'] = max($data['local_posts'], 0);
 		}
 
@@ -1830,8 +1838,7 @@ class GServer
 		}
 
 		if (!empty($data['totalResults'])) {
-			$registeredUsers                = $serverdata['registered-users'] ?? 0;
-			$serverdata['registered-users'] = max($data['totalResults'], $registeredUsers, 1);
+			$serverdata['registered-users'] = max($data['totalResults'], $serverdata['registered-users'] ?? 0, 1);
 			$serverdata['directory-type']   = self::DT_POCO;
 			$serverdata['poco']             = $url . '/poco';
 		}
@@ -2016,7 +2023,8 @@ class GServer
 			$serverdata['platform'] = 'mastodon';
 			$serverdata['version']  = $data['version'] ?? '';
 			$serverdata['network']  = Protocol::ACTIVITYPUB;
-			$valid                  = true;
+
+			$valid = true;
 		}
 
 		if (!empty($data['title'])) {
@@ -2026,7 +2034,8 @@ class GServer
 		if (!empty($data['title']) && empty($serverdata['platform']) && ($serverdata['network'] == Protocol::PHANTOM)) {
 			$serverdata['platform'] = 'mastodon';
 			$serverdata['network']  = Protocol::ACTIVITYPUB;
-			$valid                  = true;
+
+			$valid = true;
 		}
 
 		if (!empty($data['description'])) {
@@ -2040,19 +2049,22 @@ class GServer
 		if (!empty($serverdata['version']) && preg_match('/.*?\(compatible;\s(.*)\s(.*)\)/ism', $serverdata['version'], $matches)) {
 			$serverdata['platform'] = strtolower($matches[1]);
 			$serverdata['version']  = $matches[2];
-			$valid                  = true;
+
+			$valid = true;
 		}
 
 		if (!empty($serverdata['version']) && strstr(strtolower($serverdata['version']), 'pleroma')) {
 			$serverdata['platform'] = 'pleroma';
 			$serverdata['version']  = trim(str_ireplace('pleroma', '', $serverdata['version']));
-			$valid                  = true;
+
+			$valid = true;
 		}
 
 		if (!empty($serverdata['platform']) && strstr($serverdata['platform'], 'pleroma')) {
 			$serverdata['version']  = trim(str_ireplace('pleroma', '', $serverdata['platform']));
 			$serverdata['platform'] = 'pleroma';
-			$valid                  = true;
+
+			$valid = true;
 		}
 
 		if ($valid && in_array($serverdata['detection-method'], self::DETECT_UNSPECIFIC)) {
@@ -2318,14 +2330,16 @@ class GServer
 
 		$doc = new DOMDocument();
 		@$doc->loadHTML($curlResult->getBodyString());
-		$xpath    = new DOMXPath($doc);
+		$xpath = new DOMXPath($doc);
+
 		$assigned = false;
 
 		// We can only detect honk via some HTML element on their page
 		if ($xpath->query('//div[@id="honksonpage"]')->count() == 1) {
 			$serverdata['platform'] = 'honk';
 			$serverdata['network']  = Protocol::ACTIVITYPUB;
-			$assigned               = true;
+
+			$assigned = true;
 		}
 
 		$title = trim(XML::getFirstNodeValue($xpath, '//head/title/text()'));
@@ -2358,11 +2372,13 @@ class GServer
 
 			if (in_array($attr['name'], ['application-name', 'al:android:app_name', 'al:ios:app_name',
 				'twitter:app:name:googleplay', 'twitter:app:name:iphone', 'twitter:app:name:ipad', 'generator'])) {
-				$platform       = str_ireplace(array_keys($platforms), array_values($platforms), $attr['content']);
-				$platform       = str_replace('/', ' ', $platform);
+				$platform = str_ireplace(array_keys($platforms), array_values($platforms), $attr['content']);
+				$platform = str_replace('/', ' ', $platform);
+
 				$platform_parts = explode(' ', $platform);
 				if ((count($platform_parts) >= 2) && in_array(strtolower($platform_parts[0]), array_values($platforms))) {
-					$platform              = $platform_parts[0];
+					$platform = $platform_parts[0];
+
 					$serverdata['version'] = $platform_parts[1];
 				}
 				if (in_array($platform, array_values($grouped_platforms['dfrn_platforms']))) {
@@ -2374,7 +2390,8 @@ class GServer
 				}
 				if (in_array($platform, array_values($platforms))) {
 					$serverdata['platform'] = $platform;
-					$assigned               = true;
+
+					$assigned = true;
 				}
 			}
 		}
@@ -2409,7 +2426,8 @@ class GServer
 			if (in_array($attr['property'], ['og:platform', 'generator'])) {
 				if (in_array($attr['content'], array_keys($platforms))) {
 					$serverdata['platform'] = $platforms[$attr['content']];
-					$assigned               = true;
+
+					$assigned = true;
 				}
 
 				if (in_array($attr['content'], array_keys($grouped_platforms['ap_platforms']))) {
@@ -2427,7 +2445,8 @@ class GServer
 					$serverdata['version']  = trim($serverdata['platform'] . ' ' . $serverdata['version']);
 					$serverdata['platform'] = 'microblog';
 					$serverdata['network']  = Protocol::ACTIVITYPUB;
-					$assigned               = true;
+
+					$assigned = true;
 				}
 			}
 		}
@@ -2440,7 +2459,8 @@ class GServer
 						$serverdata['version']  = trim($serverdata['platform'] . ' ' . $serverdata['version']);
 						$serverdata['platform'] = 'microblog';
 						$serverdata['network']  = Protocol::ACTIVITYPUB;
-						$assigned               = true;
+
+						$assigned = true;
 					}
 				}
 			}
@@ -2490,10 +2510,6 @@ class GServer
 	 */
 	public static function discover()
 	{
-		if (!DI::config()->get('system', 'discover_servers')) {
-			return;
-		}
-
 		// Update the server list
 		self::discoverFederation();
 
