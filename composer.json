@@ -171,6 +171,7 @@
 		"cs:fix": [
 			"@cs:install",
 			"bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer fix"
-		]
+		],
+		"cs:fix-develop": "TARGET_BRANCH=develop COMMAND=fix bin/dev/fix-codestyle.sh"
 	}
 }
