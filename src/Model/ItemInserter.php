@@ -10,6 +10,7 @@ namespace Friendica\Model;
 use Friendica\App\BaseURL;
 use Friendica\Content\Item as ItemContent;
 use Friendica\Core\Protocol;
+use Friendica\Database\Database;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Psr\Log\LoggerInterface;
@@ -29,17 +30,21 @@ final class ItemInserter
 
 	private LoggerInterface $logger;
 
+	private Database $database;
+
 	private string $baseUrl;
 
 	public function __construct(
 		ItemContent $itemContent,
 		Activity $activity,
 		LoggerInterface $logger,
+		Database $database,
 		BaseURL $baseURL
 	) {
 		$this->itemContent = $itemContent;
 		$this->activity    = $activity;
 		$this->logger      = $logger;
+		$this->database    = $database;
 		$this->baseUrl     = $baseURL->__toString();
 	}
 
@@ -148,7 +153,73 @@ final class ItemInserter
 		return $item;
 	}
 
-	public function hasRestrictions(array $item, int $author_id, int $restrictions = null): bool
+	/**
+	 * Fetch top-level parent data for the given item array
+	 *
+	 * @param array $item
+	 * @return array item array with parent data
+	 * @throws \Exception
+	 */
+	public function getTopLevelParent(array $item): array
+	{
+		$fields = [
+			'uid', 'uri', 'parent-uri', 'id', 'deleted',
+			'uri-id', 'parent-uri-id', 'restrictions', 'verb',
+			'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid',
+			'wall', 'private', 'origin', 'author-id'
+		];
+		$condition = ['uri-id' => [$item['thr-parent-id'], $item['parent-uri-id']], 'uid' => $item['uid']];
+		$params    = ['order' => ['id' => false]];
+		$parent    = Post::selectFirst($fields, $condition, $params);
+
+		if (!$this->database->isResult($parent) && Post::exists(['uri-id' => [$item['thr-parent-id'], $item['parent-uri-id']], 'uid' => 0])) {
+			$stored = Item::storeForUserByUriId($item['thr-parent-id'], $item['uid'], ['post-reason' => Item::PR_COMPLETION]);
+			if (!$stored && ($item['thr-parent-id'] != $item['parent-uri-id'])) {
+				$stored = Item::storeForUserByUriId($item['parent-uri-id'], $item['uid'], ['post-reason' => Item::PR_COMPLETION]);
+			}
+			if ($stored) {
+				$this->logger->info('Stored thread parent item for user', ['uri-id' => $item['thr-parent-id'], 'uid' => $item['uid'], 'stored' => $stored]);
+				$parent = Post::selectFirst($fields, $condition, $params);
+			}
+		}
+
+		if (!$this->database->isResult($parent)) {
+			$this->logger->notice('item parent was not found - ignoring item', ['uri-id' => $item['uri-id'], 'thr-parent-id' => $item['thr-parent-id'], 'uid' => $item['uid']]);
+			return [];
+		}
+
+		if ($this->hasRestrictions($item, $parent['author-id'], $parent['restrictions'])) {
+			$this->logger->notice('Restrictions apply - ignoring item', ['restrictions' => $parent['restrictions'], 'verb' => $parent['verb'], 'uri-id' => $item['uri-id'], 'thr-parent-id' => $item['thr-parent-id'], 'uid' => $item['uid']]);
+			return [];
+		}
+
+		if ($parent['uri-id'] == $parent['parent-uri-id']) {
+			return $parent;
+		}
+
+		$condition = [
+			'uri-id'        => $parent['parent-uri-id'],
+			'parent-uri-id' => $parent['parent-uri-id'],
+			'uid'           => $parent['uid']
+		];
+		$params          = ['order' => ['id' => false]];
+		$toplevel_parent = Post::selectFirst($fields, $condition, $params);
+
+		if (!$this->database->isResult($toplevel_parent) && $item['origin']) {
+			$stored = Item::storeForUserByUriId($item['parent-uri-id'], $item['uid'], ['post-reason' => Item::PR_COMPLETION]);
+			$this->logger->info('Stored parent item for user', ['uri-id' => $item['parent-uri-id'], 'uid' => $item['uid'], 'stored' => $stored]);
+			$toplevel_parent = Post::selectFirst($fields, $condition, $params);
+		}
+
+		if (!$this->database->isResult($toplevel_parent)) {
+			$this->logger->notice('item top level parent was not found - ignoring item', ['parent-uri-id' => $parent['parent-uri-id'], 'uid' => $parent['uid']]);
+			return [];
+		}
+
+		return $toplevel_parent;
+	}
+
+	private function hasRestrictions(array $item, int $author_id, int $restrictions = null): bool
 	{
 		if (empty($restrictions) || ($author_id == $item['author-id'])) {
 			return false;

@@ -751,72 +751,6 @@ class Item
 	}
 
 	/**
-	 * Fetch top-level parent data for the given item array
-	 *
-	 * @param array $item
-	 * @return array item array with parent data
-	 * @throws \Exception
-	 */
-	private static function getTopLevelParent(array $item, ItemInserter $itemInserter): array
-	{
-		$fields = [
-			'uid', 'uri', 'parent-uri', 'id', 'deleted',
-			'uri-id', 'parent-uri-id', 'restrictions', 'verb',
-			'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid',
-			'wall', 'private', 'origin', 'author-id'
-		];
-		$condition = ['uri-id' => [$item['thr-parent-id'], $item['parent-uri-id']], 'uid' => $item['uid']];
-		$params    = ['order' => ['id' => false]];
-		$parent    = Post::selectFirst($fields, $condition, $params);
-
-		if (!DI::dba()->isResult($parent) && Post::exists(['uri-id' => [$item['thr-parent-id'], $item['parent-uri-id']], 'uid' => 0])) {
-			$stored = Item::storeForUserByUriId($item['thr-parent-id'], $item['uid'], ['post-reason' => Item::PR_COMPLETION]);
-			if (!$stored && ($item['thr-parent-id'] != $item['parent-uri-id'])) {
-				$stored = Item::storeForUserByUriId($item['parent-uri-id'], $item['uid'], ['post-reason' => Item::PR_COMPLETION]);
-			}
-			if ($stored) {
-				DI::logger()->info('Stored thread parent item for user', ['uri-id' => $item['thr-parent-id'], 'uid' => $item['uid'], 'stored' => $stored]);
-				$parent = Post::selectFirst($fields, $condition, $params);
-			}
-		}
-
-		if (!DI::dba()->isResult($parent)) {
-			DI::logger()->notice('item parent was not found - ignoring item', ['uri-id' => $item['uri-id'], 'thr-parent-id' => $item['thr-parent-id'], 'uid' => $item['uid']]);
-			return [];
-		}
-
-		if ($itemInserter->hasRestrictions($item, $parent['author-id'], $parent['restrictions'])) {
-			DI::logger()->notice('Restrictions apply - ignoring item', ['restrictions' => $parent['restrictions'], 'verb' => $parent['verb'], 'uri-id' => $item['uri-id'], 'thr-parent-id' => $item['thr-parent-id'], 'uid' => $item['uid']]);
-			return [];
-		}
-
-		if ($parent['uri-id'] == $parent['parent-uri-id']) {
-			return $parent;
-		}
-
-		$condition = [
-			'uri-id'        => $parent['parent-uri-id'],
-			'parent-uri-id' => $parent['parent-uri-id'],
-			'uid'           => $parent['uid']
-		];
-		$params          = ['order' => ['id' => false]];
-		$toplevel_parent = Post::selectFirst($fields, $condition, $params);
-
-		if (!DI::dba()->isResult($toplevel_parent) && $item['origin']) {
-			$stored = Item::storeForUserByUriId($item['parent-uri-id'], $item['uid'], ['post-reason' => Item::PR_COMPLETION]);
-			DI::logger()->info('Stored parent item for user', ['uri-id' => $item['parent-uri-id'], 'uid' => $item['uid'], 'stored' => $stored]);
-			$toplevel_parent = Post::selectFirst($fields, $condition, $params);
-		}
-
-		if (!DI::dba()->isResult($toplevel_parent)) {
-			DI::logger()->notice('item top level parent was not found - ignoring item', ['parent-uri-id' => $parent['parent-uri-id'], 'uid' => $parent['uid']]);
-			return [];
-		}
-
-		return $toplevel_parent;
-	}
-
-	/**
 	 * Inserts item record
 	 *
 	 * @param array $item Item array to be inserted
@@ -830,7 +764,8 @@ class Item
 			DI::contentItem(),
 			DI::activity(),
 			DI::logger(),
-			DI::baseUrl()
+			DI::dba(),
+			DI::baseUrl(),
 		);
 
 		$orig_item = $item;
@@ -916,7 +851,7 @@ class Item
 		}
 
 		if ($item['gravity'] !== self::GRAVITY_PARENT) {
-			$toplevel_parent = self::getTopLevelParent($item, $itemInserter);
+			$toplevel_parent = $itemInserter->getTopLevelParent($item);
 			if (empty($toplevel_parent)) {
 				return 0;
 			}
