@@ -97,52 +97,47 @@ class GroupManager
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function widget(int $uid)
+	public static function widget(int $uid): string
 	{
-		$o = '';
-
 		//sort by last updated item
-		$lastitem = true;
-
-		$contacts = self::getList($uid, $lastitem, true, true);
-		$total = count($contacts);
+		$contacts      = self::getList($uid, true, true, true);
+		$total 		   = count($contacts);
 		$visibleGroups = 10;
 
-		if (DBA::isResult($contacts)) {
-			$id = 0;
+		$id = 0;
 
-			$entries = [];
+		$entries = [];
 
-			foreach ($contacts as $contact) {
-				$entry = [
-					'url' => 'contact/' . $contact['id'] . '/conversations',
-					'external_url' => Contact::magicLinkByContact($contact),
-					'name' => $contact['name'],
-					'cid' => $contact['id'],
-					'micro' => DI::baseUrl()->remove(Contact::getMicro($contact)),
-					'id' => ++$id,
-				];
-				$entries[] = $entry;
-			}
+		$contacts = [];
 
-			$tpl = Renderer::getMarkupTemplate('widget/group_list.tpl');
-
-			$o .= Renderer::replaceMacros(
-				$tpl,
-				[
-					'$title'	=> DI::l10n()->t('Groups'),
-					'$groups'	=> $entries,
-					'$link_desc'	=> DI::l10n()->t('External link to group'),
-					'$new_group_page' => 'register/',
-					'$total'	=> $total,
-					'$visible_groups' => $visibleGroups,
-					'$showless'	=> DI::l10n()->t('show less'),
-					'$showmore'	=> DI::l10n()->t('show more'),
-					'$create_new_group' => DI::l10n()->t('Create new group')]
-			);
+		foreach ($contacts as $contact) {
+			$entry = [
+				'url'          => 'contact/' . $contact['id'] . '/conversations',
+				'external_url' => Contact::magicLinkByContact($contact),
+				'name'         => $contact['name'],
+				'cid'          => $contact['id'],
+				'micro'        => DI::baseUrl()->remove(Contact::getMicro($contact)),
+				'id'           => ++$id,
+			];
+			$entries[] = $entry;
 		}
 
-		return $o;
+		$tpl = Renderer::getMarkupTemplate('widget/group_list.tpl');
+
+		return Renderer::replaceMacros(
+			$tpl,
+			[
+				'$title'	        => DI::l10n()->t('Groups'),
+				'$groups'	        => $entries,
+				'$link_desc'	    => DI::l10n()->t('External link to group'),
+				'$new_group_page'   => 'register/',
+				'$total'	        => $total,
+				'$visible_groups'   => $visibleGroups,
+				'$showless'	        => DI::l10n()->t('show less'),
+				'$showmore'	        => DI::l10n()->t('show more'),
+				'$create_new_group' => DI::l10n()->t('Create new group')
+			],
+		);
 	}
 
 	/**
