@@ -36,6 +36,10 @@ steps:
         - '.composer'
     volumes:
       - /tmp/drone-cache:/tmp/cache
+  phpmd:
+    image: php:8.3
+    commands:
+      - ./bin/composer.phar run phpmd
   code_style:
     image: php:8.3
     commands:
@@ -54,7 +58,3 @@ steps:
           EXTRA_ARGS='';
         fi
       - ./bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer check --config=.php-cs-fixer.dist.php -v --diff --using-cache=no $${EXTRA_ARGS}
-  phpmd:
-    image: php:8.3
-    commands:
-      - ./bin/composer.phar run phpmd
