@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 /**
  * A helper class for handling an Item Model
  *
- * @internal only for use in Friendica\Content\Item class
+ * @internal ONLY for use in Friendica\Content\Item class
  *
  * @see Item::insert()
  */
@@ -75,6 +75,44 @@ final class ItemHelper
 		$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
 
 		return $item;
+	}
+
+	/**
+	 * Return the id of the given item array if it has been stored before
+	 *
+	 * @param array $item Item record
+	 * @return integer Item id or zero on error
+	 */
+	public function getDuplicateID(array $item): int
+	{
+		if (empty($item['network']) || in_array($item['network'], Protocol::FEDERATED)) {
+			$condition = [
+				'`uri-id` = ? AND `uid` = ? AND `network` IN (?, ?, ?)',
+				$item['uri-id'],
+				$item['uid'],
+				Protocol::ACTIVITYPUB,
+				Protocol::DIASPORA,
+				Protocol::DFRN
+			];
+
+			$existing = Post::selectFirst(['id', 'network'], $condition);
+
+			if ($this->database->isResult($existing)) {
+				// We only log the entries with a different user id than 0. Otherwise we would have too many false positives
+				if ($item['uid'] != 0) {
+					$this->logger->notice('Item already existed for user', [
+						'uri-id'           => $item['uri-id'],
+						'uid'              => $item['uid'],
+						'network'          => $item['network'],
+						'existing_id'      => $existing['id'],
+						'existing_network' => $existing['network']
+					]);
+				}
+
+				return $existing['id'];
+			}
+		}
+		return 0;
 	}
 
 	/**

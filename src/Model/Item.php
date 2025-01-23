@@ -651,42 +651,6 @@ class Item
 	}
 
 	/**
-	 * Return the id of the given item array if it has been stored before
-	 *
-	 * @param array $item Item record
-	 * @return integer Item id or zero on error
-	 */
-	private static function getDuplicateID(array $item): int
-	{
-		if (empty($item['network']) || in_array($item['network'], Protocol::FEDERATED)) {
-			$condition = [
-				'`uri-id` = ? AND `uid` = ? AND `network` IN (?, ?, ?)',
-				$item['uri-id'],
-				$item['uid'],
-				Protocol::ACTIVITYPUB,
-				Protocol::DIASPORA,
-				Protocol::DFRN
-			];
-			$existing = Post::selectFirst(['id', 'network'], $condition);
-			if (DBA::isResult($existing)) {
-				// We only log the entries with a different user id than 0. Otherwise we would have too many false positives
-				if ($item['uid'] != 0) {
-					DI::logger()->notice('Item already existed for user', [
-						'uri-id'           => $item['uri-id'],
-						'uid'              => $item['uid'],
-						'network'          => $item['network'],
-						'existing_id'      => $existing['id'],
-						'existing_network' => $existing['network']
-					]);
-				}
-
-				return $existing['id'];
-			}
-		}
-		return 0;
-	}
-
-	/**
 	 * Fetch the uri-id of the parent for the given uri-id
 	 *
 	 * @param integer $uriid
@@ -758,7 +722,7 @@ class Item
 		 * We have to check several networks since Friendica posts could be repeated
 		 * via Diaspora.
 		 */
-		$duplicate = self::getDuplicateID($item);
+		$duplicate = $itemHelper->getDuplicateID($item);
 		if ($duplicate) {
 			return $duplicate;
 		}
