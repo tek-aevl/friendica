@@ -857,7 +857,7 @@ class Item
 			}
 
 			$parent_id     = (int) $toplevel_parent['id'];
-			$item          = self::handleToplevelParent($item, $toplevel_parent, $defined_permissions);
+			$item          = $itemInserter->handleToplevelParent($item, $toplevel_parent, $defined_permissions);
 			$parent_origin = $toplevel_parent['origin'];
 		} else {
 			$parent_id     = 0;
@@ -1275,54 +1275,6 @@ class Item
 		}
 
 		return $post_user_id;
-	}
-
-	private static function handleToplevelParent(array $item, array $toplevel_parent, bool $defined_permissions): array
-	{
-		$parent_id             = (int) $toplevel_parent['id'];
-		$item['parent-uri']    = $toplevel_parent['uri'];
-		$item['parent-uri-id'] = $toplevel_parent['uri-id'];
-		$item['deleted']       = $toplevel_parent['deleted'];
-		$item['wall']          = $toplevel_parent['wall'];
-
-		// Reshares have to keep their permissions to allow groups to work
-		if (!$defined_permissions && (!$item['origin'] || ($item['verb'] != Activity::ANNOUNCE))) {
-			// Don't store the permissions on pure AP posts
-			$store_permissions = ($item['network'] != Protocol::ACTIVITYPUB) || $item['origin'] || !empty($item['diaspora_signed_text']);
-			$item['allow_cid'] = $store_permissions ? $toplevel_parent['allow_cid'] : '';
-			$item['allow_gid'] = $store_permissions ? $toplevel_parent['allow_gid'] : '';
-			$item['deny_cid']  = $store_permissions ? $toplevel_parent['deny_cid'] : '';
-			$item['deny_gid']  = $store_permissions ? $toplevel_parent['deny_gid'] : '';
-		}
-
-		// Don't federate received participation messages
-		if ($item['verb'] != Activity::FOLLOW) {
-			$item['wall'] = $toplevel_parent['wall'];
-		} else {
-			$item['wall'] = false;
-			// Participations are technical messages, so they are set to "seen" automatically
-			$item['unseen'] = false;
-		}
-
-		/*
-		 * If the parent is private, force privacy for the entire conversation
-		 * This differs from the above settings as it subtly allows comments from
-		 * email correspondents to be private even if the overall thread is not.
-		 */
-		if (!$defined_permissions && $toplevel_parent['private']) {
-			$item['private'] = $toplevel_parent['private'];
-		}
-
-		// If its a post that originated here then tag the thread as "mention"
-		if ($item['origin'] && $item['uid']) {
-			DBA::update('post-thread-user', ['mention' => true], ['uri-id' => $item['parent-uri-id'], 'uid' => $item['uid']]);
-			DI::logger()->info('tagged thread as mention', ['parent' => $parent_id, 'parent-uri-id' => $item['parent-uri-id'], 'uid' => $item['uid']]);
-		}
-
-		// Update the contact relations
-		Contact\Relation::store($toplevel_parent['author-id'], $item['author-id'], $item['created']);
-
-		return $item;
 	}
 
 	private static function reshareChannelPost(int $uri_id, int $reshare_id = 0)
