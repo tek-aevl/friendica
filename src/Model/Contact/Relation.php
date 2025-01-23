@@ -24,6 +24,7 @@ use Friendica\Protocol\ActivityPub;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
+use Friendica\Worker\AddContact;
 
 /**
  * This class provides relationship information based on the `contact-relation` table.
@@ -179,7 +180,7 @@ class Relation
 					$following_counter++;
 				}
 			} elseif (!Network::isUrlBlocked($contact_url)) {
-				Worker::add(Worker::PRIORITY_LOW, 'AddContact', 0, $contact_url);
+				AddContact::add(Worker::PRIORITY_LOW, 0, $contact_url);
 			}
 		}
 
