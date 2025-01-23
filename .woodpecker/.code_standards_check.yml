@@ -36,11 +36,7 @@ steps:
         - '.composer'
     volumes:
       - /tmp/drone-cache:/tmp/cache
-  phpmd:
-    image: php:8.3
-    commands:
-      - ./bin/composer.phar run phpmd
-  code_style:
+  check:
     image: php:8.3
     commands:
       - echo "**** Use bin/dev/fix-codestyle.sh in case of errors ****"
