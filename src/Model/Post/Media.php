@@ -280,8 +280,8 @@ class Media
 			// When the original picture is potentially animated but the preview isn't, we override the preview
 			if (in_array($media['mimetype'] ?? '', ['image/gif', 'image/png']) && !in_array($imagedata['mime'], ['image/gif', 'image/png'])) {
 				$media['preview']        = $media['url'];
-				$media['preview-width']  = $media['width'];
-				$media['preview-height'] = $media['height'];
+				$media['preview-width']  = $media['width']  ?? $imagedata[0];
+				$media['preview-height'] = $media['height'] ?? $imagedata[1];
 				return $media;
 			}
 
