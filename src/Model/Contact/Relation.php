@@ -22,7 +22,6 @@ use Friendica\Model\Verb;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Network;
 use Friendica\Util\Strings;
 use Friendica\Worker\AddContact;
 
@@ -179,7 +178,7 @@ class Relation
 					DBA::insert('contact-relation', $fields, Database::INSERT_UPDATE);
 					$following_counter++;
 				}
-			} elseif (!Network::isUrlBlocked($contact_url)) {
+			} else {
 				AddContact::add(Worker::PRIORITY_LOW, 0, $contact_url);
 			}
 		}
