@@ -1874,6 +1874,11 @@ class GServer
 			return $serverdata;
 		}
 
+		if (!is_countable($data)) {
+			DI::logger()->notice('Unexpected return type', ['url' => $url, 'data' => $data, 'serverdata' => $serverdata]);
+			return $serverdata;
+		}
+
 		if (count($data) == 1) {
 			$serverdata['directory-type'] = self::DT_MASTODON;
 		}
