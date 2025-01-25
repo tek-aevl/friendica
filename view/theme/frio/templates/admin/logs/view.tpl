@@ -70,13 +70,13 @@
 					aria-label="{{$l10n.View_details}}" aria-haspopup="true" aria-expanded="false"
 					data-data="{{$row->data}}" data-source="{{$row->source}}">
 					<td>{{$row->date}}</td>
-					{{assign var="class" value="bg-info text-info"}}
+					{{assign var="class" value="text-info"}}
 					{{if $row->level == "EMERGENCY" || $row->level == "ALERT" || $row->level == "CRITICAL" || $row->level == "ERROR"}}
-						{{assign var="class" value="bg-danger text-danger"}}
+						{{assign var="class" value="text-danger"}}
 					{{elseif $row->level == "WARNING"}}
-						{{assign var="class" value="bg-warning text-warning"}}
+						{{assign var="class" value="text-warning"}}
 					{{elseif $row->level == "NOTICE" || $row->level == "INFO"}}
-						{{assign var="class" value="bg-info text-info"}}
+						{{assign var="class" value="text-info"}}
 					{{else}}
 						{{ assign var="class" value="text-muted"}}
 					{{/if}}
