@@ -691,13 +691,16 @@ class Timeline extends BaseModule
 		$items = $this->selectItems();
 		$key   = '';
 
+		$maxpostperauthor = 0;
 		if ($this->selectedTab == Community::LOCAL) {
 			$maxpostperauthor = (int)$this->config->get('system', 'max_author_posts_community_page');
 			$key = 'author-id';
 		} elseif ($this->selectedTab == Community::GLOBAL) {
 			$maxpostperauthor = (int)$this->config->get('system', 'max_server_posts_community_page');
 			$key = 'author-gsid';
-		} else {
+		}
+
+		if ($maxpostperauthor === 0) {
 			$this->setItemsSeenByCondition([
 				'unseen' => true,
 				'uid' => $this->session->getLocalUserId(),
