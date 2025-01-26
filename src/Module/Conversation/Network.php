@@ -292,7 +292,7 @@ class Network extends Timeline
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
 
-		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs]);
+		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs, '$more' => $this->l10n->t('More')]);
 	}
 
 	protected function parseRequest(array $request)

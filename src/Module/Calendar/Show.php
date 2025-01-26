@@ -119,6 +119,8 @@ class Show extends BaseModule
 			'$week'  => $this->t('week'),
 			'$day'   => $this->t('day'),
 			'$list'  => $this->t('list'),
+			'$prev'  => $this->t('prev'),
+			'$next'  => $this->t('next'),
 		]);
 
 		return $o;
