@@ -215,16 +215,23 @@ function enableOnUser(){
 				const reply = $("#id_term").val();
 				if (reply && reply.length) {
 					commentBusy = true;
+					formModified = true;
 					$('body').css('cursor', 'wait');
-					$.get('filer/' + id + '?term=' + reply, NavUpdate);
-//					if(timer) clearTimeout(timer);
-//					timer = setTimeout(NavUpdate,3000);
-					liking = 1;
-					force_update = true;
-					$.colorbox.close();
+					$.get('filer/' + id + '?term=' + reply)
+						.done(function () {
+							$.colorbox.close();
+							resetFormModifiedFlag();
+						})
+						.always(function () {
+							liking = 1;
+							force_update = true;
+							update_item = id;
+							NavUpdate();
+						});
 				} else {
 					$("#id_term").css("border-color", "#FF0000");
 				}
+
 				return false;
 			});
 		});
