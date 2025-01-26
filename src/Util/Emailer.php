@@ -207,8 +207,7 @@ class Emailer
 			$hookdata['parameters']
 		);
 
-		$this->logger->debug('header ' . 'To: ' . $email->getToAddress() . '\n' . $messageHeader);
-		$this->logger->debug('return value ' . (($res) ? 'true' : 'false'));
+		$this->logger->debug('Email message header', ['To' => $email->getToAddress(), 'messageHeader' => $messageHeader, 'return' => ($res) ? 'true' : 'false']);
 
 		return $res;
 	}
