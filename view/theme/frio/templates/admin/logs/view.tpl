@@ -78,7 +78,7 @@
 					{{elseif $row->level == "NOTICE" || $row->level == "INFO"}}
 						{{assign var="class" value="text-info"}}
 					{{else}}
-						{{ assign var="class" value="text-muted"}}
+						{{assign var="class" value="text-muted"}}
 					{{/if}}
 					<td class="{{$class}}">{{$row->level}}</td>
 					<td>{{$row->context}}</td>
