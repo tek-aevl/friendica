@@ -796,7 +796,7 @@ class Media
 		}
 
 		// Search for links with descriptions
-		if (preg_match_all("/\[url\=(https?:.*?)\].*?\[\/url\]/ism", $body, $matches)) {
+		if (preg_match_all("#\[url=(https?://.+?)].+?\[/url]#ism", $body, $matches)) {
 			foreach ($matches[1] as $url) {
 				DI::logger()->info('Got page url (link with description)', ['uri-id' => $uriid, 'url' => $url]);
 				$result = self::insert(['uri-id' => $uriid, 'type' => self::UNKNOWN, 'url' => $url], false);
