@@ -226,7 +226,7 @@ class Temporal
 		bool $required = false): string
 	{
 		// First day of the week (0 = Sunday)
-		$firstDay = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'calendar', 'first_day_of_week', 0);
+		$firstDay = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'calendar', 'first_day_of_week') ?: 0;
 
 		$lang = DI::l10n()->toISO6391(DI::l10n()->getCurrentLang());
 
