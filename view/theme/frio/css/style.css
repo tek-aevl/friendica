@@ -1815,11 +1815,11 @@ blockquote.shared_content {
 .media .contact-info-comment {
 	display: table-cell;
 }
-.media .contact-info-xs h5,
 .media .contact-info-comment {
 	margin: 0 0 5px;
 }
 .media-heading {
+	font-size: 14px;
 	margin: 0px;
 }
 .wall-item-name,
