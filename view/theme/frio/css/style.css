@@ -740,6 +740,7 @@ nav.navbar .nav > li > button:focus {
 #topbar-first #nav-notifications-menu a {
 	color: $font_color_darker;
 	padding: 0;
+	word-break: break-word;
 }
 #topbar-first #nav-notifications-menu li.notif-entry {
 	color: $font_color_darker;
