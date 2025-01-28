@@ -61,7 +61,7 @@ class Instance extends BaseDataTransferObject
 		$this->approval_required = ($register_policy === Register::APPROVE);
 		$this->invites_enabled   = false;
 		$this->configuration     = $configuration;
-		$this->contact_account   = $contact_account ?? [];
+		$this->contact_account   = $contact_account;
 		$this->rules             = $rules;
 	}
 }
