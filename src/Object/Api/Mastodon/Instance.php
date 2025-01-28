@@ -41,7 +41,7 @@ class Instance extends BaseDataTransferObject
 	protected bool $invites_enabled;
 	protected Configuration $configuration;
 	protected ?Account $contact_account = null;
-	protected array $rules = [];
+	protected array $rules              = [];
 
 	public function __construct(IManageConfigValues $config, BaseURL $baseUrl, Database $database, Configuration $configuration, ?Account $contact_account, array $rules)
 	{
