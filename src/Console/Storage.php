@@ -192,5 +192,7 @@ HELP;
 		} while ($moved);
 
 		$this->out(sprintf(date('[Y-m-d H:i:s] ') . 'Moved %d files total', $total));
+
+		return 0;
 	}
 }
