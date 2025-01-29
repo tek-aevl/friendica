@@ -3670,9 +3670,8 @@ section .profile-match-wrapper {
 }
 
 .qq-upload-drop-area {
-	background: white !important;
+	background: inherit !important;
 	float: none;
-	border: none;
 	-webkit-box-shadow: none;
 	box-shadow: none;
 	-moz-box-shadow: none;
@@ -3687,7 +3686,7 @@ section .profile-match-wrapper {
 	width: 100% !important;
 	display: block !important;
 	position: relative !important;
-	border: black 1px dashed !important;
+	border: $font_color_darker 1px dashed !important;
 	margin-bottom: 5px !important;
 	margin-top: 15px !important;
 }
