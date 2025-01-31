@@ -123,8 +123,8 @@ class Blocked extends BaseUsers
 	 */
 	private function processGetActions(): void
 	{
-		$action = (string)$this->parameters['action'] ?? '';
-		$uid = (int)$this->parameters['uid'] ?? 0;
+		$action = (string) ($this->parameters['action'] ?? '');
+		$uid = (int) ($this->parameters['uid'] ?? 0);
 
 		if ($uid === 0) {
 			return;
