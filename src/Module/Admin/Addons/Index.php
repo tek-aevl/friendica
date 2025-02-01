@@ -35,8 +35,10 @@ class Index extends BaseAdmin
 					break;
 
 				case 'toggle' :
+					$addonHelper = DI::addonHelper();
+
 					$addon = $_GET['addon'] ?? '';
-					if (Addon::isEnabled($addon)) {
+					if ($addonHelper->isEnabled($addon)) {
 						Addon::uninstall($addon);
 						DI::sysmsg()->addInfo(DI::l10n()->t('Addon %s disabled.', $addon));
 					} elseif (Addon::install($addon)) {

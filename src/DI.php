@@ -8,6 +8,7 @@
 namespace Friendica;
 
 use Dice\Dice;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Logger\Capability\ICheckLoggerSettings;
 use Friendica\Core\Logger\LoggerManager;
 use Friendica\Core\Logger\Util\LoggerSettingsCheck;
@@ -278,6 +279,11 @@ abstract class DI
 	public static function storageManager()
 	{
 		return self::$dice->create(Core\Storage\Repository\StorageManager::class);
+	}
+
+	public static function addonHelper(): AddonHelper
+	{
+		return self::$dice->create(AddonHelper::class);
 	}
 
 	/**
