@@ -7,14 +7,14 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Test\Unit\EventSubscriber;
+namespace Friendica\Test\Unit\Core\Hooks;
 
 use Friendica\Core\Config\Util\ConfigFileManager;
+use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
 use Friendica\Event\HtmlFilterEvent;
-use Friendica\EventSubscriber\HookEventBridge;
 use PHPUnit\Framework\TestCase;
 
 class HookEventBridgeTest extends TestCase

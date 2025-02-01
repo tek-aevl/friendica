@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Friendica\EventSubscriber;
+namespace Friendica\Core\Hooks;
 
 use Friendica\Core\Hook;
 use Friendica\Event\ArrayFilterEvent;
