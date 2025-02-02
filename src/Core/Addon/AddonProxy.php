@@ -27,12 +27,22 @@ final class AddonProxy implements AddonHelper
 	}
 
 	/**
-	 * Returns a list of the enabled addon names
+	 * Returns a list with the IDs of the enabled addons
 	 *
 	 * @return string[]
 	 */
 	public function getEnabledList(): array
 	{
 		return Addon::getEnabledList();
+	}
+
+	/**
+	 * Returns the list of the IDs of the non-hidden enabled addons
+	 *
+	 * @return string[]
+	 */
+	public static function getVisibleList(): array
+	{
+		return Addon::getVisibleList();
 	}
 }

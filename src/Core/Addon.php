@@ -300,6 +300,8 @@ class Addon
 	/**
 	 * Returns the list of non-hidden enabled addon names
 	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getVisibleList()` instead
+	 *
 	 * @return array
 	 * @throws \Exception
 	 */
