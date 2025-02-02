@@ -2708,10 +2708,10 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 #circle-update-wrapper .shortmode .contact-entry-desc {
 	font-size: 12px !important;
 }
-#circle-update-wrapper .shortmode .contact-entry-desc h1.media-heading {
+#circle-update-wrapper .shortmode .contact-entry-desc h4.media-heading {
 	margin: 0;
 }
-#circle-update-wrapper .shortmode .contact-entry-desc h1.media-heading a {
+#circle-update-wrapper .shortmode .contact-entry-desc h4.media-heading a {
 	font-size: 13px !important;
 	white-space: nowrap;
 }
