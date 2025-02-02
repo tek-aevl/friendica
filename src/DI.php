@@ -332,9 +332,16 @@ abstract class DI
 	 */
 	public static function workerLogger()
 	{
+		@trigger_error('`' . __METHOD__ . '()` is deprecated since 2025.02 and will be removed after 5 months, use `DI::logger()` instead.', E_USER_DEPRECATED);
+
 		return self::$dice->create(Core\Logger\Type\WorkerLogger::class);
 	}
 
+	/**
+	 * @internal Only for use in Friendica\Core\Worker class
+	 *
+	 * @see Friendica\Core\Worker::execFunction()
+	 */
 	public static function loggerManager(): LoggerManager
 	{
 		return self::$dice->create(LoggerManager::class);
