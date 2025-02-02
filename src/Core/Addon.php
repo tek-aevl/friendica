@@ -275,6 +275,8 @@ class Addon
 	/**
 	 * Checks if the provided addon is enabled
 	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::isEnabled()` instead
+	 *
 	 * @param string $addon
 	 * @return boolean
 	 */
@@ -285,6 +287,8 @@ class Addon
 
 	/**
 	 * Returns a list of the enabled addon names
+	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getEnabledList()` instead
 	 *
 	 * @return array
 	 */

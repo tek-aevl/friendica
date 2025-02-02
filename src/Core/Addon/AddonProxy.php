@@ -25,4 +25,14 @@ final class AddonProxy implements AddonHelper
 	{
 		return Addon::isEnabled($addonId);
 	}
+
+	/**
+	 * Returns a list of the enabled addon names
+	 *
+	 * @return string[]
+	 */
+	public function getEnabledList(): array
+	{
+		return Addon::getEnabledList();
+	}
 }

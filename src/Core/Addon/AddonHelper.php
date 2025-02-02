@@ -18,4 +18,11 @@ interface AddonHelper
 	 * Checks if the provided addon is enabled
 	 */
 	public function isEnabled(string $addonId): bool;
+
+    /**
+	 * Returns a list of the enabled addon names
+	 *
+	 * @return array
+	 */
+	public function getEnabledList(): array;
 }
