@@ -115,7 +115,7 @@ if ($minimal) {
 						echo '
 					</aside>
 
-					<div class="col-lg-7 col-md-7 col-sm-12 col-xs-12" id="content">
+					<div class="col-lg-7 col-md-7 col-sm-12 col-xs-12" id="content" tabindex="0">
 						<section class="sectiontop ';
 						echo $page['section'] ?? '';
 						echo '-content-wrapper">';

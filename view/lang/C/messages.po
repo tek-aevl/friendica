@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.02-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-03 21:49+0000\n"
+"POT-Creation-Date: 2025-02-04 04:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1936,8 +1936,8 @@ msgstr ""
 msgid "Nothing new here"
 msgstr ""
 
-#: src/Content/Nav.php:111 src/Module/Special/HTTPException.php:64
-msgid "Go back"
+#: src/Content/Nav.php:111 src/Content/Nav.php:237 src/Content/Nav.php:294
+msgid "Home"
 msgstr ""
 
 #: src/Content/Nav.php:112
@@ -2022,10 +2022,6 @@ msgstr ""
 
 #: src/Content/Nav.php:220
 msgid "Your personal notes"
-msgstr ""
-
-#: src/Content/Nav.php:237 src/Content/Nav.php:294
-msgid "Home"
 msgstr ""
 
 #: src/Content/Nav.php:237 src/Module/Settings/OAuth.php:59
@@ -10754,6 +10750,10 @@ msgstr ""
 
 #: src/Module/Special/DisplayNotFound.php:33
 msgid "Possible reasons include:"
+msgstr ""
+
+#: src/Module/Special/HTTPException.php:64
+msgid "Go back"
 msgstr ""
 
 #: src/Module/Special/HTTPException.php:65
