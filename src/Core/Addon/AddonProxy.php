@@ -21,7 +21,7 @@ final class AddonProxy implements AddonHelper
 	/**
 	 * Checks if the provided addon is enabled
 	 */
-	public function isEnabled(string $addonId): bool
+	public function isAddonEnabled(string $addonId): bool
 	{
 		return Addon::isEnabled($addonId);
 	}
@@ -31,17 +31,17 @@ final class AddonProxy implements AddonHelper
 	 *
 	 * @return string[]
 	 */
-	public function getEnabledList(): array
+	public function getEnabledAddons(): array
 	{
 		return Addon::getEnabledList();
 	}
 
 	/**
-	 * Returns the list of the IDs of the non-hidden enabled addons
+	 * Returns a list with the IDs of the non-hidden enabled addons
 	 *
 	 * @return string[]
 	 */
-	public static function getVisibleList(): array
+	public static function getVisibleEnabledAddons(): array
 	{
 		return Addon::getVisibleList();
 	}

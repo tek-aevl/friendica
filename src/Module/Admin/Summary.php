@@ -186,7 +186,7 @@ class Summary extends BaseAdmin
 			'$platform'       => App::PLATFORM,
 			'$codename'       => App::CODENAME,
 			'$build'          => DI::config()->get('system', 'build'),
-			'$addons'         => [DI::l10n()->t('Active addons'), DI::addonHelper()->getEnabledList()],
+			'$addons'         => [DI::l10n()->t('Active addons'), DI::addonHelper()->getEnabledAddons()],
 			'$serversettings' => $server_settings,
 			'$warningtext'    => $warningtext,
 		]);

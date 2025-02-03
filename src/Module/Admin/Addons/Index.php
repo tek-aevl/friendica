@@ -38,7 +38,7 @@ class Index extends BaseAdmin
 					$addonHelper = DI::addonHelper();
 
 					$addon = $_GET['addon'] ?? '';
-					if ($addonHelper->isEnabled($addon)) {
+					if ($addonHelper->isAddonEnabled($addon)) {
 						Addon::uninstall($addon);
 						DI::sysmsg()->addInfo(DI::l10n()->t('Addon %s disabled.', $addon));
 					} elseif (Addon::install($addon)) {

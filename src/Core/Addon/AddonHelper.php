@@ -17,19 +17,19 @@ interface AddonHelper
 	/**
 	 * Checks if the provided addon is enabled
 	 */
-	public function isEnabled(string $addonId): bool;
+	public function isAddonEnabled(string $addonId): bool;
 
 	/**
 	 * Returns a list with the IDs of the enabled addons
 	 *
 	 * @return string[]
 	 */
-	public function getEnabledList(): array;
+	public function getEnabledAddons(): array;
 
 	/**
-	 * Returns the list of the IDs of the non-hidden enabled addons
+	 * Returns a list with the IDs of the non-hidden enabled addons
 	 *
 	 * @return string[]
 	 */
-	public static function getVisibleList(): array;
+	public static function getVisibleEnabledAddons(): array;
 }

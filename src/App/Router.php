@@ -294,7 +294,7 @@ class Router
 		} catch (NotFoundException $e) {
 			$moduleName = $this->args->getModuleName();
 			// Then we try addon-provided modules that we wrap in the LegacyModule class
-			if ($this->addonHelper->isEnabled($moduleName) && file_exists("addon/{$moduleName}/{$moduleName}.php")) {
+			if ($this->addonHelper->isAddonEnabled($moduleName) && file_exists("addon/{$moduleName}/{$moduleName}.php")) {
 				//Check if module is an app and if public access to apps is allowed or not
 				$privateapps = $this->config->get('config', 'private_addons', false);
 				if (!$this->isLocalUser && Hook::isAddonApp($moduleName) && $privateapps) {
