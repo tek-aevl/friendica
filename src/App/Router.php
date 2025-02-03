@@ -7,13 +7,11 @@
 
 namespace Friendica\App;
 
-use Dice\Dice;
 use FastRoute\DataGenerator\GroupCountBased;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
-use Friendica\Capabilities\ICanHandleRequests;
-use Friendica\Core\Addon;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -86,6 +84,8 @@ class Router
 	/** @var LoggerInterface */
 	private $logger;
 
+	private AddonHelper $addonHelper;
+
 	/** @var bool */
 	private $isLocalUser;
 
@@ -110,7 +110,7 @@ class Router
 	 * @param IHandleUserSessions $userSession
 	 * @param RouteCollector|null $routeCollector
 	 */
-	public function __construct(array $server, string $baseRoutesFilepath, L10n $l10n, ICanCache $cache, ICanLock $lock, IManageConfigValues $config, Arguments $args, LoggerInterface $logger, IHandleUserSessions $userSession, RouteCollector $routeCollector = null)
+	public function __construct(array $server, string $baseRoutesFilepath, L10n $l10n, ICanCache $cache, ICanLock $lock, IManageConfigValues $config, Arguments $args, LoggerInterface $logger, AddonHelper $addonHelper, IHandleUserSessions $userSession, RouteCollector $routeCollector = null)
 	{
 		$this->baseRoutesFilepath      = $baseRoutesFilepath;
 		$this->l10n                    = $l10n;
@@ -120,6 +120,7 @@ class Router
 		$this->config                  = $config;
 		$this->server                  = $server;
 		$this->logger                  = $logger;
+		$this->addonHelper             = $addonHelper;
 		$this->isLocalUser             = !empty($userSession->getLocalUserId());
 
 		$this->routeCollector = $routeCollector ?? new RouteCollector(new Std(), new GroupCountBased());
@@ -293,7 +294,7 @@ class Router
 		} catch (NotFoundException $e) {
 			$moduleName = $this->args->getModuleName();
 			// Then we try addon-provided modules that we wrap in the LegacyModule class
-			if (Addon::isEnabled($moduleName) && file_exists("addon/{$moduleName}/{$moduleName}.php")) {
+			if ($this->addonHelper->isEnabled($moduleName) && file_exists("addon/{$moduleName}/{$moduleName}.php")) {
 				//Check if module is an app and if public access to apps is allowed or not
 				$privateapps = $this->config->get('config', 'private_addons', false);
 				if (!$this->isLocalUser && Hook::isAddonApp($moduleName) && $privateapps) {
