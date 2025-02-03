@@ -12,6 +12,7 @@ use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\BaseModule;
 use Friendica\Core\Addon;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
 use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
@@ -31,6 +32,7 @@ use Psr\Log\LoggerInterface;
  */
 class Friendica extends BaseModule
 {
+	private AddonHelper $addonHelper;
 	/** @var IManageConfigValues */
 	private $config;
 	/** @var IManageKeyValuePairs */
@@ -38,18 +40,19 @@ class Friendica extends BaseModule
 	/** @var IHandleUserSessions */
 	private $session;
 
-	public function __construct(IHandleUserSessions $session, IManageKeyValuePairs $keyValue, IManageConfigValues $config, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(AddonHelper $addonHelper, IHandleUserSessions $session, IManageKeyValuePairs $keyValue, IManageConfigValues $config, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->config = $config;
 		$this->keyValue = $keyValue;
 		$this->session = $session;
+		$this->addonHelper = $addonHelper;
 	}
 
 	protected function content(array $request = []): string
 	{
-		$visibleAddonList = Addon::getVisibleList();
+		$visibleAddonList = $this->addonHelper->getVisibleEnabledAddons();
 		if (!empty($visibleAddonList)) {
 
 			$sorted = $visibleAddonList;
@@ -157,7 +160,7 @@ class Friendica extends BaseModule
 			];
 		}
 
-		$visible_addons = Addon::getVisibleList();
+		$visible_addons = $this->addonHelper->getVisibleEnabledAddons();
 
 		$this->config->reload();
 		$locked_features = [];
