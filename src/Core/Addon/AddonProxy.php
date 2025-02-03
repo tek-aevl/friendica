@@ -19,6 +19,18 @@ use Friendica\Core\Addon;
 final class AddonProxy implements AddonHelper
 {
 	/**
+	 * Returns the list of available addons with their current status and info.
+	 * This list is made from scanning the addon/ folder.
+	 * Unsupported addons are excluded unless they already are enabled or system.show_unsupported_addon is set.
+	 *
+	 * @return array<array<string|bool|array>>
+	 */
+	public function getAvailableAddons(): array
+	{
+		return Addon::getAvailableList();
+	}
+
+	/**
 	 * Checks if the provided addon is enabled
 	 */
 	public function isAddonEnabled(string $addonId): bool

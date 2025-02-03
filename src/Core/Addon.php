@@ -34,6 +34,8 @@ class Addon
 	 * This list is made from scanning the addon/ folder.
 	 * Unsupported addons are excluded unless they already are enabled or system.show_unsupported_addon is set.
 	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getAvailableAddons()` instead
+	 *
 	 * @return array
 	 * @throws \Exception
 	 */
