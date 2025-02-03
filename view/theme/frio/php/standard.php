@@ -31,7 +31,6 @@ $frio = 'view/theme/frio';
 <?php if($_SERVER['REQUEST_URI'] == '/') {
 	header('Location: /login');
 } ?>
-<a href="<?php echo DI::args()->getCommand(); ?>/#content" class="sr-only sr-only-focusable"><?php echo DI::l10n()->t('Skip to main content'); ?></a>
 <?php
 	if(!empty($page['nav'])) {
 		echo	str_replace(
