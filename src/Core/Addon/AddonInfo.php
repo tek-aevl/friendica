@@ -84,13 +84,13 @@ final class AddonInfo
 		string $version,
 		string $status,
 	) {
-		$this->id = $id;
-		$this->name = $name;
+		$this->id          = $id;
+		$this->name        = $name;
 		$this->description = $description;
-		$this->author = $author;
-		$this->maintainer = $maintainer;
-		$this->version = $version;
-		$this->status = $status;
+		$this->author      = $author;
+		$this->maintainer  = $maintainer;
+		$this->version     = $version;
+		$this->status      = $status;
 	}
 
 	public function getId(): string

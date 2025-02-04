@@ -96,28 +96,28 @@ class Details extends BaseAdmin
 		$t = Renderer::getMarkupTemplate('admin/addons/details.tpl');
 
 		return Renderer::replaceMacros($t, [
-			'$title' => DI::l10n()->t('Administration'),
-			'$page' => DI::l10n()->t('Addons'),
-			'$toggle' => DI::l10n()->t('Toggle'),
+			'$title'    => DI::l10n()->t('Administration'),
+			'$page'     => DI::l10n()->t('Addons'),
+			'$toggle'   => DI::l10n()->t('Toggle'),
 			'$settings' => DI::l10n()->t('Settings'),
 
-			'$addon' => $addon,
+			'$addon'  => $addon,
 			'$status' => $status,
 			'$action' => $action,
-			'$info' => [
-				'name' => $addonInfo->getName(),
-				'version' => $addonInfo->getVersion(),
+			'$info'   => [
+				'name'        => $addonInfo->getName(),
+				'version'     => $addonInfo->getVersion(),
 				'description' => $addonInfo->getDescription(),
-				'author' => $addonInfo->getAuthor(),
-				'maintainer' => $addonInfo->getMaintainer(),
+				'author'      => $addonInfo->getAuthor(),
+				'maintainer'  => $addonInfo->getMaintainer(),
 			],
-			'$str_author' => DI::l10n()->t('Author: '),
+			'$str_author'     => DI::l10n()->t('Author: '),
 			'$str_maintainer' => DI::l10n()->t('Maintainer: '),
 
 			'$admin_form' => $admin_form,
-			'$function' => 'addons',
+			'$function'   => 'addons',
 			'$screenshot' => '',
-			'$readme' => $readme,
+			'$readme'     => $readme,
 
 			'$form_security_token' => self::getFormSecurityToken('admin_addons_details'),
 		]);
