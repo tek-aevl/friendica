@@ -42,12 +42,14 @@ class Details extends BaseAdmin
 	{
 		parent::content();
 
+		$addonHelper = DI::addonHelper();
+
 		$addons_admin = Addon::getAdminList();
 
 		$addon = Strings::sanitizeFilePathItem($this->parameters['addon']);
 		if (!is_file("addon/$addon/$addon.php")) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Addon not found.'));
-			Addon::uninstall($addon);
+			$addonHelper->uninstallAddon($addon);
 			DI::baseUrl()->redirect('admin/addons');
 		}
 
@@ -55,11 +57,11 @@ class Details extends BaseAdmin
 			self::checkFormSecurityTokenRedirectOnError('/admin/addons', 'admin_addons_details', 't');
 
 			// Toggle addon status
-			if (Addon::isEnabled($addon)) {
-				Addon::uninstall($addon);
+			if ($addonHelper->isAddonEnabled($addon)) {
+				$addonHelper->uninstallAddon($addon);
 				DI::sysmsg()->addInfo(DI::l10n()->t('Addon %s disabled.', $addon));
 			} else {
-				Addon::install($addon);
+				$addonHelper->installAdodn($addon);
 				DI::sysmsg()->addInfo(DI::l10n()->t('Addon %s enabled.', $addon));
 			}
 
@@ -67,7 +69,7 @@ class Details extends BaseAdmin
 		}
 
 		// display addon details
-		if (Addon::isEnabled($addon)) {
+		if ($addonHelper->isAddonEnabled($addon)) {
 			$status = 'on';
 			$action = DI::l10n()->t('Disable');
 		} else {
@@ -89,6 +91,8 @@ class Details extends BaseAdmin
 			$func($admin_form);
 		}
 
+		$addonInfo = $addonHelper->getAddonInfo($addon);
+
 		$t = Renderer::getMarkupTemplate('admin/addons/details.tpl');
 
 		return Renderer::replaceMacros($t, [
@@ -100,7 +104,13 @@ class Details extends BaseAdmin
 			'$addon' => $addon,
 			'$status' => $status,
 			'$action' => $action,
-			'$info' => Addon::getInfo($addon),
+			'$info' => [
+				'name' => $addonInfo->getName(),
+				'version' => $addonInfo->getVersion(),
+				'description' => $addonInfo->getDescription(),
+				'author' => $addonInfo->getAuthor(),
+				'maintainer' => $addonInfo->getMaintainer(),
+			],
 			'$str_author' => DI::l10n()->t('Author: '),
 			'$str_maintainer' => DI::l10n()->t('Maintainer: '),
 
