@@ -82,7 +82,7 @@ final class AddonInfo
 		array $author,
 		array $maintainer,
 		string $version,
-		string $status,
+		string $status
 	) {
 		$this->id          = $id;
 		$this->name        = $name;
