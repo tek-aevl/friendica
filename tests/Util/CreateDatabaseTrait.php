@@ -15,8 +15,6 @@ use Friendica\Database\Definition\DbaDefinition;
 use Friendica\Database\Definition\ViewDefinition;
 use Friendica\Test\DatabaseTestTrait;
 use Friendica\Test\Util\Database\StaticDatabase;
-use Friendica\Util\Profiler;
-use Psr\Log\NullLogger;
 
 trait CreateDatabaseTrait
 {
@@ -38,7 +36,7 @@ trait CreateDatabaseTrait
 			$this->root->url() . '/config',
 			$this->root->url() . '/static'
 		);
-		$config            = new ReadOnlyFileConfig(new Cache([
+		$config = new ReadOnlyFileConfig(new Cache([
 			'database' => [
 				'disable_pdo' => true
 			],

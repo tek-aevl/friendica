@@ -60,9 +60,9 @@ class Index extends BaseAdmin
 			$addonInfo = $addonHelper->getAddonInfo($addonId);
 
 			$info = [
-				'name' => $addonInfo->getName(),
+				'name'        => $addonInfo->getName(),
 				'description' => $addonInfo->getDescription(),
-				'version' => $addonInfo->getVersion(),
+				'version'     => $addonInfo->getVersion(),
 			];
 
 			$addons[] = [

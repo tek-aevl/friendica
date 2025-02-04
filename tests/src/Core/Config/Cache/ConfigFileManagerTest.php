@@ -66,7 +66,7 @@ class ConfigFileManagerTest extends MockedTestCase
 			$this->root->url() . DIRECTORY_SEPARATOR . Config::CONFIG_DIR,
 			$this->root->url() . DIRECTORY_SEPARATOR . Config::STATIC_DIR
 		);
-		$configCache      = new Cache();
+		$configCache = new Cache();
 
 		$configFileLoader->setupCache($configCache);
 	}
@@ -96,7 +96,7 @@ class ConfigFileManagerTest extends MockedTestCase
 			$this->root->url() . DIRECTORY_SEPARATOR . Config::CONFIG_DIR,
 			$this->root->url() . DIRECTORY_SEPARATOR . Config::STATIC_DIR
 		);
-		$configCache      = new Cache();
+		$configCache = new Cache();
 
 		$configFileLoader->setupCache($configCache);
 
@@ -134,7 +134,7 @@ class ConfigFileManagerTest extends MockedTestCase
 			$this->root->url() . DIRECTORY_SEPARATOR . Config::CONFIG_DIR,
 			$this->root->url() . DIRECTORY_SEPARATOR . Config::STATIC_DIR
 		);
-		$configCache      = new Cache();
+		$configCache = new Cache();
 
 		$configFileLoader->setupCache($configCache);
 
@@ -171,7 +171,7 @@ class ConfigFileManagerTest extends MockedTestCase
 			$this->root->url() . DIRECTORY_SEPARATOR . Config::CONFIG_DIR,
 			$this->root->url() . DIRECTORY_SEPARATOR . Config::STATIC_DIR
 		);
-		$configCache      = new Cache();
+		$configCache = new Cache();
 
 		$configFileLoader->setupCache($configCache);
 
@@ -264,7 +264,7 @@ class ConfigFileManagerTest extends MockedTestCase
 			$this->root->url() . DIRECTORY_SEPARATOR . Config::CONFIG_DIR,
 			$this->root->url() . DIRECTORY_SEPARATOR . Config::STATIC_DIR
 		);
-		$configCache      = new Cache();
+		$configCache = new Cache();
 
 		$configFileLoader->setupCache($configCache);
 
@@ -299,7 +299,7 @@ class ConfigFileManagerTest extends MockedTestCase
 			$this->root->url() . DIRECTORY_SEPARATOR . Config::CONFIG_DIR,
 			$this->root->url() . DIRECTORY_SEPARATOR . Config::STATIC_DIR
 		);
-		$configCache      = new Cache();
+		$configCache = new Cache();
 
 		$configFileLoader->setupCache($configCache);
 
@@ -355,7 +355,7 @@ class ConfigFileManagerTest extends MockedTestCase
 			$this->root->url() . '/addon',
 			['FRIENDICA_CONFIG_DIR' => '/a/wrong/dir/'],
 		);
-		$configCache       = new Cache();
+		$configCache = new Cache();
 
 		$configFileManager->setupCache($configCache);
 
@@ -385,7 +385,7 @@ class ConfigFileManagerTest extends MockedTestCase
 			$this->root->url() . '/addon',
 			['FRIENDICA_CONFIG_DIR' => $this->root->getChild('config2')->url()],
 		);
-		$configCache       = new Cache();
+		$configCache = new Cache();
 
 		$configFileManager->setupCache($configCache);
 
@@ -407,7 +407,7 @@ class ConfigFileManagerTest extends MockedTestCase
 			$this->root->url(),
 			$this->root->url() . '/addon',
 		);
-		$configCache       = new Cache();
+		$configCache = new Cache();
 
 		$configFileManager->setupCache($configCache);
 	}

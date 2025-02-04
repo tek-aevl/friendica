@@ -46,7 +46,7 @@ final class AddonProxy implements AddonHelper
 	public function getAvailableAddons(): array
 	{
 		return array_map(
-			function(array $item) {
+			function (array $item) {
 				return $item[0];
 			},
 			Addon::getAvailableList()
