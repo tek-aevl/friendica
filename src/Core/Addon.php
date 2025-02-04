@@ -18,6 +18,9 @@ class Addon
 {
 	/**
 	 * The addon sub-directory
+	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getAddonPath()` instead
+	 *
 	 * @var string
 	 */
 	const DIRECTORY = 'addon';

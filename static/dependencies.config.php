@@ -44,6 +44,9 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 		],
 		\Friendica\Core\Addon\AddonHelper::class => [
 			'instanceOf' => \Friendica\Core\Addon\AddonProxy::class,
+			'constructParams' => [
+				$basepath . '/addon',
+			],
 		],
 		\Friendica\Util\BasePath::class => [
 			'constructParams' => [

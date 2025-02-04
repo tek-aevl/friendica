@@ -18,6 +18,23 @@ use Friendica\Core\Addon;
  */
 final class AddonProxy implements AddonHelper
 {
+	private string $addonPath;
+
+	public function __construct(string $addonPath)
+	{
+		$this->addonPath = $addonPath;
+	}
+
+	/**
+	 * Returns the absolute path to the addon folder
+	 *
+	 * e.g. `/var/www/html/addon`
+	 */
+	public function getAddonPath(): string
+	{
+		return $this->addonPath;
+	}
+
 	/**
 	 * Returns the list of available addons with their current status and info.
 	 * This list is made from scanning the addon/ folder.

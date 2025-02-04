@@ -15,6 +15,13 @@ namespace Friendica\Core\Addon;
 interface AddonHelper
 {
 	/**
+	 * Returns the absolute path to the addon folder
+	 *
+	 * e.g. `/var/www/html/addon`
+	 */
+	public function getAddonPath(): string;
+
+	/**
 	 * Returns the list of available addons with their current status and info.
 	 * This list is made from scanning the addon/ folder.
 	 * Unsupported addons are excluded unless they already are enabled or system.show_unsupported_addon is set.
