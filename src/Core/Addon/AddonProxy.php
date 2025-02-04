@@ -103,6 +103,14 @@ final class AddonProxy implements AddonHelper
 		// add addon ID
 		$data['id'] = $addonId;
 
+		// rename author to authors
+		$data['authors'] = $data['author'];
+		unset($data['author']);
+
+		// rename maintainer to maintainers
+		$data['maintainers'] = $data['maintainer'];
+		unset($data['maintainer']);
+
 		return AddonInfo::fromArray($data);
 	}
 

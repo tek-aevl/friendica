@@ -20,8 +20,8 @@ class AddonInfoTest extends TestCase
 			'id'          => '',
 			'name'        => '',
 			'description' => '',
-			'author'      => [],
-			'maintainer'  => [],
+			'authors'     => [],
+			'maintainers' => [],
 			'version'     => '',
 			'status'      => '',
 		];
@@ -35,8 +35,8 @@ class AddonInfoTest extends TestCase
 			'id'          => 'test',
 			'name'        => 'Test-Addon',
 			'description' => 'This is an addon for tests',
-			'author'      => ['name' => 'Sam'],
-			'maintainer'  => ['name' => 'Sam', 'link' => 'https://example.com'],
+			'authors'     => [['name' => 'Sam']],
+			'maintainers' => [['name' => 'Sam', 'link' => 'https://example.com']],
 			'version'     => '0.1',
 			'status'      => 'In Development',
 		];
@@ -47,8 +47,8 @@ class AddonInfoTest extends TestCase
 		$this->assertSame($data['name'], $info->getName());
 		$this->assertSame($data['description'], $info->getDescription());
 		$this->assertSame($data['description'], $info->getDescription());
-		$this->assertSame($data['author'], $info->getAuthor());
-		$this->assertSame($data['maintainer'], $info->getMaintainer());
+		$this->assertSame($data['authors'], $info->getAuthors());
+		$this->assertSame($data['maintainers'], $info->getMaintainers());
 		$this->assertSame($data['version'], $info->getVersion());
 		$this->assertSame($data['status'], $info->getStatus());
 	}

@@ -24,8 +24,8 @@ final class AddonInfo
 		$id          = array_key_exists('id', $info) ? (string) $info['id'] : '';
 		$name        = array_key_exists('name', $info) ? (string) $info['name'] : '';
 		$description = array_key_exists('description', $info) ? (string) $info['description'] : '';
-		$author      = array_key_exists('author', $info) ? self::parseContributor($info['author']) : [];
-		$maintainer  = array_key_exists('maintainer', $info) ? self::parseContributor($info['maintainer']) : [];
+		$authors     = array_key_exists('authors', $info) ? self::parseContributors($info['authors']) : [];
+		$maintainers = array_key_exists('maintainers', $info) ? self::parseContributors($info['maintainers']) : [];
 		$version     = array_key_exists('version', $info) ? (string) $info['version'] : '';
 		$status      = array_key_exists('status', $info) ? (string) $info['status'] : '';
 
@@ -33,32 +33,42 @@ final class AddonInfo
 			$id,
 			$name,
 			$description,
-			$author,
-			$maintainer,
+			$authors,
+			$maintainers,
 			$version,
 			$status
 		);
 	}
 
-	private static function parseContributor($entry): array
+	private static function parseContributors($entries): array
 	{
-		if (!is_array($entry)) {
+		if (!is_array($entries)) {
 			return [];
 		}
 
-		if (!array_key_exists('name', $entry)) {
-			return [];
+		$contributors = [];
+
+		foreach ($entries as $entry) {
+			if (!is_array($entry)) {
+				continue;
+			}
+
+			if (!array_key_exists('name', $entry)) {
+				continue;
+			}
+
+			$contributor = [
+				'name' => (string) $entry['name'],
+			];
+
+			if (array_key_exists('link', $entry)) {
+				$contributor['link'] = (string) $entry['link'];
+			}
+
+			$contributors[] = $contributor;
 		}
 
-		$contributor = [
-			'name' => (string) $entry['name'],
-		];
-
-		if (array_key_exists('link', $entry)) {
-			$contributor['link'] = (string) $entry['link'];
-		}
-
-		return $contributor;
+		return $contributors;
 	}
 
 	private string $id = '';
@@ -67,9 +77,9 @@ final class AddonInfo
 
 	private string $description = '';
 
-	private array $author = [];
+	private array $authors = [];
 
-	private array $maintainer = [];
+	private array $maintainers = [];
 
 	private string $version = '';
 
@@ -79,16 +89,16 @@ final class AddonInfo
 		string $id,
 		string $name,
 		string $description,
-		array $author,
-		array $maintainer,
+		array $authors,
+		array $maintainers,
 		string $version,
 		string $status
 	) {
 		$this->id          = $id;
 		$this->name        = $name;
 		$this->description = $description;
-		$this->author      = $author;
-		$this->maintainer  = $maintainer;
+		$this->authors     = $authors;
+		$this->maintainers = $maintainers;
 		$this->version     = $version;
 		$this->status      = $status;
 	}
@@ -108,14 +118,14 @@ final class AddonInfo
 		return $this->description;
 	}
 
-	public function getAuthor(): array
+	public function getAuthors(): array
 	{
-		return $this->author;
+		return $this->authors;
 	}
 
-	public function getMaintainer(): array
+	public function getMaintainers(): array
 	{
-		return $this->maintainer;
+		return $this->maintainers;
 	}
 
 	public function getVersion(): string
