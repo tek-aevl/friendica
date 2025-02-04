@@ -31,6 +31,36 @@ final class AddonProxy implements AddonHelper
 	}
 
 	/**
+	 * Installs an addon.
+	 *
+	 * @param string $addonId name of the addon
+	 *
+	 * @return bool true on success or false on failure
+	 */
+	public function installAdodn(string $addonId): bool
+	{
+		return Addon::install($addonId);
+	}
+
+	/**
+	 * Uninstalls an addon.
+	 *
+	 * @param string $addonId name of the addon
+	 */
+	public function uninstallAddon(string $addonId): void
+	{
+		Addon::uninstall($addonId);
+	}
+
+	/**
+	 * Reload (uninstall and install) all updated addons.
+	 */
+	public function reloadAddons(): void
+	{
+		Addon::reload();
+	}
+
+	/**
 	 * Checks if the provided addon is enabled
 	 */
 	public function isAddonEnabled(string $addonId): bool

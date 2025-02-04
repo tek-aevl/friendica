@@ -24,6 +24,27 @@ interface AddonHelper
 	public function getAvailableAddons(): array;
 
 	/**
+	 * Installs an addon.
+	 *
+	 * @param string $addonId name of the addon
+	 *
+	 * @return bool true on success or false on failure
+	 */
+	public function installAdodn(string $addonId): bool;
+
+	/**
+	 * Uninstalls an addon.
+	 *
+	 * @param string $addonId name of the addon
+	 */
+	public function uninstallAddon(string $addonId): void;
+
+	/**
+	 * Reload (uninstall and install) all updated addons.
+	 */
+	public function reloadAddons(): void;
+
+	/**
 	 * Checks if the provided addon is enabled
 	 */
 	public function isAddonEnabled(string $addonId): bool;
