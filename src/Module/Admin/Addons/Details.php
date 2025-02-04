@@ -8,7 +8,6 @@
 namespace Friendica\Module\Admin\Addons;
 
 use Friendica\Content\Text\Markdown;
-use Friendica\Core\Addon;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Module\BaseAdmin;
@@ -44,8 +43,6 @@ class Details extends BaseAdmin
 
 		$addonHelper = DI::addonHelper();
 
-		$addons_admin = Addon::getAdminList();
-
 		$addon = Strings::sanitizeFilePathItem($this->parameters['addon']);
 		if (!is_file("addon/$addon/$addon.php")) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Addon not found.'));
@@ -61,7 +58,7 @@ class Details extends BaseAdmin
 				$addonHelper->uninstallAddon($addon);
 				DI::sysmsg()->addInfo(DI::l10n()->t('Addon %s disabled.', $addon));
 			} else {
-				$addonHelper->installAdodn($addon);
+				$addonHelper->installAddon($addon);
 				DI::sysmsg()->addInfo(DI::l10n()->t('Addon %s enabled.', $addon));
 			}
 
@@ -84,8 +81,10 @@ class Details extends BaseAdmin
 			$readme = '<pre>' . file_get_contents("addon/$addon/README") . '</pre>';
 		}
 
+		$addons_admin = $addonHelper->getEnabledAddonsWithAdminSettings();
+
 		$admin_form = '';
-		if (array_key_exists($addon, $addons_admin)) {
+		if (in_array($addon, $addons_admin)) {
 			require_once "addon/$addon/$addon.php";
 			$func = $addon . '_addon_admin';
 			$func($admin_form);

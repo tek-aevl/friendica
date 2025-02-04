@@ -30,7 +30,7 @@ interface AddonHelper
 	 *
 	 * @return bool true on success or false on failure
 	 */
-	public function installAdodn(string $addonId): bool;
+	public function installAddon(string $addonId): bool;
 
 	/**
 	 * Uninstalls an addon.
@@ -66,5 +66,12 @@ interface AddonHelper
 	 *
 	 * @return string[]
 	 */
-	public static function getVisibleEnabledAddons(): array;
+	public function getVisibleEnabledAddons(): array;
+
+	/**
+	 * Returns a list with the IDs of the enabled addons that provides admin settings.
+	 *
+	 * @return string[]
+	 */
+	public function getEnabledAddonsWithAdminSettings(): array;
 }

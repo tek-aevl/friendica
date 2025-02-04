@@ -66,6 +66,8 @@ class Addon
 	 * Returns a list of addons that can be configured at the node level.
 	 * The list is formatted for display in the admin panel aside.
 	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getEnabledAddonsWithAdminSettings()` instead
+	 *
 	 * @return array
 	 * @throws \Exception
 	 */

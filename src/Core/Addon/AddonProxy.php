@@ -37,7 +37,7 @@ final class AddonProxy implements AddonHelper
 	 *
 	 * @return bool true on success or false on failure
 	 */
-	public function installAdodn(string $addonId): bool
+	public function installAddon(string $addonId): bool
 	{
 		return Addon::install($addonId);
 	}
@@ -96,8 +96,18 @@ final class AddonProxy implements AddonHelper
 	 *
 	 * @return string[]
 	 */
-	public static function getVisibleEnabledAddons(): array
+	public function getVisibleEnabledAddons(): array
 	{
 		return Addon::getVisibleList();
+	}
+
+	/**
+	 * Returns a list with the IDs of the enabled addons that provides admin settings.
+	 *
+	 * @return string[]
+	 */
+	public function getEnabledAddonsWithAdminSettings(): array
+	{
+		return array_keys(Addon::getAdminList());
 	}
 }
