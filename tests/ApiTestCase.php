@@ -9,6 +9,7 @@ namespace Friendica\Test;
 
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\Core\Addon;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
 use Friendica\DI;
@@ -201,7 +202,7 @@ abstract class ApiTestCase extends FixtureTestCase
 			'plugin_admin' => function_exists($addon . '_addon_admin'),
 		]);
 
-		Addon::loadAddons();
+		$this->dice->create(AddonHelper::class)->loadAddons();
 		Hook::loadHooks();
 	}
 }

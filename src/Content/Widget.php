@@ -87,19 +87,21 @@ class Widget
 	 */
 	public static function unavailableNetworks(): array
 	{
+		$addonHelper = DI::addonHelper();
+
 		// Always hide content from these networks
 		$networks = [Protocol::PHANTOM, Protocol::FACEBOOK, Protocol::APPNET, Protocol::TWITTER, Protocol::ZOT, Protocol::OSTATUS, Protocol::STATUSNET];
-		Addon::loadAddons();
+		$addonHelper->loadAddons();
 
-		if (!Addon::isEnabled('discourse')) {
+		if (!$addonHelper->isAddonEnabled('discourse')) {
 			$networks[] = Protocol::DISCOURSE;
 		}
 
-		if (!Addon::isEnabled('pumpio')) {
+		if (!$addonHelper->isAddonEnabled('pumpio')) {
 			$networks[] = Protocol::PUMPIO;
 		}
 
-		if (!Addon::isEnabled('tumblr')) {
+		if (!$addonHelper->isAddonEnabled('tumblr')) {
 			$networks[] = Protocol::TUMBLR;
 		}
 
@@ -107,7 +109,7 @@ class Widget
 			$networks[] = Protocol::DIASPORA;
 		}
 
-		if (!Addon::isEnabled('pnut')) {
+		if (!$addonHelper->isAddonEnabled('pnut')) {
 			$networks[] = Protocol::PNUT;
 		}
 		return $networks;
@@ -120,18 +122,20 @@ class Widget
 	 */
 	public static function availableNetworks(): array
 	{
-		$networks = [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::FEED];
-		Addon::loadAddons();
+		$addonHelper = DI::addonHelper();
 
-		if (Addon::isEnabled('discourse')) {
+		$networks = [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::FEED];
+		$addonHelper->loadAddons();
+
+		if ($addonHelper->isAddonEnabled('discourse')) {
 			$networks[] = Protocol::DISCOURSE;
 		}
 
-		if (Addon::isEnabled('pumpio')) {
+		if ($addonHelper->isAddonEnabled('pumpio')) {
 			$networks[] = Protocol::PUMPIO;
 		}
 
-		if (Addon::isEnabled('tumblr')) {
+		if ($addonHelper->isAddonEnabled('tumblr')) {
 			$networks[] = Protocol::TUMBLR;
 		}
 
@@ -143,7 +147,7 @@ class Widget
 			$networks[] = Protocol::MAIL;
 		}
 
-		if (Addon::isEnabled('pnut')) {
+		if ($addonHelper->isAddonEnabled('pnut')) {
 			$networks[] = Protocol::PNUT;
 		}
 		return $networks;

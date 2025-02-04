@@ -10,7 +10,6 @@ namespace Friendica\Console;
 use Console_Table;
 use Friendica\App\Mode;
 use Friendica\Core\L10n;
-use Friendica\Core\Addon as AddonCore;
 use Friendica\Core\Addon\AddonHelper;
 use Friendica\Database\Database;
 use Friendica\Util\Strings;
@@ -67,7 +66,7 @@ HELP;
 		$this->dba         = $dba;
 		$this->addonHelper = $addonHelper;
 
-		AddonCore::loadAddons();
+		$this->addonHelper->loadAddons();
 	}
 
 	protected function doExecute(): int

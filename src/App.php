@@ -17,6 +17,7 @@ use Friendica\App\Router;
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Content\Nav;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Addon\Capability\ICanLoadAddons;
 use Friendica\Core\Config\Factory\Config;
 use Friendica\Core\Container;
@@ -181,6 +182,7 @@ class App
 			$this->container->create(IManagePersonalConfigValues::class),
 			$this->container->create(Page::class),
 			$this->container->create(Nav::class),
+			$this->container->create(AddonHelper::class),
 			$this->container->create(ModuleHTTPException::class),
 			$start_time,
 			$request
@@ -388,6 +390,7 @@ class App
 		IManagePersonalConfigValues $pconfig,
 		Page $page,
 		Nav $nav,
+		AddonHelper $addonHelper,
 		ModuleHTTPException $httpException,
 		float $start_time,
 		ServerRequestInterface $request
@@ -475,11 +478,11 @@ class App
 			// but we need "view" module for stylesheet
 			if ($this->mode->isInstall() && $moduleName !== 'install') {
 				$this->baseURL->redirect('install');
-			} else {
-				Core\Update::check($this->appHelper->getBasePath(), false);
-				Core\Addon::loadAddons();
-				Core\Hook::loadHooks();
 			}
+
+			Core\Update::check($this->appHelper->getBasePath(), false);
+			$addonHelper->loadAddons();
+			Core\Hook::loadHooks();
 
 			// Compatibility with Hubzilla
 			if ($moduleName == 'rpost') {

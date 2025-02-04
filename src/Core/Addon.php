@@ -92,7 +92,6 @@ class Addon
 		return $addons_admin;
 	}
 
-
 	/**
 	 * Synchronize addons:
 	 *
@@ -104,6 +103,7 @@ class Addon
 	 * Then go through the config list and if we have a addon that isn't installed,
 	 * call the install procedure and add it to the database.
 	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::loadAddons()` instead
 	 */
 	public static function loadAddons()
 	{

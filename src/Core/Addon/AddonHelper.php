@@ -40,6 +40,13 @@ interface AddonHelper
 	public function uninstallAddon(string $addonId): void;
 
 	/**
+	 * Load addons.
+	 *
+	 * @internal
+	 */
+	public function loadAddons(): void;
+
+	/**
 	 * Reload (uninstall and install) all updated addons.
 	 */
 	public function reloadAddons(): void;

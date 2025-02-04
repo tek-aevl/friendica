@@ -53,6 +53,16 @@ final class AddonProxy implements AddonHelper
 	}
 
 	/**
+	 * Load addons.
+	 *
+	 * @internal
+	 */
+	public function loadAddons(): void
+	{
+		Addon::loadAddons();
+	}
+
+	/**
 	 * Reload (uninstall and install) all updated addons.
 	 */
 	public function reloadAddons(): void
