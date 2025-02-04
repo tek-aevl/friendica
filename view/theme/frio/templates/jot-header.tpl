@@ -296,27 +296,33 @@
 	}
 
 	function itemFiler(id) {
-		const bordercolor = $("input").css("border-color");
+		var modal = $('#modal').modal();
 
 		$.get('filer/', function (data) {
-			$.colorbox({html: data});
-			$("#id_term").keypress(function () {
-				$(this).css("border-color", bordercolor);
-			})
-			$("#select_term").change(function () {
-				$("#id_term").css("border-color", bordercolor);
-			})
+			modal
+				.find('#modal-body')
+				.append(data);
+
+			modal
+				.find('#modal-header h4')
+				.append("{{$fileas}}");
+
+			// Ensure focus after the modal is fully visible
+			modal.on('shown.bs.modal', function () {
+				$('#id_term').trigger('focus');
+			});
 
 			$("#filer_save").click(function (e) {
 				e.preventDefault();
-				const reply = $("#id_term").val();
-				if (reply && reply.length) {
+				const term = $("#id_term").val();
+				if (term && term.length) {
 					commentBusy = true;
 					formModified = true;
 					$('body').css('cursor', 'wait');
-					$.get('filer/' + id + '?term=' + reply)
+					$.get('filer/' + id + '?term=' + term)
 						.done(function () {
-							$.colorbox.close();
+							$('#modal-body').empty();
+							$('#modal').modal('hide');
 							resetFormModifiedFlag();
 						})
 						.always(function () {

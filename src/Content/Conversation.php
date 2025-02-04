@@ -326,7 +326,7 @@ class Conversation
 			'$ispublic'  => $this->l10n->t('Visible to <strong>everybody</strong>'),
 			'$linkurl'   => $this->l10n->t('Please enter a image/video/audio/webpage URL:'),
 			'$term'      => $this->l10n->t('Tag term:'),
-			'$fileas'    => $this->l10n->t('Save to Folder:'),
+			'$fileas'    => $this->l10n->t('Save to Folder'),
 			'$whereareu' => $this->l10n->t('Where are you right now?'),
 			'$delitems'  => $this->l10n->t("Delete item\x28s\x29?"),
 			'$is_mobile' => $this->mode->isMobile(),
