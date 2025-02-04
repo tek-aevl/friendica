@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Admin\Addons;
 
-use Friendica\Core\Addon;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Module\BaseAdmin;
@@ -24,24 +23,25 @@ class Index extends BaseAdmin
 	{
 		parent::content();
 
+		$addonHelper = DI::addonHelper();
+
 		// reload active themes
 		if (!empty($_GET['action'])) {
 			self::checkFormSecurityTokenRedirectOnError('/admin/addons', 'admin_addons', 't');
 
 			switch ($_GET['action']) {
 				case 'reload':
-					Addon::reload();
+					$addonHelper->reloadAddons();
 					DI::sysmsg()->addInfo(DI::l10n()->t('Addons reloaded'));
 					break;
 
 				case 'toggle':
-					$addonHelper = DI::addonHelper();
-
 					$addon = $_GET['addon'] ?? '';
+
 					if ($addonHelper->isAddonEnabled($addon)) {
-						Addon::uninstall($addon);
+						$addonHelper->uninstallAddon($addon);
 						DI::sysmsg()->addInfo(DI::l10n()->t('Addon %s disabled.', $addon));
-					} elseif (Addon::install($addon)) {
+					} elseif ($addonHelper->installAddon($addon)) {
 						DI::sysmsg()->addInfo(DI::l10n()->t('Addon %s enabled.', $addon));
 					} else {
 						DI::sysmsg()->addNotice(DI::l10n()->t('Addon %s failed to install.', $addon));
@@ -54,7 +54,7 @@ class Index extends BaseAdmin
 			DI::baseUrl()->redirect('admin/addons');
 		}
 
-		$addons = Addon::getAvailableList();
+		$addons = $addonHelper->getAvailableAddons();
 
 		$t = Renderer::getMarkupTemplate('admin/addons/index.tpl');
 		return Renderer::replaceMacros($t, [
