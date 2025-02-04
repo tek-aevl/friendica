@@ -8,7 +8,6 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\Core\Addon;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Network\HTTPException;
@@ -98,9 +97,19 @@ abstract class BaseAdmin extends BaseModule
 			]],
 		];
 
+		$addons_admin = [];
+
+		foreach (DI::addonHelper()->getEnabledAddonsWithAdminSettings() as $addonId) {
+			$addons_admin[$addonId] = [
+				'url'   => 'admin/addons/' . $addonId,
+				'name'  => $addonId,
+				'class' => 'addon',
+			];
+		}
+
 		$t = Renderer::getMarkupTemplate('admin/aside.tpl');
 		DI::page()['aside'] .= Renderer::replaceMacros($t, [
-			'$admin' => ['addons_admin' => Addon::getAdminList()],
+			'$admin' => ['addons_admin' => $addons_admin],
 			'$subpages' => $aside_sub,
 			'$admtxt' => DI::l10n()->t('Admin'),
 			'$plugadmtxt' => DI::l10n()->t('Addon Features'),
