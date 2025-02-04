@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.02-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-03 19:55+0000\n"
+"POT-Creation-Date: 2025-02-03 21:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -8764,11 +8764,11 @@ msgid "Your invitation code: "
 msgstr ""
 
 #: src/Module/Register.php:151
-msgid "Your Display Name (as you would like it to be displayed on this system)"
+msgid "Your Display Name (as you would like it to be displayed on this system):"
 msgstr ""
 
 #: src/Module/Register.php:152
-msgid "Your Email Address: (Initial information will be send there, so this has to be an existing address.)"
+msgid "Your Email Address (initial information will be sent there, so this must be a valid address):"
 msgstr ""
 
 #: src/Module/Register.php:153
