@@ -111,6 +111,8 @@ class Addon
 	/**
 	 * uninstalls an addon.
 	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::uninstallAddon()` instead
+	 *
 	 * @param string $addon name of the addon
 	 * @return void
 	 * @throws \Exception
@@ -136,6 +138,8 @@ class Addon
 
 	/**
 	 * installs an addon.
+	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::installAddon()` instead
 	 *
 	 * @param string $addon name of the addon
 	 * @return bool
@@ -175,6 +179,8 @@ class Addon
 	/**
 	 * reload all updated addons
 	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::reloadAddons()` instead
+	 *
 	 * @return void
 	 * @throws \Exception
 	 *
@@ -211,6 +217,9 @@ class Addon
 	 *   * Maintainer: Jess <email>
 	 *   *
 	 *   *\endcode
+	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getAddonInfo()` instead
+	 *
 	 * @param string $addon the name of the addon
 	 * @return array with the addon information
 	 * @throws \Exception
