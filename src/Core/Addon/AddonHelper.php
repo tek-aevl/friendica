@@ -19,7 +19,7 @@ interface AddonHelper
 	 * This list is made from scanning the addon/ folder.
 	 * Unsupported addons are excluded unless they already are enabled or system.show_unsupported_addon is set.
 	 *
-	 * @return array<array<string|bool|array>>
+	 * @return array<array<string|string|array>>
 	 */
 	public function getAvailableAddons(): array;
 

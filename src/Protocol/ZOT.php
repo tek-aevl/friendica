@@ -8,7 +8,6 @@
 namespace Friendica\Protocol;
 
 use Friendica\App;
-use Friendica\Core\Addon;
 use Friendica\DI;
 use Friendica\Module;
 use Friendica\Module\Register;
