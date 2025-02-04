@@ -56,7 +56,12 @@ class ConfigTest extends DatabaseTestCase
 		parent::setUp();
 
 		$this->configCache = new Cache();
-		$this->configFileManager = new ConfigFileManager($this->root->url(), $this->root->url() . '/config/', $this->root->url() . '/static/');
+		$this->configFileManager = new ConfigFileManager(
+			$this->root->url(),
+			$this->root->url() . '/addon',
+			$this->root->url() . '/config',
+			$this->root->url() . '/static'
+		);
 	}
 
 	/**
@@ -608,7 +613,13 @@ class ConfigTest extends DatabaseTestCase
 		$this->setConfigFile('static' . DIRECTORY_SEPARATOR . 'env.config.php', true);
 		$this->loadDirectFixture($this->configToDbArray($data), $this->getDbInstance());
 
-		$configFileManager = new ConfigFileManager($this->root->url(), $this->root->url() . '/config/', $this->root->url() . '/static/', $server);
+		$configFileManager = new ConfigFileManager(
+			$this->root->url(),
+			$this->root->url() . '/addon',
+			$this->root->url() . '/config',
+			$this->root->url() . '/static',
+			$server
+		);
 		$configFileManager->setupCache($this->configCache);
 		$config = new DatabaseConfig($this->getDbInstance(), $this->configCache);
 

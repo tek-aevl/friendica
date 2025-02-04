@@ -166,6 +166,8 @@ class App
 		$this->session   = $this->container->create(IHandleUserSessions::class);
 		$this->appHelper = $this->container->create(AppHelper::class);
 
+		$addonHelper = $this->container->create(AddonHelper::class);
+
 		$this->load(
 			$request->getServerParams(),
 			$this->container->create(DbaDefinition::class),
@@ -174,6 +176,7 @@ class App
 			$this->config,
 			$this->profiler,
 			$this->appHelper,
+			$addonHelper,
 		);
 
 		$this->registerTemplateEngine();
@@ -182,7 +185,7 @@ class App
 			$this->container->create(IManagePersonalConfigValues::class),
 			$this->container->create(Page::class),
 			$this->container->create(Nav::class),
-			$this->container->create(AddonHelper::class),
+			$addonHelper,
 			$this->container->create(ModuleHTTPException::class),
 			$start_time,
 			$request
@@ -212,6 +215,7 @@ class App
 			$this->container->create(IManageConfigValues::class),
 			$this->container->create(Profiler::class),
 			$this->container->create(AppHelper::class),
+			$this->container->create(AddonHelper::class),
 		);
 
 		$this->registerTemplateEngine();
@@ -240,6 +244,7 @@ class App
 			$this->container->create(IManageConfigValues::class),
 			$this->container->create(Profiler::class),
 			$this->container->create(AppHelper::class),
+			$this->container->create(AddonHelper::class),
 		);
 
 		/** @var BasePath */
@@ -318,7 +323,8 @@ class App
 		Mode $mode,
 		IManageConfigValues $config,
 		Profiler $profiler,
-		AppHelper $appHelper
+		AppHelper $appHelper,
+		AddonHelper $addonHelper
 	): void {
 		if ($config->get('system', 'ini_max_execution_time') !== false) {
 			set_time_limit((int) $config->get('system', 'ini_max_execution_time'));
@@ -340,7 +346,7 @@ class App
 
 		if ($mode->has(Mode::DBAVAILABLE)) {
 			Core\Hook::loadHooks();
-			$loader = (new Config())->createConfigFileManager($appHelper->getBasePath(), $serverParams);
+			$loader = (new Config())->createConfigFileManager($appHelper->getBasePath(), $addonHelper->getAddonPath(), $serverParams);
 			Core\Hook::callAll('load_config', $loader);
 
 			// Hooks are now working, reload the whole definitions with hook enabled

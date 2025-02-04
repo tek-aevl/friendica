@@ -26,7 +26,8 @@ class Summary extends BaseAdmin
 	{
 		parent::content();
 
-		$basePath = DI::appHelper()->getBasePath();
+		$basePath  = DI::appHelper()->getBasePath();
+		$addonPath = DI::addonHelper()->getAddonPath();
 
 		// are there MyISAM tables in the DB? If so, trigger a warning message
 		$warningtext = [];
@@ -117,7 +118,7 @@ class Summary extends BaseAdmin
 		}
 
 		// check legacy basepath settings
-		$configLoader = (new Config())->createConfigFileManager($basePath, $_SERVER);
+		$configLoader = (new Config())->createConfigFileManager($basePath, $addonPath, $_SERVER);
 		$configCache  = new Cache();
 		$configLoader->setupCache($configCache);
 		$confBasepath = $configCache->get('system', 'basepath');

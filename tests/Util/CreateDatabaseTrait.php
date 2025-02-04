@@ -32,7 +32,12 @@ trait CreateDatabaseTrait
 			return $this->dba;
 		}
 
-		$configFileManager = new ConfigFileManager($this->root->url(), $this->root->url() . '/config/', $this->root->url() . '/static/');
+		$configFileManager = new ConfigFileManager(
+			$this->root->url(),
+			$this->root->url() . '/addon',
+			$this->root->url() . '/config',
+			$this->root->url() . '/static'
+		);
 		$config            = new ReadOnlyFileConfig(new Cache([
 			'database' => [
 				'disable_pdo' => true

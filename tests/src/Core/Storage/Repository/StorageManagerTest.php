@@ -64,7 +64,10 @@ class StorageManagerTest extends DatabaseTestCase
 		$this->database = $this->getDbInstance();
 
 		$configFactory     = new Config();
-		$configFileManager = $configFactory->createConfigFileManager($this->root->url());
+		$configFileManager = $configFactory->createConfigFileManager(
+			$this->root->url(),
+			$this->root->url() . '/addon',
+		);
 		$configCache       = $configFactory->createCache($configFileManager);
 
 		$this->config = new \Friendica\Core\Config\Model\DatabaseConfig($this->database, $configCache);

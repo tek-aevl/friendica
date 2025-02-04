@@ -87,6 +87,7 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			'call' => [
 				['createConfigFileManager', [
 					$basepath,
+					$basepath . '/addon',
 					$serverVars,
 				], Dice::CHAIN_CALL],
 			],
