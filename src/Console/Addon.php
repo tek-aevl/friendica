@@ -170,7 +170,7 @@ HELP;
 			throw new RuntimeException($this->l10n->t('Addon already enabled'));
 		}
 
-		AddonCore::install($addon);
+		$this->addonHelper->installAddon($addon);
 
 		return 0;
 	}
@@ -194,7 +194,7 @@ HELP;
 			throw new RuntimeException($this->l10n->t('Addon already disabled'));
 		}
 
-		AddonCore::uninstall($addon);
+		$this->addonHelper->uninstallAddon($addon);
 
 		return 0;
 	}
