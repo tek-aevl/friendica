@@ -54,7 +54,23 @@ class Index extends BaseAdmin
 			DI::baseUrl()->redirect('admin/addons');
 		}
 
-		$addons = $addonHelper->getAvailableAddons();
+		$addons = [];
+
+		foreach ($addonHelper->getAvailableAddons() as $addonId) {
+			$addonInfo = $addonHelper->getAddonInfo($addonId);
+
+			$info = [
+				'name' => $addonInfo->getName(),
+				'description' => $addonInfo->getDescription(),
+				'version' => $addonInfo->getVersion(),
+			];
+
+			$addons[] = [
+				$addonId,
+				($addonHelper->isAddonEnabled($addonId) ? 'on' : 'off'),
+				$info,
+			];
+		}
 
 		$t = Renderer::getMarkupTemplate('admin/addons/index.tpl');
 		return Renderer::replaceMacros($t, [

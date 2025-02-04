@@ -36,15 +36,21 @@ final class AddonProxy implements AddonHelper
 	}
 
 	/**
-	 * Returns the list of available addons with their current status and info.
+	 * Returns the list of available addons.
+	 *
 	 * This list is made from scanning the addon/ folder.
 	 * Unsupported addons are excluded unless they already are enabled or system.show_unsupported_addon is set.
 	 *
-	 * @return array<array<string|string|array>>
+	 * @return string[]
 	 */
 	public function getAvailableAddons(): array
 	{
-		return Addon::getAvailableList();
+		return array_map(
+			function(array $item) {
+				return $item[0];
+			},
+			Addon::getAvailableList()
+		);
 	}
 
 	/**

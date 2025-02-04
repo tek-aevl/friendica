@@ -124,8 +124,7 @@ HELP;
 				return false;
 		}
 
-		foreach ($this->addonHelper->getAvailableAddons() as $addon) {
-			$addonId = $addon[0];
+		foreach ($this->addonHelper->getAvailableAddons() as $addonId) {
 			$enabled = $this->addonHelper->isAddonEnabled($addonId);
 
 			if ($subCmd === 'all') {
