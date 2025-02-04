@@ -94,8 +94,6 @@ class Details extends BaseAdmin
 
 		$t = Renderer::getMarkupTemplate('admin/addons/details.tpl');
 
-		throw new \Exception('ff');
-
 		return Renderer::replaceMacros($t, [
 			'$title'    => DI::l10n()->t('Administration'),
 			'$page'     => DI::l10n()->t('Addons'),
