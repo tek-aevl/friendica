@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.02-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 13:20-0500\n"
+"POT-Creation-Date: 2025-02-04 05:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -9594,8 +9594,8 @@ msgstr ""
 msgid "Full Text Search"
 msgstr ""
 
-#: src/Module/Settings/Channels.php:188 src/Module/Settings/Channels.php:209
-msgid "Select all languages that you want to see in this channel."
+#: src/Module/Settings/Channels.php:188
+msgid "Select all languages that you want to see in this channel. \"Unspecified\" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list."
 msgstr ""
 
 #: src/Module/Settings/Channels.php:190
@@ -9653,6 +9653,10 @@ msgstr ""
 
 #: src/Module/Settings/Channels.php:208
 msgid "Check to display audio in the channel."
+msgstr ""
+
+#: src/Module/Settings/Channels.php:209
+msgid "Select all languages that you want to see in this channel."
 msgstr ""
 
 #: src/Module/Settings/Channels.php:213
@@ -10140,7 +10144,7 @@ msgid "Channel languages:"
 msgstr ""
 
 #: src/Module/Settings/Display.php:356
-msgid "Select all languages that you want to see in your channels."
+msgid "Select all the languages you want to see in your channels. \"Unspecified\" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list."
 msgstr ""
 
 #: src/Module/Settings/Display.php:358
