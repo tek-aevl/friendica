@@ -61,6 +61,19 @@ final class AddonProxy implements AddonHelper
 	}
 
 	/**
+	 * Get the comment block of an addon as value object.
+	 */
+	public function getAddonInfo(string $addonId): AddonInfo
+	{
+		$data = Addon::getInfo($addonId);
+
+		// add addon ID
+		$data['id'] = $addonId;
+
+		return AddonInfo::fromArray($data);
+	}
+
+	/**
 	 * Checks if the provided addon is enabled
 	 */
 	public function isAddonEnabled(string $addonId): bool

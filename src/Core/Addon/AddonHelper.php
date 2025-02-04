@@ -45,6 +45,11 @@ interface AddonHelper
 	public function reloadAddons(): void;
 
 	/**
+	 * Get the comment block of an addon as value object.
+	 */
+	public function getAddonInfo(string $addonId): AddonInfo;
+
+	/**
 	 * Checks if the provided addon is enabled
 	 */
 	public function isAddonEnabled(string $addonId): bool;
