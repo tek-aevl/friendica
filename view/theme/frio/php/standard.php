@@ -32,17 +32,17 @@ $frio = 'view/theme/frio';
 	header('Location: /login');
 } ?>
 <?php
-	if(!empty($page['nav'])) {
-		echo	str_replace(
-			'~config.sitename~',
-			DI::config()->get('config', 'sitename'),
-			str_replace(
-				'~system.banner~',
-				DI::config()->get('system', 'banner'),
-				$page['nav']
-			)
-		);
-	};
+if(!empty($page['nav'])) {
+	echo	str_replace(
+		'~config.sitename~',
+		DI::config()->get('config', 'sitename'),
+		str_replace(
+			'~system.banner~',
+			DI::config()->get('system', 'banner'),
+			$page['nav']
+		)
+	);
+};
 ?>
 	<main>
 
