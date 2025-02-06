@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # SPDX-FileCopyrightText: 2010 - 2024 the Friendica project
 #
@@ -6,8 +6,8 @@
 
 set -eo pipefail
 
-function resolve {
-	if [ "$(uname)" == "Darwin" ]
+resolve() {
+	if [ "$(uname)" = "Darwin" ]
 	then
 		realpath "$1"
 	else
@@ -17,26 +17,26 @@ function resolve {
 
 FULLPATH=$(dirname "$(resolve "$0")")
 
-if [ "$1" == "--help" ] || [ "$1" == "-h" ]
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]
 then
 	echo "$(basename "$(resolve "$0")") [options]"
 	echo
 	echo "-a | --addon <name>	extract strings from addon 'name'"
-	echo "-s | --single				single addon mode: extract string from current folder"
+	echo "-s | --single			single addon mode: extract string from current folder"
 	exit
 fi
 
 MODE='default'
 ADDONNAME=
-if [ "$1" == "--addon" ] || [ "$1" == "-a" ]
+if [ "$1" = "--addon" ] || [ "$1" = "-a" ]
 then
 	MODE='addon'
-	if [ -z "$2" ]; then echo -e "ERROR: missing addon name\n\nrun_xgettext.sh -a <addonname>"; exit 1; fi
+	if [ -z "$2" ]; then echo "ERROR: missing addon name\n\nrun_xgettext.sh -a <addonname>"; exit 1; fi
 	ADDONNAME=$2
 	if [ ! -d "$FULLPATH/../addon/$ADDONNAME" ]; then echo "ERROR: addon '$ADDONNAME' not found"; exit 2; fi
 fi
 
-if [ "$1" == "--single" ] || [ "$1" == "-s" ]
+if [ "$1" = "--single" ] || [ "$1" = "-s" ]
 then
 	MODE='single'
 fi
@@ -69,7 +69,6 @@ case "$MODE" in
 		echo "Friendica version $F9KVERSION"
 	;;
 esac
-
 
 KEYWORDS="-k -kt -ktt:1,2"
 
@@ -119,7 +118,7 @@ case "$MODE" in
 	;;
 esac
 
-if [ "" != "$1" ] && [ "$MODE" == "default" ]
+if [ -n "$1" ] && [ "$MODE" = "default" ]
 then
 	UPDATEFILE="$(resolve "${FULLPATH}/$1")"
 	echo "Merging new strings to $UPDATEFILE.."
