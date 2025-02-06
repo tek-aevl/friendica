@@ -116,7 +116,6 @@
 		},
 		"sort-packages": true,
 		"autoloader-suffix": "Friendica",
-		"optimize-autoloader": true,
 		"preferred-install": "dist",
 		"allow-plugins": {
 			"composer/installers": true,
@@ -174,6 +173,7 @@
 			"@cs:install",
 			"bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer fix"
 		],
-		"cs:fix-develop": "TARGET_BRANCH=develop COMMAND=fix bin/dev/fix-codestyle.sh"
+		"cs:fix-develop": "TARGET_BRANCH=develop COMMAND=fix bin/dev/fix-codestyle.sh",
+		"install:prod": "@composer install -o --no-dev"
 	}
 }
