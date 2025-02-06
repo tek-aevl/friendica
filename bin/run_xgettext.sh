@@ -4,7 +4,14 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-set -eo pipefail
+set -e
+
+# Custom function to handle pipefail behavior
+pipefail() {
+    local cmd="$1"
+    shift
+    { eval "$cmd"; } || exit 1
+}
 
 resolve() {
 	if [ "$(uname)" = "Darwin" ]
@@ -78,13 +85,13 @@ echo "Extract strings to $OUTFILE.."
 # shellcheck disable=SC2086  # $FINDOPTS is meant to be split
 find_result=$(find "$FINDSTARTDIR" $FINDOPTS -name "*.php" -type f | LC_ALL=C sort -s)
 
-total_files=$(wc -l <<< "${find_result}")
+total_files=$(echo "${find_result}" | wc -l)
 
 count=1
 for file in $find_result
 do
-	echo -ne "                                            \r"
-	echo -ne "Reading file $count/$total_files..."
+	printf "                                            \r"
+	printf "Reading file %d/%d..." "$count" "$total_files"
 
 	# On Windows, find still outputs the name of pruned folders
 	if [ ! -d "$file" ]
@@ -93,9 +100,8 @@ do
 		xgettext $KEYWORDS --no-wrap -j -o "$OUTFILE" --from-code=UTF-8 "$file" || exit 1
 		sed -i.bkp "s/CHARSET/UTF-8/g" "$OUTFILE"
 	fi
-	(( count++ ))
+	count=$((count + 1))
 done
-echo -ne "\n"
 
 echo "Interpolate metadata.."
 
