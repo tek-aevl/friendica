@@ -555,6 +555,7 @@ class Post
 			'title'                  => $item['title'],
 			'summary'                => $item['content-warning'],
 			'localtime'              => DateTimeFormat::local($item['created'], 'r'),
+			'utc'                    => DateTimeFormat::utc($item['created']),
 			'ago'                    => $item['app'] ? DI::l10n()->t('%s from %s', $ago, $item['app']) : $ago,
 			'app'                    => $item['app'],
 			'created'                => $ago,
