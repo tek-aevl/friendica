@@ -24,8 +24,8 @@ class CryptoTest extends TestCase
 			return 1;
 		});
 
-		self::assertSame(1, Crypto::randomDigits(1));
-		self::assertSame(11111111, Crypto::randomDigits(8));
+		self::assertSame('1', Crypto::randomDigits(1));
+		self::assertSame('11111111', Crypto::randomDigits(8));
 	}
 
 	public function testDiasporaPubRsaToMe()
