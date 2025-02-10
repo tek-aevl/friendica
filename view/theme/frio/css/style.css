@@ -1813,6 +1813,10 @@ blockquote.shared_content {
 	font-weight: 500;
 	color: $font_color_darker;
 }
+.contact-info h1.media-heading {
+	font-size: 15px;
+	font-weight: 700;
+}
 .media .contact-info-comment {
 	display: table-cell;
 }
