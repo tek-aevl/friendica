@@ -632,11 +632,13 @@ function liveUpdate(src) {
 
 	var orgHeight = $("section").height();
 
+	var update_url = getUpdateUrl(src);
+
 	if (force_update) {
 		force_update = false;
 	}
 
-	$.get('update_' + getUpdateUrl(src), function(data) {
+	$.get('update_' + update_url, function(data) {
 		in_progress = false;
 		update_item = 0;
 
