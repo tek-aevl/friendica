@@ -42,6 +42,12 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 				[Dice::INSTANCE => Dice::SELF],
 			],
 		],
+		\Friendica\Core\Addon\AddonHelper::class => [
+			'instanceOf' => \Friendica\Core\Addon\AddonProxy::class,
+			'constructParams' => [
+				$basepath . '/addon',
+			],
+		],
 		\Friendica\Util\BasePath::class => [
 			'constructParams' => [
 				$basepath,
@@ -81,6 +87,7 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			'call' => [
 				['createConfigFileManager', [
 					$basepath,
+					$basepath . '/addon',
 					$serverVars,
 				], Dice::CHAIN_CALL],
 			],
