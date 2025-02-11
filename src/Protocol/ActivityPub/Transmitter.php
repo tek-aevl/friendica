@@ -798,10 +798,12 @@ class Transmitter
 		}
 
 		if (!empty($item['quote-uri-id']) && in_array($item['private'], [Item::PUBLIC, Item::UNLISTED])) {
-			$quoted  = Post::selectFirst(['author-link'], ['uri-id' => $item['quote-uri-id']]);
-			$profile = APContact::getByURL($quoted['author-link'], false);
-			if (!empty($profile)) {
-				$data['cc'][] = $profile['url'];
+			$quoted = Post::selectFirst(['author-link'], ['uri-id' => $item['quote-uri-id']]);
+			if (!empty($quoted['author-link'])) {
+				$profile = APContact::getByURL($quoted['author-link'], false);
+				if (!empty($profile)) {
+					$data['cc'][] = $profile['url'];
+				}
 			}
 		}
 

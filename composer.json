@@ -70,10 +70,12 @@
 		"pragmarx/google2fa": "^5.0",
 		"pragmarx/recovery": "^0.2",
 		"psr/clock": "^1.0",
-		"psr/container": "^2.0",
+		"psr/container": "^1.1|^2.0",
+		"psr/event-dispatcher": "^1.0",
 		"psr/log": "^1.1",
 		"seld/cli-prompt": "^1.0",
 		"smarty/smarty": "^4",
+		"symfony/event-dispatcher": "^5.4",
 		"textalk/websocket": "^1.6",
 		"ua-parser/uap-php": "^3.9",
 		"xemlock/htmlpurifier-html5": "^0.1.11"
@@ -114,7 +116,6 @@
 		},
 		"sort-packages": true,
 		"autoloader-suffix": "Friendica",
-		"optimize-autoloader": true,
 		"preferred-install": "dist",
 		"allow-plugins": {
 			"composer/installers": true,
@@ -174,6 +175,7 @@
 			"@cs:install",
 			"bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer fix"
 		],
-		"cs:fix-develop": "TARGET_BRANCH=develop COMMAND=fix bin/dev/fix-codestyle.sh"
+		"cs:fix-develop": "TARGET_BRANCH=develop COMMAND=fix bin/dev/fix-codestyle.sh",
+		"install:prod": "@composer install -o --no-dev"
 	}
 }

@@ -3182,6 +3182,10 @@ class Item
 		}
 
 		if (!empty($shared_item['uri-id'])) {
+			if (!$s) {
+				DI::logger()->notice('Unexpected empty item HTML', ['item' => $item]);
+			}
+
 			$s = self::replacePlatformIcon($s, $shared_item, $uid);
 		}
 
@@ -3258,6 +3262,10 @@ class Item
 	 */
 	private static function replacePlatformIcon(string $html, array $item, int $uid): string
 	{
+		if ($html === '') {
+			return $html;
+		}
+
 		$dom = new \DOMDocument();
 		if (!@$dom->loadHTML($html)) {
 			return $html;
