@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-05 22:44+0000\n"
+"POT-Creation-Date: 2025-02-09 20:13+0000\n"
 "PO-Revision-Date: 2011-05-05 10:19+0000\n"
 "Last-Translator: Balázs Úr, 2020-2024\n"
 "Language-Team: Hungarian (http://app.transifex.com/Friendica/friendica/language/hu/)\n"
@@ -75,7 +75,7 @@ msgstr "Az elem nem található."
 #: src/Module/Settings/ContactImport.php:49
 #: src/Module/Settings/ContactImport.php:96
 #: src/Module/Settings/Delegation.php:76 src/Module/Settings/Display.php:80
-#: src/Module/Settings/Display.php:194
+#: src/Module/Settings/Display.php:188
 #: src/Module/Settings/Profile/Photo/Crop.php:148
 #: src/Module/Settings/Profile/Photo/Index.php:96
 #: src/Module/Settings/RemoveMe.php:103 src/Module/Settings/UserExport.php:64
@@ -296,7 +296,7 @@ msgstr "Webhivatkozás beszúrása"
 #: mod/message.php:188 mod/message.php:344 mod/photos.php:1252
 #: src/Content/Conversation.php:389 src/Content/Conversation.php:1565
 #: src/Module/Item/Compose.php:202 src/Module/Post/Edit.php:136
-#: src/Object/Post.php:607
+#: src/Object/Post.php:608
 msgid "Please wait"
 msgstr "Kis türelmet"
 
@@ -319,7 +319,7 @@ msgstr "Kis türelmet"
 #: src/Module/Profile/Profile.php:265
 #: src/Module/Settings/Profile/Index.php:248
 #: src/Module/Settings/Server/Action.php:65 src/Module/User/Delegation.php:177
-#: src/Object/Post.php:1148 view/theme/duepuntozero/config.php:73
+#: src/Object/Post.php:1149 view/theme/duepuntozero/config.php:73
 #: view/theme/frio/config.php:155 view/theme/quattro/config.php:75
 #: view/theme/vier/config.php:123
 msgid "Submit"
@@ -605,25 +605,25 @@ msgstr "Forgatás balra"
 
 #: mod/photos.php:1090 mod/photos.php:1146 mod/photos.php:1226
 #: src/Module/Contact.php:599 src/Module/Item/Compose.php:184
-#: src/Object/Post.php:1145
+#: src/Object/Post.php:1146
 msgid "This is you"
 msgstr "Ez Ön"
 
 #: mod/photos.php:1092 mod/photos.php:1148 mod/photos.php:1228
-#: src/Module/Moderation/Reports.php:105 src/Object/Post.php:601
-#: src/Object/Post.php:1147
+#: src/Module/Moderation/Reports.php:105 src/Object/Post.php:602
+#: src/Object/Post.php:1148
 msgid "Comment"
 msgstr "Hozzászólás"
 
 #: mod/photos.php:1094 mod/photos.php:1150 mod/photos.php:1230
 #: src/Content/Conversation.php:403 src/Module/Calendar/Event/Form.php:234
 #: src/Module/Item/Compose.php:197 src/Module/Post/Edit.php:156
-#: src/Object/Post.php:1161
+#: src/Object/Post.php:1162
 msgid "Preview"
 msgstr "Előnézet"
 
 #: mod/photos.php:1095 src/Content/Conversation.php:357
-#: src/Module/Post/Edit.php:121 src/Object/Post.php:1149
+#: src/Module/Post/Edit.php:121 src/Object/Post.php:1150
 msgid "Loading..."
 msgstr "Betöltés…"
 
@@ -665,112 +665,112 @@ msgstr "Térkép"
 msgid "Apologies but the website is unavailable at the moment."
 msgstr ""
 
-#: src/App/Page.php:247
+#: src/App/Page.php:236
 msgid "Delete this item?"
 msgstr "Törli ezt az elemet?"
 
-#: src/App/Page.php:248
+#: src/App/Page.php:237
 msgid ""
 "Block this author? They won't be able to follow you nor see your public "
 "posts, and you won't be able to see their posts and their notifications."
 msgstr "Tiltja ezt a szerzőt? Nem lesz képes követni Önt, és a nyilvános bejegyzéseit sem látja, valamint Ön sem lesz képes megtekinteni az ő bejegyzéseit és értesítéseit."
 
-#: src/App/Page.php:249
+#: src/App/Page.php:238
 msgid ""
 "Ignore this author? You won't be able to see their posts and their "
 "notifications."
 msgstr "Mellőzi ezt a szerzőt? Nem lesz képes megtekinteni az ő bejegyzéseit és értesítéseit."
 
-#: src/App/Page.php:250
+#: src/App/Page.php:239
 msgid "Collapse this author's posts?"
 msgstr "Összecsukja ennek a szerzőnek a bejegyzéseit?"
 
-#: src/App/Page.php:251
+#: src/App/Page.php:240
 msgid "Ignore this author's server?"
 msgstr "Mellőzi ennek a szerzőnek a kiszolgálóját?"
 
-#: src/App/Page.php:252 src/Module/Settings/Server/Action.php:47
+#: src/App/Page.php:241 src/Module/Settings/Server/Action.php:47
 #: src/Module/Settings/Server/Index.php:94
 msgid ""
 "You won't see any content from this server including reshares in your "
 "Network page, the community pages and individual conversations."
 msgstr "Nem fog látni semmilyen tartalmat erről a kiszolgálóról, beleértve a hálózat oldalon, a közösségi oldalakon és az egyéni beszélgetésekben lévő újra megosztásokat is."
 
-#: src/App/Page.php:254
+#: src/App/Page.php:243
 msgid "Like not successful"
 msgstr "A kedvelés sikertelen"
 
-#: src/App/Page.php:255
+#: src/App/Page.php:244
 msgid "Dislike not successful"
 msgstr "A nem kedvelés sikertelen"
 
-#: src/App/Page.php:256
+#: src/App/Page.php:245
 msgid "Sharing not successful"
 msgstr "A megosztás sikertelen"
 
-#: src/App/Page.php:257
+#: src/App/Page.php:246
 msgid "Attendance unsuccessful"
 msgstr "A részvétel sikertelen"
 
-#: src/App/Page.php:258
+#: src/App/Page.php:247
 msgid "Backend error"
 msgstr "Háttérprogram hiba"
 
-#: src/App/Page.php:259
+#: src/App/Page.php:248
 msgid "Network error"
 msgstr "Hálózati hiba"
 
-#: src/App/Page.php:262
+#: src/App/Page.php:251
 msgid "Drop files here to upload"
 msgstr "Dobja ide a fájlokat a feltöltéséhez"
 
-#: src/App/Page.php:263
+#: src/App/Page.php:252
 msgid "Your browser does not support drag and drop file uploads."
 msgstr "A böngészője nem támogatja a fogd és vidd fájlfeltöltéseket."
 
-#: src/App/Page.php:264
+#: src/App/Page.php:253
 msgid ""
 "Please use the fallback form below to upload your files like in the olden "
 "days."
 msgstr "Használja az alábbi tartalék űrlapot a fájlok feltöltéséhez, mint a régi időkben."
 
-#: src/App/Page.php:265
+#: src/App/Page.php:254
 msgid "File is too big ({{filesize}}MiB). Max filesize: {{maxFilesize}}MiB."
 msgstr "A fájl túl nagy ({{filesize}} MiB). A legnagyobb fájlméret: {{maxFilesize}} MiB."
 
-#: src/App/Page.php:266
+#: src/App/Page.php:255
 msgid "You can't upload files of this type."
 msgstr "Nem tud ilyen típusú fájlokat feltölteni."
 
-#: src/App/Page.php:267
+#: src/App/Page.php:256
 msgid "Server responded with {{statusCode}} code."
 msgstr "A kiszolgáló {{statusCode}} állapotkóddal válaszolt."
 
-#: src/App/Page.php:268
+#: src/App/Page.php:257
 msgid "Cancel upload"
 msgstr "Feltöltés megszakítása"
 
-#: src/App/Page.php:269
+#: src/App/Page.php:258
 msgid "Upload canceled."
 msgstr "A feltöltés megszakítva."
 
-#: src/App/Page.php:270
+#: src/App/Page.php:259
 msgid "Are you sure you want to cancel this upload?"
 msgstr "Biztosan meg szeretné szakítani ezt a feltöltést?"
 
-#: src/App/Page.php:271
+#: src/App/Page.php:260
 msgid "Remove file"
 msgstr "Fájl eltávolítása"
 
-#: src/App/Page.php:272
+#: src/App/Page.php:261
 msgid "You can't upload any more files."
 msgstr "Nem tud több fájlt feltölteni."
 
-#: src/App/Page.php:356
+#: src/App/Page.php:345
 msgid "toggle mobile"
 msgstr "váltás mobilra"
 
-#: src/App/Page.php:367 src/Module/Admin/Logs/View.php:92
+#: src/App/Page.php:356 src/Module/Admin/Logs/View.php:92
 #: view/theme/frio/php/minimal.php:39 view/theme/frio/php/standard.php:138
 msgid "Close"
 msgstr "Bezárás"
@@ -1263,7 +1263,7 @@ msgid "Visible to <strong>everybody</strong>"
 msgstr "Látható <strong>mindenkinek</strong>"
 
 #: src/Content/Conversation.php:327 src/Module/Item/Compose.php:196
-#: src/Object/Post.php:1160
+#: src/Object/Post.php:1161
 msgid "Please enter a image/video/audio/webpage URL:"
 msgstr "Írjon be egy kép, videó, hang vagy weboldal URL-t:"
 
@@ -1308,52 +1308,52 @@ msgid "attach file"
 msgstr "fájl csatolása"
 
 #: src/Content/Conversation.php:362 src/Module/Item/Compose.php:186
-#: src/Module/Post/Edit.php:162 src/Object/Post.php:1150
+#: src/Module/Post/Edit.php:162 src/Object/Post.php:1151
 msgid "Bold"
 msgstr "Félkövér"
 
 #: src/Content/Conversation.php:363 src/Module/Item/Compose.php:187
-#: src/Module/Post/Edit.php:163 src/Object/Post.php:1151
+#: src/Module/Post/Edit.php:163 src/Object/Post.php:1152
 msgid "Italic"
 msgstr "Dőlt"
 
 #: src/Content/Conversation.php:364 src/Module/Item/Compose.php:188
-#: src/Module/Post/Edit.php:164 src/Object/Post.php:1152
+#: src/Module/Post/Edit.php:164 src/Object/Post.php:1153
 msgid "Underline"
 msgstr "Aláhúzott"
 
 #: src/Content/Conversation.php:365 src/Module/Item/Compose.php:189
-#: src/Module/Post/Edit.php:165 src/Object/Post.php:1154
+#: src/Module/Post/Edit.php:165 src/Object/Post.php:1155
 msgid "Quote"
 msgstr "Idézet"
 
 #: src/Content/Conversation.php:366 src/Module/Item/Compose.php:190
-#: src/Module/Post/Edit.php:166 src/Object/Post.php:1155
+#: src/Module/Post/Edit.php:166 src/Object/Post.php:1156
 msgid "Add emojis"
 msgstr "Emodzsik hozzáadása"
 
 #: src/Content/Conversation.php:367 src/Module/Item/Compose.php:191
-#: src/Object/Post.php:1153
+#: src/Object/Post.php:1154
 msgid "Content Warning"
 msgstr "Tartalom figyelmeztetés"
 
 #: src/Content/Conversation.php:368 src/Module/Item/Compose.php:192
-#: src/Module/Post/Edit.php:167 src/Object/Post.php:1156
+#: src/Module/Post/Edit.php:167 src/Object/Post.php:1157
 msgid "Code"
 msgstr "Kód"
 
 #: src/Content/Conversation.php:369 src/Module/Item/Compose.php:193
-#: src/Object/Post.php:1157
+#: src/Object/Post.php:1158
 msgid "Image"
 msgstr "Kép"
 
 #: src/Content/Conversation.php:370 src/Module/Item/Compose.php:194
-#: src/Module/Post/Edit.php:168 src/Object/Post.php:1158
+#: src/Module/Post/Edit.php:168 src/Object/Post.php:1159
 msgid "Link"
 msgstr "Hivatkozás"
 
 #: src/Content/Conversation.php:371 src/Module/Item/Compose.php:195
-#: src/Module/Post/Edit.php:169 src/Object/Post.php:1159
+#: src/Module/Post/Edit.php:169 src/Object/Post.php:1160
 msgid "Link or Media"
 msgstr "Hivatkozás vagy média"
 
@@ -1527,7 +1527,7 @@ msgstr "Kategóriák:"
 msgid "Filed under:"
 msgstr "Iktatva itt:"
 
-#: src/Content/Conversation.php:1547 src/Object/Post.php:558
+#: src/Content/Conversation.php:1547 src/Object/Post.php:559
 #, php-format
 msgid "%s from %s"
 msgstr "%s tőle: %s"
@@ -1787,7 +1787,7 @@ msgstr "A kiválasztott fióktípussal rendelkező fiókok által készített be
 
 #: src/Content/Feature.php:131 src/Content/Widget.php:610
 #: src/Module/Admin/Site.php:463 src/Module/BaseSettings.php:113
-#: src/Module/Settings/Channels.php:211 src/Module/Settings/Display.php:323
+#: src/Module/Settings/Channels.php:211 src/Module/Settings/Display.php:313
 msgid "Channels"
 msgstr "Csatornák"
 
@@ -1962,7 +1962,7 @@ msgstr "A(z) %s kiszolgáló mellőzése"
 msgid "Languages"
 msgstr "Nyelvek"
 
-#: src/Content/Item.php:435 src/Object/Post.php:585
+#: src/Content/Item.php:435 src/Object/Post.php:586
 msgid "Search Text"
 msgstr "Szöveg keresése"
 
@@ -2055,7 +2055,7 @@ msgstr "Az Ön médiával rendelkező beküldései"
 #: src/Content/Nav.php:229 src/Content/Nav.php:289
 #: src/Module/BaseProfile.php:70 src/Module/BaseProfile.php:73
 #: src/Module/BaseProfile.php:81 src/Module/BaseProfile.php:84
-#: src/Module/Settings/Display.php:324 view/theme/frio/theme.php:225
+#: src/Module/Settings/Display.php:314 view/theme/frio/theme.php:225
 #: view/theme/frio/theme.php:229
 msgid "Calendar"
 msgstr "Naptár"
@@ -2943,37 +2943,37 @@ msgid "%s (%s)"
 msgstr "%s (%s)"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:416
-#: src/Module/Settings/Display.php:292
+#: src/Module/Settings/Display.php:282
 msgid "Monday"
 msgstr "Hétfő"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:417
-#: src/Module/Settings/Display.php:293
+#: src/Module/Settings/Display.php:283
 msgid "Tuesday"
 msgstr "Kedd"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:418
-#: src/Module/Settings/Display.php:294
+#: src/Module/Settings/Display.php:284
 msgid "Wednesday"
 msgstr "Szerda"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:419
-#: src/Module/Settings/Display.php:295
+#: src/Module/Settings/Display.php:285
 msgid "Thursday"
 msgstr "Csütörtök"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:420
-#: src/Module/Settings/Display.php:296
+#: src/Module/Settings/Display.php:286
 msgid "Friday"
 msgstr "Péntek"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:421
-#: src/Module/Settings/Display.php:297
+#: src/Module/Settings/Display.php:287
 msgid "Saturday"
 msgstr "Szombat"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:415
-#: src/Module/Settings/Display.php:291
+#: src/Module/Settings/Display.php:281
 msgid "Sunday"
 msgstr "Vasárnap"
 
@@ -3426,17 +3426,17 @@ msgid "today"
 msgstr "ma"
 
 #: src/Model/Event.php:449 src/Module/Calendar/Show.php:117
-#: src/Module/Settings/Display.php:302 src/Util/Temporal.php:343
+#: src/Module/Settings/Display.php:292 src/Util/Temporal.php:343
 msgid "month"
 msgstr "hónap"
 
 #: src/Model/Event.php:450 src/Module/Calendar/Show.php:118
-#: src/Module/Settings/Display.php:303 src/Util/Temporal.php:344
+#: src/Module/Settings/Display.php:293 src/Util/Temporal.php:344
 msgid "week"
 msgstr "hét"
 
 #: src/Model/Event.php:451 src/Module/Calendar/Show.php:119
-#: src/Module/Settings/Display.php:304 src/Util/Temporal.php:345
+#: src/Module/Settings/Display.php:294 src/Util/Temporal.php:345
 msgid "day"
 msgstr "nap"
 
@@ -4009,7 +4009,7 @@ msgid "Disable"
 msgstr "Letiltás"
 
 #: src/Module/Admin/Addons/Details.php:75
-#: src/Module/Admin/Themes/Details.php:41 src/Module/Settings/Display.php:351
+#: src/Module/Admin/Themes/Details.php:41 src/Module/Settings/Display.php:341
 msgid "Enable"
 msgstr "Engedélyezés"
 
@@ -4060,7 +4060,7 @@ msgstr "A(z) „%s” bővítmény telepítése sikertelen."
 #: src/Module/Settings/Connectors.php:143
 #: src/Module/Settings/Connectors.php:228
 #: src/Module/Settings/ContactImport.php:110
-#: src/Module/Settings/Delegation.php:179 src/Module/Settings/Display.php:317
+#: src/Module/Settings/Delegation.php:179 src/Module/Settings/Display.php:307
 #: src/Module/Settings/Features.php:61
 msgid "Save Settings"
 msgstr "Beállítások mentése"
@@ -4439,11 +4439,11 @@ msgstr "A(z) %s nem érvényes bemenet a legnagyobb médiamérethez"
 msgid "%s is no valid input for maximum image size"
 msgstr "A(z) %s nem érvényes bemenet a legnagyobb képmérethez"
 
-#: src/Module/Admin/Site.php:361 src/Module/Settings/Display.php:212
+#: src/Module/Admin/Site.php:361 src/Module/Settings/Display.php:206
 msgid "No special theme for mobile devices"
 msgstr "Nincs különleges téma a mobil eszközökhöz"
 
-#: src/Module/Admin/Site.php:378 src/Module/Settings/Display.php:222
+#: src/Module/Admin/Site.php:378 src/Module/Settings/Display.php:216
 #, php-format
 msgid "%s - (Experimental)"
 msgstr "%s – (kísérleti)"
@@ -5520,7 +5520,7 @@ msgid ""
 msgstr "Lehet „összes” vagy „címkék”. Az „összes” azt jelenti, hogy minden nyilvános bejegyzést meg kell kapni. A „címkék” jelentése, hogy csak a kijelölt címkékkel rendelkező bejegyzéseket kell megkapni."
 
 #: src/Module/Admin/Site.php:584 src/Module/Contact/Profile.php:315
-#: src/Module/Settings/Display.php:259
+#: src/Module/Settings/Display.php:249
 #: src/Module/Settings/TwoFactor/Index.php:132
 msgid "Disabled"
 msgstr "Letiltva"
@@ -6153,7 +6153,7 @@ msgstr "Tippek új tagoknak"
 #: src/Module/Contact.php:537 src/Module/Conversation/Channel.php:98
 #: src/Module/Conversation/Community.php:91
 #: src/Module/Conversation/Network.php:295
-#: src/Module/Moderation/BaseUsers.php:102 src/Object/Post.php:605
+#: src/Module/Moderation/BaseUsers.php:102 src/Object/Post.php:606
 msgid "More"
 msgstr "Több"
 
@@ -6342,7 +6342,7 @@ msgstr "Nézet"
 msgid "Create New Event"
 msgstr "Új esemény létrehozása"
 
-#: src/Module/Calendar/Show.php:120 src/Module/Settings/Display.php:305
+#: src/Module/Calendar/Show.php:120 src/Module/Settings/Display.php:295
 msgid "list"
 msgstr "lista"
 
@@ -10232,12 +10232,12 @@ msgid ""
 msgstr "Ha ki van választva, akkor a csatorna eredményei újra megosztásra kerülnek. Ez csak a nyilvános idővonalról vagy a felhasználó által meghatározott körökből származó nyilvános ActivityPub-bejegyzéseknél működik."
 
 #: src/Module/Settings/Channels.php:176 src/Module/Settings/Channels.php:197
-#: src/Module/Settings/Display.php:349
+#: src/Module/Settings/Display.php:339
 msgid "Label"
 msgstr "Címke"
 
 #: src/Module/Settings/Channels.php:177 src/Module/Settings/Channels.php:198
-#: src/Module/Settings/Display.php:350
+#: src/Module/Settings/Display.php:340
 #: src/Module/Settings/TwoFactor/AppSpecific.php:123
 msgid "Description"
 msgstr "Leírás"
@@ -10673,213 +10673,215 @@ msgstr "Lehetséges meghatalmazottak"
 msgid "No entries."
 msgstr "Nincsenek bejegyzések."
 
-#: src/Module/Settings/Display.php:180
+#: src/Module/Settings/Display.php:174
 msgid "The theme you chose isn't available."
 msgstr "A választott téma nem érhető el."
 
-#: src/Module/Settings/Display.php:220
+#: src/Module/Settings/Display.php:214
 #, php-format
 msgid "%s - (Unsupported)"
 msgstr "%s – (nem támogatott)"
 
-#: src/Module/Settings/Display.php:260
+#: src/Module/Settings/Display.php:250
 msgid "Color/Black"
 msgstr "Színes/fekete"
 
-#: src/Module/Settings/Display.php:261 view/theme/frio/php/scheme.php:95
+#: src/Module/Settings/Display.php:251 view/theme/frio/php/scheme.php:95
 msgid "Black"
 msgstr "Fekete"
 
-#: src/Module/Settings/Display.php:262
+#: src/Module/Settings/Display.php:252
 msgid "Color/White"
 msgstr "Színes/fehér"
 
-#: src/Module/Settings/Display.php:263
+#: src/Module/Settings/Display.php:253
 msgid "White"
 msgstr "Fehér"
 
-#: src/Module/Settings/Display.php:268
+#: src/Module/Settings/Display.php:258
 msgid "No preview"
 msgstr "Nincs előnézet"
 
-#: src/Module/Settings/Display.php:269
+#: src/Module/Settings/Display.php:259
 msgid "No image"
 msgstr "Nincs kép"
 
-#: src/Module/Settings/Display.php:270
+#: src/Module/Settings/Display.php:260
 msgid "Small Image"
 msgstr "Kis kép"
 
-#: src/Module/Settings/Display.php:271
+#: src/Module/Settings/Display.php:261
 msgid "Large Image"
 msgstr "Nagy kép"
 
-#: src/Module/Settings/Display.php:316
+#: src/Module/Settings/Display.php:306
 msgid "Display Settings"
 msgstr "Megjelenítési beállítások"
 
-#: src/Module/Settings/Display.php:318
+#: src/Module/Settings/Display.php:308
 msgid "General Theme Settings"
 msgstr "Általános témabeállítások"
 
-#: src/Module/Settings/Display.php:319
+#: src/Module/Settings/Display.php:309
 msgid "Custom Theme Settings"
 msgstr "Egyéni témabeállítások"
 
-#: src/Module/Settings/Display.php:320
+#: src/Module/Settings/Display.php:310
 msgid "Content Settings"
 msgstr "Tartalombeállítások"
 
-#: src/Module/Settings/Display.php:321 view/theme/duepuntozero/config.php:74
+#: src/Module/Settings/Display.php:311 view/theme/duepuntozero/config.php:74
 #: view/theme/frio/config.php:156 view/theme/quattro/config.php:76
 #: view/theme/vier/config.php:124
 msgid "Theme settings"
 msgstr "Témabeállítások"
 
-#: src/Module/Settings/Display.php:322
+#: src/Module/Settings/Display.php:312
 msgid "Timelines"
 msgstr "Idővonalak"
 
-#: src/Module/Settings/Display.php:329
+#: src/Module/Settings/Display.php:319
 msgid "Display Theme:"
 msgstr "Megjelenítés témája:"
 
-#: src/Module/Settings/Display.php:330
+#: src/Module/Settings/Display.php:320
 msgid "Mobile Theme:"
 msgstr "Mobil téma:"
 
-#: src/Module/Settings/Display.php:333
+#: src/Module/Settings/Display.php:323
 msgid "Number of items to display per page:"
 msgstr "Oldalanként megjelenítendő elemek száma:"
 
-#: src/Module/Settings/Display.php:333 src/Module/Settings/Display.php:334
+#: src/Module/Settings/Display.php:323 src/Module/Settings/Display.php:324
 msgid "Maximum of 100 items"
 msgstr "Legfeljebb 100 elem"
 
-#: src/Module/Settings/Display.php:334
+#: src/Module/Settings/Display.php:324
 msgid "Number of items to display per page when viewed from mobile device:"
 msgstr "Oldalanként megjelenítendő elemek száma, ha mobil eszközről nézik:"
 
-#: src/Module/Settings/Display.php:335
-msgid "Update browser every xx seconds"
-msgstr "Böngésző frissítése N másodpercenként"
+#: src/Module/Settings/Display.php:325
+msgid "Regularly update the page content"
+msgstr ""
 
-#: src/Module/Settings/Display.php:335
-msgid "Minimum of 10 seconds. Enter -1 to disable it."
-msgstr "Legalább 10 másodperc. A -1 beírása letiltja."
+#: src/Module/Settings/Display.php:325
+msgid ""
+"When enabled, new content on network, community and channels are added on "
+"top."
+msgstr ""
 
-#: src/Module/Settings/Display.php:336
+#: src/Module/Settings/Display.php:326
 msgid "Display emoticons"
 msgstr "Hangulatjelek megjelenítése"
 
-#: src/Module/Settings/Display.php:336
+#: src/Module/Settings/Display.php:326
 msgid "When enabled, emoticons are replaced with matching symbols."
 msgstr "Ha engedélyezve van, akkor a hangulatjelek ki lesznek cserélve a megfelelő szimbólumokkal."
 
-#: src/Module/Settings/Display.php:337
+#: src/Module/Settings/Display.php:327
 msgid "Infinite scroll"
 msgstr "Végtelen görgetés"
 
-#: src/Module/Settings/Display.php:337
+#: src/Module/Settings/Display.php:327
 msgid "Automatic fetch new items when reaching the page end."
 msgstr "Új elemek automatikus lekérése az oldal végének elérésekor."
 
-#: src/Module/Settings/Display.php:338
+#: src/Module/Settings/Display.php:328
 msgid "Enable Smart Threading"
 msgstr "Intelligens szálkezelés engedélyezése"
 
-#: src/Module/Settings/Display.php:338
+#: src/Module/Settings/Display.php:328
 msgid "Enable the automatic suppression of extraneous thread indentation."
 msgstr "A nem odatartozó szálbehúzások automatikus elnyomásának engedélyezése."
 
-#: src/Module/Settings/Display.php:339
+#: src/Module/Settings/Display.php:329
 msgid "Display the Dislike feature"
 msgstr "A nem tetszik funkció megjelenítése"
 
-#: src/Module/Settings/Display.php:339
+#: src/Module/Settings/Display.php:329
 msgid ""
 "Display the Dislike button and dislike reactions on posts and comments."
 msgstr "A nem tetszik gomb és a nem tetszik reakciók megjelenítése a bejegyzéseknél és a hozzászólásoknál."
 
-#: src/Module/Settings/Display.php:340
+#: src/Module/Settings/Display.php:330
 msgid "Display the resharer"
 msgstr "Az újramegosztó megjelenítése"
 
-#: src/Module/Settings/Display.php:340
+#: src/Module/Settings/Display.php:330
 msgid "Display the first resharer as icon and text on a reshared item."
 msgstr "Az első újramegosztó megjelenítése ikonként és szövegként egy újra megosztott elemnél."
 
-#: src/Module/Settings/Display.php:341
+#: src/Module/Settings/Display.php:331
 msgid "Stay local"
 msgstr "Maradjon helyi"
 
-#: src/Module/Settings/Display.php:341
+#: src/Module/Settings/Display.php:331
 msgid "Don't go to a remote system when following a contact link."
 msgstr "Ne menjen távoli rendszerre, ha egy partnerhivatkozást követ."
 
-#: src/Module/Settings/Display.php:342
+#: src/Module/Settings/Display.php:332
 msgid "Show the post deletion checkbox"
 msgstr "A bejegyzéstörlés jelölőnégyzet megjelenítése"
 
-#: src/Module/Settings/Display.php:342
+#: src/Module/Settings/Display.php:332
 msgid "Display the checkbox for the post deletion on the network page."
 msgstr "Jelölőnégyzet megjelenítése a bejegyzés törléséhez a hálózat oldalán."
 
-#: src/Module/Settings/Display.php:343
+#: src/Module/Settings/Display.php:333
 msgid "DIsplay the event list"
 msgstr "Az eseménylista megjelenítése"
 
-#: src/Module/Settings/Display.php:343
+#: src/Module/Settings/Display.php:333
 msgid "Display the birthday reminder and event list on the network page."
 msgstr "A születésnapi emlékeztető és az eseménylista megjelenítése a hálózat oldalán."
 
-#: src/Module/Settings/Display.php:344
+#: src/Module/Settings/Display.php:334
 msgid "Link preview mode"
 msgstr "Hivatkozás-előnézeti mód"
 
-#: src/Module/Settings/Display.php:344
+#: src/Module/Settings/Display.php:334
 msgid "Appearance of the link preview that is added to each post with a link."
 msgstr "A hivatkozás előnézetének megjelenése, amely minden egyes hivatkozással rendelkező bejegyzéshez hozzá van adva."
 
-#: src/Module/Settings/Display.php:345
+#: src/Module/Settings/Display.php:335
 msgid "Hide pictures with empty alternative text"
 msgstr "Üres alternatív szöveggel rendelkező képek elrejtése"
 
-#: src/Module/Settings/Display.php:345
+#: src/Module/Settings/Display.php:335
 msgid "Don't display pictures that are missing the alternative text."
 msgstr "Ne jelenítse meg azokat a képeket, amelyeknél hiányzik az alternatív szöveg."
 
-#: src/Module/Settings/Display.php:346
+#: src/Module/Settings/Display.php:336
 msgid "Hide custom emojis"
 msgstr "Egyéni emodzsik elrejtése"
 
-#: src/Module/Settings/Display.php:346
+#: src/Module/Settings/Display.php:336
 msgid "Don't display custom emojis."
 msgstr "Ne jelenítse meg az egyéni emodzsikat."
 
-#: src/Module/Settings/Display.php:347
+#: src/Module/Settings/Display.php:337
 msgid "Platform icons style"
 msgstr "Platformikonok stílusa"
 
-#: src/Module/Settings/Display.php:347
+#: src/Module/Settings/Display.php:337
 msgid "Style of the platform icons"
 msgstr "A platformikonok stílusa"
 
-#: src/Module/Settings/Display.php:352
+#: src/Module/Settings/Display.php:342
 msgid "Bookmark"
 msgstr "Könyvjelző"
 
-#: src/Module/Settings/Display.php:354
+#: src/Module/Settings/Display.php:344
 msgid ""
 "Enable timelines that you want to see in the channels widget. Bookmark "
 "timelines that you want to see in the top menu."
 msgstr "Azon idővonalak engedélyezése, amelyeket a csatornák felületi elemben szeretne látni. Azon idővonalak könyvjelzőzése, amelyeket a felső menüben szeretne látni."
 
-#: src/Module/Settings/Display.php:356
+#: src/Module/Settings/Display.php:346
 msgid "Channel languages:"
 msgstr "Csatorna nyelvei:"
 
-#: src/Module/Settings/Display.php:356
+#: src/Module/Settings/Display.php:346
 msgid ""
 "Select all the languages you want to see in your channels. \"Unspecified\" "
 "describes all posts for which no language information was detected (e.g. "
@@ -10888,11 +10890,11 @@ msgid ""
 "list."
 msgstr ""
 
-#: src/Module/Settings/Display.php:358
+#: src/Module/Settings/Display.php:348
 msgid "Beginning of week:"
 msgstr "A hét kezdete:"
 
-#: src/Module/Settings/Display.php:359
+#: src/Module/Settings/Display.php:349
 msgid "Default calendar view:"
 msgstr "Alapértelmezett naptárnézet:"
 
@@ -12540,97 +12542,97 @@ msgstr "Falról-falra"
 msgid "via Wall-To-Wall:"
 msgstr "falról-falra szolgáltatáson keresztül:"
 
-#: src/Object/Post.php:602
+#: src/Object/Post.php:603
 #, php-format
 msgid "Reply to %s"
 msgstr "Válasz erre: %s"
 
-#: src/Object/Post.php:624
+#: src/Object/Post.php:625
 msgid "Notifier task is pending"
 msgstr "Az értesítőfeladat függőben van"
 
-#: src/Object/Post.php:625
+#: src/Object/Post.php:626
 msgid "Delivery to remote servers is pending"
 msgstr "A távoli kiszolgálókra történő kézbesítés függőben van"
 
-#: src/Object/Post.php:626
+#: src/Object/Post.php:627
 msgid "Delivery to remote servers is underway"
 msgstr "A távoli kiszolgálókra történő kézbesítés úton van"
 
-#: src/Object/Post.php:627
+#: src/Object/Post.php:628
 msgid "Delivery to remote servers is mostly done"
 msgstr "A távoli kiszolgálókra történő kézbesítés többnyire készen van"
 
-#: src/Object/Post.php:628
+#: src/Object/Post.php:629
 msgid "Delivery to remote servers is done"
 msgstr "A távoli kiszolgálókra történő kézbesítés készen van"
 
-#: src/Object/Post.php:650
+#: src/Object/Post.php:651
 #, php-format
 msgid "%d comment"
 msgid_plural "%d comments"
 msgstr[0] "%d hozzászólás"
 msgstr[1] "%d hozzászólás"
 
-#: src/Object/Post.php:651
+#: src/Object/Post.php:652
 msgid "Show more"
 msgstr "Több megjelenítése"
 
-#: src/Object/Post.php:652
+#: src/Object/Post.php:653
 msgid "Show fewer"
 msgstr "Kevesebb megjelenítése"
 
-#: src/Object/Post.php:689
+#: src/Object/Post.php:690
 #, php-format
 msgid "Reshared by: %s"
 msgstr "Újra megosztotta: %s"
 
-#: src/Object/Post.php:694
+#: src/Object/Post.php:695
 #, php-format
 msgid "Viewed by: %s"
 msgstr "Megtekintette: %s"
 
-#: src/Object/Post.php:699
+#: src/Object/Post.php:700
 #, php-format
 msgid "Read by: %s"
 msgstr "Olvasta: %s"
 
-#: src/Object/Post.php:704
+#: src/Object/Post.php:705
 #, php-format
 msgid "Liked by: %s"
 msgstr "Kedvelte: %s"
 
-#: src/Object/Post.php:709
+#: src/Object/Post.php:710
 #, php-format
 msgid "Disliked by: %s"
 msgstr "Nem kedvelte: %s"
 
-#: src/Object/Post.php:714
+#: src/Object/Post.php:715
 #, php-format
 msgid "Attended by: %s"
 msgstr "Részt vett: %s"
 
-#: src/Object/Post.php:719
+#: src/Object/Post.php:720
 #, php-format
 msgid "Maybe attended by: %s"
 msgstr "Talán részt vett: %s"
 
-#: src/Object/Post.php:724
+#: src/Object/Post.php:725
 #, php-format
 msgid "Not attended by: %s"
 msgstr "Nem vett részt: %s"
 
-#: src/Object/Post.php:729
+#: src/Object/Post.php:730
 #, php-format
 msgid "Commented by: %s"
 msgstr "Hozzászólt: %s"
 
-#: src/Object/Post.php:734
+#: src/Object/Post.php:735
 #, php-format
 msgid "Reacted with %s by: %s"
 msgstr "Reagált ezzel: %s: %s"
 
-#: src/Object/Post.php:757
+#: src/Object/Post.php:758
 #, php-format
 msgid "Quote shared by: %s"
 msgstr "Idézetten osztott meg: %s"

@@ -689,7 +689,6 @@ $a->strings['Display Settings'] = 'Настройки на дисплея';
 $a->strings['Theme settings'] = 'Тема Настройки';
 $a->strings['Display Theme:'] = 'Палитрата на дисплея:';
 $a->strings['Maximum of 100 items'] = 'Максимум от 100 точки';
-$a->strings['Update browser every xx seconds'] = 'Актуализиране на браузъра на всеки ХХ секунди';
 $a->strings['Additional Features'] = 'Допълнителни възможности';
 $a->strings['Connected Apps'] = 'Свързани Apps';
 $a->strings['Remove authorization'] = 'Премахване на разрешение';
