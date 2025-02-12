@@ -1108,7 +1108,6 @@ $a->strings['Display Theme:'] = 'Tema/utseende:';
 $a->strings['Mobile Theme:'] = 'Mobil-tema:';
 $a->strings['Number of items to display per page:'] = 'Antalet objekt att visa per sida:';
 $a->strings['Maximum of 100 items'] = 'Maximalt 100 objekt';
-$a->strings['Update browser every xx seconds'] = 'Uppdatera webbläsaren var xx sekunder';
 $a->strings['Infinite scroll'] = 'Oändlig skroll';
 $a->strings['Additional Features'] = 'Ytterligare funktioner';
 $a->strings['Connected Apps'] = 'Anslutna appar';

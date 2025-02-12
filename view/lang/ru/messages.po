@@ -26,7 +26,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-05 22:44+0000\n"
+"POT-Creation-Date: 2025-02-09 20:13+0000\n"
 "PO-Revision-Date: 2011-05-05 10:19+0000\n"
 "Last-Translator: Fitik Old Account, 2025\n"
 "Language-Team: Russian (http://app.transifex.com/Friendica/friendica/language/ru/)\n"
@@ -88,7 +88,7 @@ msgstr "Пункт не найден."
 #: src/Module/Settings/ContactImport.php:49
 #: src/Module/Settings/ContactImport.php:96
 #: src/Module/Settings/Delegation.php:76 src/Module/Settings/Display.php:80
-#: src/Module/Settings/Display.php:194
+#: src/Module/Settings/Display.php:188
 #: src/Module/Settings/Profile/Photo/Crop.php:148
 #: src/Module/Settings/Profile/Photo/Index.php:96
 #: src/Module/Settings/RemoveMe.php:103 src/Module/Settings/UserExport.php:64
@@ -309,7 +309,7 @@ msgstr "Вставить веб-ссылку"
 #: mod/message.php:188 mod/message.php:344 mod/photos.php:1252
 #: src/Content/Conversation.php:389 src/Content/Conversation.php:1565
 #: src/Module/Item/Compose.php:202 src/Module/Post/Edit.php:136
-#: src/Object/Post.php:607
+#: src/Object/Post.php:608
 msgid "Please wait"
 msgstr "Пожалуйста, подождите"
 
@@ -332,7 +332,7 @@ msgstr "Пожалуйста, подождите"
 #: src/Module/Profile/Profile.php:265
 #: src/Module/Settings/Profile/Index.php:248
 #: src/Module/Settings/Server/Action.php:65 src/Module/User/Delegation.php:177
-#: src/Object/Post.php:1148 view/theme/duepuntozero/config.php:73
+#: src/Object/Post.php:1149 view/theme/duepuntozero/config.php:73
 #: view/theme/frio/config.php:155 view/theme/quattro/config.php:75
 #: view/theme/vier/config.php:123
 msgid "Submit"
@@ -620,25 +620,25 @@ msgstr "Поворот против часовой стрелки (налево)
 
 #: mod/photos.php:1090 mod/photos.php:1146 mod/photos.php:1226
 #: src/Module/Contact.php:599 src/Module/Item/Compose.php:184
-#: src/Object/Post.php:1145
+#: src/Object/Post.php:1146
 msgid "This is you"
 msgstr "Это вы"
 
 #: mod/photos.php:1092 mod/photos.php:1148 mod/photos.php:1228
-#: src/Module/Moderation/Reports.php:105 src/Object/Post.php:601
-#: src/Object/Post.php:1147
+#: src/Module/Moderation/Reports.php:105 src/Object/Post.php:602
+#: src/Object/Post.php:1148
 msgid "Comment"
 msgstr "Комментировать"
 
 #: mod/photos.php:1094 mod/photos.php:1150 mod/photos.php:1230
 #: src/Content/Conversation.php:403 src/Module/Calendar/Event/Form.php:234
 #: src/Module/Item/Compose.php:197 src/Module/Post/Edit.php:156
-#: src/Object/Post.php:1161
+#: src/Object/Post.php:1162
 msgid "Preview"
 msgstr "Просмотр"
 
 #: mod/photos.php:1095 src/Content/Conversation.php:357
-#: src/Module/Post/Edit.php:121 src/Object/Post.php:1149
+#: src/Module/Post/Edit.php:121 src/Object/Post.php:1150
 msgid "Loading..."
 msgstr "Загрузка..."
 
@@ -680,112 +680,112 @@ msgstr "Карта"
 msgid "Apologies but the website is unavailable at the moment."
 msgstr ""
 
-#: src/App/Page.php:247
+#: src/App/Page.php:236
 msgid "Delete this item?"
 msgstr "Удалить этот элемент?"
 
-#: src/App/Page.php:248
+#: src/App/Page.php:237
 msgid ""
 "Block this author? They won't be able to follow you nor see your public "
 "posts, and you won't be able to see their posts and their notifications."
 msgstr "Заблокировать этого автора? Они не смогут подписаться на вас или видеть ваши записи, вы не будете видеть их записи и получать от них уведомления."
 
-#: src/App/Page.php:249
+#: src/App/Page.php:238
 msgid ""
 "Ignore this author? You won't be able to see their posts and their "
 "notifications."
 msgstr "Игнорировать этого автора? Вы не увидите их записи и уведомления."
 
-#: src/App/Page.php:250
+#: src/App/Page.php:239
 msgid "Collapse this author's posts?"
 msgstr "Сворачивать записи этого автора?"
 
-#: src/App/Page.php:251
+#: src/App/Page.php:240
 msgid "Ignore this author's server?"
 msgstr "Игнорировать сервер этого автора?"
 
-#: src/App/Page.php:252 src/Module/Settings/Server/Action.php:47
+#: src/App/Page.php:241 src/Module/Settings/Server/Action.php:47
 #: src/Module/Settings/Server/Index.php:94
 msgid ""
 "You won't see any content from this server including reshares in your "
 "Network page, the community pages and individual conversations."
 msgstr "Вы не будете видеть любые записи с этого сервера, включая репосты, в вашей ленте, в сообществах и в комментариях."
 
-#: src/App/Page.php:254
+#: src/App/Page.php:243
 msgid "Like not successful"
 msgstr "Ошибка отправки \"мне нравится\""
 
-#: src/App/Page.php:255
+#: src/App/Page.php:244
 msgid "Dislike not successful"
 msgstr "Ошибка оправки \"мне не нравится\""
 
-#: src/App/Page.php:256
+#: src/App/Page.php:245
 msgid "Sharing not successful"
 msgstr "Ошибка при попытке поделиться"
 
-#: src/App/Page.php:257
+#: src/App/Page.php:246
 msgid "Attendance unsuccessful"
 msgstr "Ошибка обновления календаря"
 
-#: src/App/Page.php:258
+#: src/App/Page.php:247
 msgid "Backend error"
 msgstr "Ошибка бэкенда"
 
-#: src/App/Page.php:259
+#: src/App/Page.php:248
 msgid "Network error"
 msgstr "Ошибка сети"
 
-#: src/App/Page.php:262
+#: src/App/Page.php:251
 msgid "Drop files here to upload"
 msgstr "Перетащите сюда файлы для загрузки"
 
-#: src/App/Page.php:263
+#: src/App/Page.php:252
 msgid "Your browser does not support drag and drop file uploads."
 msgstr "Ваш браузер не поддерживает перетаскивание файлов для загрузки"
 
-#: src/App/Page.php:264
+#: src/App/Page.php:253
 msgid ""
 "Please use the fallback form below to upload your files like in the olden "
 "days."
 msgstr "Пожалуйста, используйте форму ниже для загрузки файлов"
 
-#: src/App/Page.php:265
+#: src/App/Page.php:254
 msgid "File is too big ({{filesize}}MiB). Max filesize: {{maxFilesize}}MiB."
 msgstr "Файл слишком большой ({{filesize}}MiB). Ограничение: {{maxFilesize}}MiB."
 
-#: src/App/Page.php:266
+#: src/App/Page.php:255
 msgid "You can't upload files of this type."
 msgstr "Нельзя загрузить этот тип файла."
 
-#: src/App/Page.php:267
+#: src/App/Page.php:256
 msgid "Server responded with {{statusCode}} code."
 msgstr "Сервер ответил с кодом {{statusCode}}."
 
-#: src/App/Page.php:268
+#: src/App/Page.php:257
 msgid "Cancel upload"
 msgstr "Отменить загрузку"
 
-#: src/App/Page.php:269
+#: src/App/Page.php:258
 msgid "Upload canceled."
 msgstr "Загрузка отменена"
 
-#: src/App/Page.php:270
+#: src/App/Page.php:259
 msgid "Are you sure you want to cancel this upload?"
 msgstr "Вы уверены, что хотите отменить загрузку?"
 
-#: src/App/Page.php:271
+#: src/App/Page.php:260
 msgid "Remove file"
 msgstr "Убрать файл"
 
-#: src/App/Page.php:272
+#: src/App/Page.php:261
 msgid "You can't upload any more files."
 msgstr "Вы не можете загрузить больше файлов."
 
-#: src/App/Page.php:356
+#: src/App/Page.php:345
 msgid "toggle mobile"
 msgstr "мобильная версия"
 
-#: src/App/Page.php:367 src/Module/Admin/Logs/View.php:92
+#: src/App/Page.php:356 src/Module/Admin/Logs/View.php:92
 #: view/theme/frio/php/minimal.php:39 view/theme/frio/php/standard.php:138
 msgid "Close"
 msgstr "Закрыть"
@@ -1302,7 +1302,7 @@ msgid "Visible to <strong>everybody</strong>"
 msgstr "Видимое <strong>всем</strong>"
 
 #: src/Content/Conversation.php:327 src/Module/Item/Compose.php:196
-#: src/Object/Post.php:1160
+#: src/Object/Post.php:1161
 msgid "Please enter a image/video/audio/webpage URL:"
 msgstr "Пожалуйста, введите адрес картинки/видео/аудио/странички:"
 
@@ -1347,52 +1347,52 @@ msgid "attach file"
 msgstr "приложить файл"
 
 #: src/Content/Conversation.php:362 src/Module/Item/Compose.php:186
-#: src/Module/Post/Edit.php:162 src/Object/Post.php:1150
+#: src/Module/Post/Edit.php:162 src/Object/Post.php:1151
 msgid "Bold"
 msgstr "Жирный"
 
 #: src/Content/Conversation.php:363 src/Module/Item/Compose.php:187
-#: src/Module/Post/Edit.php:163 src/Object/Post.php:1151
+#: src/Module/Post/Edit.php:163 src/Object/Post.php:1152
 msgid "Italic"
 msgstr "Kурсивный"
 
 #: src/Content/Conversation.php:364 src/Module/Item/Compose.php:188
-#: src/Module/Post/Edit.php:164 src/Object/Post.php:1152
+#: src/Module/Post/Edit.php:164 src/Object/Post.php:1153
 msgid "Underline"
 msgstr "Подчеркнутый"
 
 #: src/Content/Conversation.php:365 src/Module/Item/Compose.php:189
-#: src/Module/Post/Edit.php:165 src/Object/Post.php:1154
+#: src/Module/Post/Edit.php:165 src/Object/Post.php:1155
 msgid "Quote"
 msgstr "Цитата"
 
 #: src/Content/Conversation.php:366 src/Module/Item/Compose.php:190
-#: src/Module/Post/Edit.php:166 src/Object/Post.php:1155
+#: src/Module/Post/Edit.php:166 src/Object/Post.php:1156
 msgid "Add emojis"
 msgstr "Добавить эмодзи"
 
 #: src/Content/Conversation.php:367 src/Module/Item/Compose.php:191
-#: src/Object/Post.php:1153
+#: src/Object/Post.php:1154
 msgid "Content Warning"
 msgstr "Предупреждение о контенте (CW)"
 
 #: src/Content/Conversation.php:368 src/Module/Item/Compose.php:192
-#: src/Module/Post/Edit.php:167 src/Object/Post.php:1156
+#: src/Module/Post/Edit.php:167 src/Object/Post.php:1157
 msgid "Code"
 msgstr "Код"
 
 #: src/Content/Conversation.php:369 src/Module/Item/Compose.php:193
-#: src/Object/Post.php:1157
+#: src/Object/Post.php:1158
 msgid "Image"
 msgstr "Изображение / Фото"
 
 #: src/Content/Conversation.php:370 src/Module/Item/Compose.php:194
-#: src/Module/Post/Edit.php:168 src/Object/Post.php:1158
+#: src/Module/Post/Edit.php:168 src/Object/Post.php:1159
 msgid "Link"
 msgstr "Ссылка"
 
 #: src/Content/Conversation.php:371 src/Module/Item/Compose.php:195
-#: src/Module/Post/Edit.php:169 src/Object/Post.php:1159
+#: src/Module/Post/Edit.php:169 src/Object/Post.php:1160
 msgid "Link or Media"
 msgstr "Ссылка или медиа"
 
@@ -1566,7 +1566,7 @@ msgstr "Категории:"
 msgid "Filed under:"
 msgstr "В рубрике:"
 
-#: src/Content/Conversation.php:1547 src/Object/Post.php:558
+#: src/Content/Conversation.php:1547 src/Object/Post.php:559
 #, php-format
 msgid "%s from %s"
 msgstr "%s из %s"
@@ -1826,7 +1826,7 @@ msgstr "Показывать записи от выбранных типов к�
 
 #: src/Content/Feature.php:131 src/Content/Widget.php:610
 #: src/Module/Admin/Site.php:463 src/Module/BaseSettings.php:113
-#: src/Module/Settings/Channels.php:211 src/Module/Settings/Display.php:323
+#: src/Module/Settings/Channels.php:211 src/Module/Settings/Display.php:313
 msgid "Channels"
 msgstr "Каналы"
 
@@ -2001,7 +2001,7 @@ msgstr "Игнорировать сервер %s "
 msgid "Languages"
 msgstr "Языки"
 
-#: src/Content/Item.php:435 src/Object/Post.php:585
+#: src/Content/Item.php:435 src/Object/Post.php:586
 msgid "Search Text"
 msgstr "Текст поиска"
 
@@ -2094,7 +2094,7 @@ msgstr "Ваши записи с фото и видео"
 #: src/Content/Nav.php:229 src/Content/Nav.php:289
 #: src/Module/BaseProfile.php:70 src/Module/BaseProfile.php:73
 #: src/Module/BaseProfile.php:81 src/Module/BaseProfile.php:84
-#: src/Module/Settings/Display.php:324 view/theme/frio/theme.php:225
+#: src/Module/Settings/Display.php:314 view/theme/frio/theme.php:225
 #: view/theme/frio/theme.php:229
 msgid "Calendar"
 msgstr "Календарь"
@@ -2990,37 +2990,37 @@ msgid "%s (%s)"
 msgstr ""
 
 #: src/Core/L10n.php:481 src/Model/Event.php:416
-#: src/Module/Settings/Display.php:292
+#: src/Module/Settings/Display.php:282
 msgid "Monday"
 msgstr "Понедельник"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:417
-#: src/Module/Settings/Display.php:293
+#: src/Module/Settings/Display.php:283
 msgid "Tuesday"
 msgstr "Вторник"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:418
-#: src/Module/Settings/Display.php:294
+#: src/Module/Settings/Display.php:284
 msgid "Wednesday"
 msgstr "Среда"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:419
-#: src/Module/Settings/Display.php:295
+#: src/Module/Settings/Display.php:285
 msgid "Thursday"
 msgstr "Четверг"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:420
-#: src/Module/Settings/Display.php:296
+#: src/Module/Settings/Display.php:286
 msgid "Friday"
 msgstr "Пятница"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:421
-#: src/Module/Settings/Display.php:297
+#: src/Module/Settings/Display.php:287
 msgid "Saturday"
 msgstr "Суббота"
 
 #: src/Core/L10n.php:481 src/Model/Event.php:415
-#: src/Module/Settings/Display.php:291
+#: src/Module/Settings/Display.php:281
 msgid "Sunday"
 msgstr "Воскресенье"
 
@@ -3473,17 +3473,17 @@ msgid "today"
 msgstr "сегодня"
 
 #: src/Model/Event.php:449 src/Module/Calendar/Show.php:117
-#: src/Module/Settings/Display.php:302 src/Util/Temporal.php:343
+#: src/Module/Settings/Display.php:292 src/Util/Temporal.php:343
 msgid "month"
 msgstr "мес."
 
 #: src/Model/Event.php:450 src/Module/Calendar/Show.php:118
-#: src/Module/Settings/Display.php:303 src/Util/Temporal.php:344
+#: src/Module/Settings/Display.php:293 src/Util/Temporal.php:344
 msgid "week"
 msgstr "неделя"
 
 #: src/Model/Event.php:451 src/Module/Calendar/Show.php:119
-#: src/Module/Settings/Display.php:304 src/Util/Temporal.php:345
+#: src/Module/Settings/Display.php:294 src/Util/Temporal.php:345
 msgid "day"
 msgstr "день"
 
@@ -4068,7 +4068,7 @@ msgid "Disable"
 msgstr "Отключить"
 
 #: src/Module/Admin/Addons/Details.php:75
-#: src/Module/Admin/Themes/Details.php:41 src/Module/Settings/Display.php:351
+#: src/Module/Admin/Themes/Details.php:41 src/Module/Settings/Display.php:341
 msgid "Enable"
 msgstr "Включить"
 
@@ -4119,7 +4119,7 @@ msgstr "Не удалось установить дополнение %s."
 #: src/Module/Settings/Connectors.php:143
 #: src/Module/Settings/Connectors.php:228
 #: src/Module/Settings/ContactImport.php:110
-#: src/Module/Settings/Delegation.php:179 src/Module/Settings/Display.php:317
+#: src/Module/Settings/Delegation.php:179 src/Module/Settings/Display.php:307
 #: src/Module/Settings/Features.php:61
 msgid "Save Settings"
 msgstr "Сохранить настройки"
@@ -4514,11 +4514,11 @@ msgstr ""
 msgid "%s is no valid input for maximum image size"
 msgstr "%s недопустимое значение для максимального размера изображений"
 
-#: src/Module/Admin/Site.php:361 src/Module/Settings/Display.php:212
+#: src/Module/Admin/Site.php:361 src/Module/Settings/Display.php:206
 msgid "No special theme for mobile devices"
 msgstr "Нет специальной темы для мобильных устройств"
 
-#: src/Module/Admin/Site.php:378 src/Module/Settings/Display.php:222
+#: src/Module/Admin/Site.php:378 src/Module/Settings/Display.php:216
 #, php-format
 msgid "%s - (Experimental)"
 msgstr "%s - (экспериментально)"
@@ -5595,7 +5595,7 @@ msgid ""
 msgstr "Допустимые значения \"all\" или \"tags\". \"all\" означает, что любые публичные записи будут получены. \"tags\" включает приём публичных записей с выбранными тэгами."
 
 #: src/Module/Admin/Site.php:584 src/Module/Contact/Profile.php:315
-#: src/Module/Settings/Display.php:259
+#: src/Module/Settings/Display.php:249
 #: src/Module/Settings/TwoFactor/Index.php:132
 msgid "Disabled"
 msgstr "Отключено"
@@ -6234,7 +6234,7 @@ msgstr "Советы для новых участников"
 #: src/Module/Contact.php:537 src/Module/Conversation/Channel.php:98
 #: src/Module/Conversation/Community.php:91
 #: src/Module/Conversation/Network.php:295
-#: src/Module/Moderation/BaseUsers.php:102 src/Object/Post.php:605
+#: src/Module/Moderation/BaseUsers.php:102 src/Object/Post.php:606
 msgid "More"
 msgstr "Ещё"
 
@@ -6425,7 +6425,7 @@ msgstr "Смотреть"
 msgid "Create New Event"
 msgstr "Создать новое мероприятие"
 
-#: src/Module/Calendar/Show.php:120 src/Module/Settings/Display.php:305
+#: src/Module/Calendar/Show.php:120 src/Module/Settings/Display.php:295
 msgid "list"
 msgstr "список"
 
@@ -10359,12 +10359,12 @@ msgid ""
 msgstr "Если включено, содержимое канала будет публиковаться. Это будет работать только для публичных записей, поступивших по ActivityPub из публичной ленты или кругов пользователя."
 
 #: src/Module/Settings/Channels.php:176 src/Module/Settings/Channels.php:197
-#: src/Module/Settings/Display.php:349
+#: src/Module/Settings/Display.php:339
 msgid "Label"
 msgstr "Название"
 
 #: src/Module/Settings/Channels.php:177 src/Module/Settings/Channels.php:198
-#: src/Module/Settings/Display.php:350
+#: src/Module/Settings/Display.php:340
 #: src/Module/Settings/TwoFactor/AppSpecific.php:123
 msgid "Description"
 msgstr "Описание"
@@ -10800,213 +10800,215 @@ msgstr "Возможные доверенные лица"
 msgid "No entries."
 msgstr "Нет записей."
 
-#: src/Module/Settings/Display.php:180
+#: src/Module/Settings/Display.php:174
 msgid "The theme you chose isn't available."
 msgstr "Выбранная вами тема недоступна."
 
-#: src/Module/Settings/Display.php:220
+#: src/Module/Settings/Display.php:214
 #, php-format
 msgid "%s - (Unsupported)"
 msgstr "%s - (Не поддерживается)"
 
-#: src/Module/Settings/Display.php:260
+#: src/Module/Settings/Display.php:250
 msgid "Color/Black"
 msgstr "Цвет/Черная"
 
-#: src/Module/Settings/Display.php:261 view/theme/frio/php/scheme.php:95
+#: src/Module/Settings/Display.php:251 view/theme/frio/php/scheme.php:95
 msgid "Black"
 msgstr "Чёрная"
 
-#: src/Module/Settings/Display.php:262
+#: src/Module/Settings/Display.php:252
 msgid "Color/White"
 msgstr "Цвет/Светлая"
 
-#: src/Module/Settings/Display.php:263
+#: src/Module/Settings/Display.php:253
 msgid "White"
 msgstr "Светлая"
 
-#: src/Module/Settings/Display.php:268
+#: src/Module/Settings/Display.php:258
 msgid "No preview"
 msgstr "Нет предпросмотра"
 
-#: src/Module/Settings/Display.php:269
+#: src/Module/Settings/Display.php:259
 msgid "No image"
 msgstr "Без изображения"
 
-#: src/Module/Settings/Display.php:270
+#: src/Module/Settings/Display.php:260
 msgid "Small Image"
 msgstr "Маленькое изображение"
 
-#: src/Module/Settings/Display.php:271
+#: src/Module/Settings/Display.php:261
 msgid "Large Image"
 msgstr "Большое изображение"
 
-#: src/Module/Settings/Display.php:316
+#: src/Module/Settings/Display.php:306
 msgid "Display Settings"
 msgstr "Внешний вид"
 
-#: src/Module/Settings/Display.php:318
+#: src/Module/Settings/Display.php:308
 msgid "General Theme Settings"
 msgstr "Общие настройки тем"
 
-#: src/Module/Settings/Display.php:319
+#: src/Module/Settings/Display.php:309
 msgid "Custom Theme Settings"
 msgstr "Личные настройки тем"
 
-#: src/Module/Settings/Display.php:320
+#: src/Module/Settings/Display.php:310
 msgid "Content Settings"
 msgstr "Настройки контента"
 
-#: src/Module/Settings/Display.php:321 view/theme/duepuntozero/config.php:74
+#: src/Module/Settings/Display.php:311 view/theme/duepuntozero/config.php:74
 #: view/theme/frio/config.php:156 view/theme/quattro/config.php:76
 #: view/theme/vier/config.php:124
 msgid "Theme settings"
 msgstr "Настройки темы"
 
-#: src/Module/Settings/Display.php:322
+#: src/Module/Settings/Display.php:312
 msgid "Timelines"
 msgstr "Ленты"
 
-#: src/Module/Settings/Display.php:329
+#: src/Module/Settings/Display.php:319
 msgid "Display Theme:"
 msgstr "Показать тему:"
 
-#: src/Module/Settings/Display.php:330
+#: src/Module/Settings/Display.php:320
 msgid "Mobile Theme:"
 msgstr "Мобильная тема:"
 
-#: src/Module/Settings/Display.php:333
+#: src/Module/Settings/Display.php:323
 msgid "Number of items to display per page:"
 msgstr "Количество элементов, отображаемых на одной странице:"
 
-#: src/Module/Settings/Display.php:333 src/Module/Settings/Display.php:334
+#: src/Module/Settings/Display.php:323 src/Module/Settings/Display.php:324
 msgid "Maximum of 100 items"
 msgstr "Максимум 100 элементов"
 
-#: src/Module/Settings/Display.php:334
+#: src/Module/Settings/Display.php:324
 msgid "Number of items to display per page when viewed from mobile device:"
 msgstr "Количество элементов на странице, когда просмотр осуществляется с мобильных устройств:"
 
-#: src/Module/Settings/Display.php:335
-msgid "Update browser every xx seconds"
-msgstr "Обновление браузера каждые хх секунд"
+#: src/Module/Settings/Display.php:325
+msgid "Regularly update the page content"
+msgstr ""
 
-#: src/Module/Settings/Display.php:335
-msgid "Minimum of 10 seconds. Enter -1 to disable it."
-msgstr "Минимум 10 секунд. Введите -1 для отключения."
+#: src/Module/Settings/Display.php:325
+msgid ""
+"When enabled, new content on network, community and channels are added on "
+"top."
+msgstr ""
 
-#: src/Module/Settings/Display.php:336
+#: src/Module/Settings/Display.php:326
 msgid "Display emoticons"
 msgstr "Показывать смайлики"
 
-#: src/Module/Settings/Display.php:336
+#: src/Module/Settings/Display.php:326
 msgid "When enabled, emoticons are replaced with matching symbols."
 msgstr "Когда включено, соответствующие символы отображаются как смайлики."
 
-#: src/Module/Settings/Display.php:337
+#: src/Module/Settings/Display.php:327
 msgid "Infinite scroll"
 msgstr "Бесконечная прокрутка"
 
-#: src/Module/Settings/Display.php:337
+#: src/Module/Settings/Display.php:327
 msgid "Automatic fetch new items when reaching the page end."
 msgstr "Автоматически подгружать новые записи, когда вы оказываетесь в конце страницы."
 
-#: src/Module/Settings/Display.php:338
+#: src/Module/Settings/Display.php:328
 msgid "Enable Smart Threading"
 msgstr "Включить умное ветвление обсуждений"
 
-#: src/Module/Settings/Display.php:338
+#: src/Module/Settings/Display.php:328
 msgid "Enable the automatic suppression of extraneous thread indentation."
 msgstr "Включить автоматическое удаление излишних отступов в ветках обсуждений."
 
-#: src/Module/Settings/Display.php:339
+#: src/Module/Settings/Display.php:329
 msgid "Display the Dislike feature"
 msgstr "Показывать \"Не нравится\""
 
-#: src/Module/Settings/Display.php:339
+#: src/Module/Settings/Display.php:329
 msgid ""
 "Display the Dislike button and dislike reactions on posts and comments."
 msgstr "Показывать кнопку \"Не нравится\" и соответствующие реакции на записях и комментариях."
 
-#: src/Module/Settings/Display.php:340
+#: src/Module/Settings/Display.php:330
 msgid "Display the resharer"
 msgstr "Показывать поделившегося"
 
-#: src/Module/Settings/Display.php:340
+#: src/Module/Settings/Display.php:330
 msgid "Display the first resharer as icon and text on a reshared item."
 msgstr "Показывать первого из поделившихся записью в виде значка над этой записью."
 
-#: src/Module/Settings/Display.php:341
+#: src/Module/Settings/Display.php:331
 msgid "Stay local"
 msgstr "Оставаться локально"
 
-#: src/Module/Settings/Display.php:341
+#: src/Module/Settings/Display.php:331
 msgid "Don't go to a remote system when following a contact link."
 msgstr "Не переходить на другие серверы по ссылкам профилей."
 
-#: src/Module/Settings/Display.php:342
+#: src/Module/Settings/Display.php:332
 msgid "Show the post deletion checkbox"
 msgstr "Показывать отметку для удаления записи"
 
-#: src/Module/Settings/Display.php:342
+#: src/Module/Settings/Display.php:332
 msgid "Display the checkbox for the post deletion on the network page."
 msgstr "Показывать галочку отметки записей для удаления на странице ленты"
 
-#: src/Module/Settings/Display.php:343
+#: src/Module/Settings/Display.php:333
 msgid "DIsplay the event list"
 msgstr "Показывать события"
 
-#: src/Module/Settings/Display.php:343
+#: src/Module/Settings/Display.php:333
 msgid "Display the birthday reminder and event list on the network page."
 msgstr "Показывать напоминания о днях рождения и список событий на странице ленты."
 
-#: src/Module/Settings/Display.php:344
+#: src/Module/Settings/Display.php:334
 msgid "Link preview mode"
 msgstr "Предпросмотр ссылок"
 
-#: src/Module/Settings/Display.php:344
+#: src/Module/Settings/Display.php:334
 msgid "Appearance of the link preview that is added to each post with a link."
 msgstr "Внешний вид предпросмотра ссылок,  который появляется в записях со ссылками."
 
-#: src/Module/Settings/Display.php:345
+#: src/Module/Settings/Display.php:335
 msgid "Hide pictures with empty alternative text"
 msgstr "Скрывать картинки без альт-текста"
 
-#: src/Module/Settings/Display.php:345
+#: src/Module/Settings/Display.php:335
 msgid "Don't display pictures that are missing the alternative text."
 msgstr "Не отображать картинки, у которых отсутствует альтернативный текст-описание."
 
-#: src/Module/Settings/Display.php:346
+#: src/Module/Settings/Display.php:336
 msgid "Hide custom emojis"
 msgstr "Скрывать нестандартные смайлики"
 
-#: src/Module/Settings/Display.php:346
+#: src/Module/Settings/Display.php:336
 msgid "Don't display custom emojis."
 msgstr "Не показывать нестандартные смайлики"
 
-#: src/Module/Settings/Display.php:347
+#: src/Module/Settings/Display.php:337
 msgid "Platform icons style"
 msgstr "Тема иконок платформ"
 
-#: src/Module/Settings/Display.php:347
+#: src/Module/Settings/Display.php:337
 msgid "Style of the platform icons"
 msgstr "Стиль отображения иконок платформ"
 
-#: src/Module/Settings/Display.php:352
+#: src/Module/Settings/Display.php:342
 msgid "Bookmark"
 msgstr "Главное меню"
 
-#: src/Module/Settings/Display.php:354
+#: src/Module/Settings/Display.php:344
 msgid ""
 "Enable timelines that you want to see in the channels widget. Bookmark "
 "timelines that you want to see in the top menu."
 msgstr "Включите ленты, которые вы хотите видеть в меню каналов слева, выберите ленты, которые будут отображаться в главном меню сверху."
 
-#: src/Module/Settings/Display.php:356
+#: src/Module/Settings/Display.php:346
 msgid "Channel languages:"
 msgstr "Языки каналов:"
 
-#: src/Module/Settings/Display.php:356
+#: src/Module/Settings/Display.php:346
 msgid ""
 "Select all the languages you want to see in your channels. \"Unspecified\" "
 "describes all posts for which no language information was detected (e.g. "
@@ -11015,11 +11017,11 @@ msgid ""
 "list."
 msgstr ""
 
-#: src/Module/Settings/Display.php:358
+#: src/Module/Settings/Display.php:348
 msgid "Beginning of week:"
 msgstr "Начало недели:"
 
-#: src/Module/Settings/Display.php:359
+#: src/Module/Settings/Display.php:349
 msgid "Default calendar view:"
 msgstr "Вид календаря по-умолчанию:"
 
@@ -12669,32 +12671,32 @@ msgstr "Стена-на-Стену"
 msgid "via Wall-To-Wall:"
 msgstr "через Стена-на-Стену:"
 
-#: src/Object/Post.php:602
+#: src/Object/Post.php:603
 #, php-format
 msgid "Reply to %s"
 msgstr "Ответ %s"
 
-#: src/Object/Post.php:624
+#: src/Object/Post.php:625
 msgid "Notifier task is pending"
 msgstr "Постановка в очередь"
 
-#: src/Object/Post.php:625
+#: src/Object/Post.php:626
 msgid "Delivery to remote servers is pending"
 msgstr "Ожидается отправка адресатам"
 
-#: src/Object/Post.php:626
+#: src/Object/Post.php:627
 msgid "Delivery to remote servers is underway"
 msgstr "Отправка адресатам в процессе"
 
-#: src/Object/Post.php:627
+#: src/Object/Post.php:628
 msgid "Delivery to remote servers is mostly done"
 msgstr "Отправка адресатам почти завершилась"
 
-#: src/Object/Post.php:628
+#: src/Object/Post.php:629
 msgid "Delivery to remote servers is done"
 msgstr "Отправка адресатам завершена"
 
-#: src/Object/Post.php:650
+#: src/Object/Post.php:651
 #, php-format
 msgid "%d comment"
 msgid_plural "%d comments"
@@ -12703,65 +12705,65 @@ msgstr[1] "%d комментариев"
 msgstr[2] "%d комментариев"
 msgstr[3] "%d комментариев"
 
-#: src/Object/Post.php:651
+#: src/Object/Post.php:652
 msgid "Show more"
 msgstr "Показать больше"
 
-#: src/Object/Post.php:652
+#: src/Object/Post.php:653
 msgid "Show fewer"
 msgstr "Показать меньше"
 
-#: src/Object/Post.php:689
+#: src/Object/Post.php:690
 #, php-format
 msgid "Reshared by: %s"
 msgstr "Репост от: %s"
 
-#: src/Object/Post.php:694
+#: src/Object/Post.php:695
 #, php-format
 msgid "Viewed by: %s"
 msgstr "Просмотрено: %s"
 
-#: src/Object/Post.php:699
+#: src/Object/Post.php:700
 #, php-format
 msgid "Read by: %s"
 msgstr "Прочитано: %s"
 
-#: src/Object/Post.php:704
+#: src/Object/Post.php:705
 #, php-format
 msgid "Liked by: %s"
 msgstr "Понравилось: %s"
 
-#: src/Object/Post.php:709
+#: src/Object/Post.php:710
 #, php-format
 msgid "Disliked by: %s"
 msgstr "Не понравилось: %s"
 
-#: src/Object/Post.php:714
+#: src/Object/Post.php:715
 #, php-format
 msgid "Attended by: %s"
 msgstr "Присутствуют: %s"
 
-#: src/Object/Post.php:719
+#: src/Object/Post.php:720
 #, php-format
 msgid "Maybe attended by: %s"
 msgstr "Под вопросом: %s"
 
-#: src/Object/Post.php:724
+#: src/Object/Post.php:725
 #, php-format
 msgid "Not attended by: %s"
 msgstr "Не присутствуют: %s"
 
-#: src/Object/Post.php:729
+#: src/Object/Post.php:730
 #, php-format
 msgid "Commented by: %s"
 msgstr "Прокомментировали: %s"
 
-#: src/Object/Post.php:734
+#: src/Object/Post.php:735
 #, php-format
 msgid "Reacted with %s by: %s"
 msgstr "Отреагировали как %s : %s"
 
-#: src/Object/Post.php:757
+#: src/Object/Post.php:758
 #, php-format
 msgid "Quote shared by: %s"
 msgstr "Процитировано: %s"

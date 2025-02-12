@@ -696,7 +696,6 @@ $a->strings['Display Settings'] = 'Ekranagordoj';
 $a->strings['Theme settings'] = 'Agordoj pri la etoso';
 $a->strings['Display Theme:'] = 'Vidiga etoso:';
 $a->strings['Maximum of 100 items'] = 'Maksimume 100 eroj';
-$a->strings['Update browser every xx seconds'] = 'Ĝisdatigu retesplorilon ĉiu xxx sekundoj';
 $a->strings['Connected Apps'] = 'Konektitaj Programoj';
 $a->strings['Remove authorization'] = 'Forviŝi rajtigon';
 $a->strings['(click to open/close)'] = '(klaku por malfermi/fermi)';

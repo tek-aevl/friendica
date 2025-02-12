@@ -862,7 +862,6 @@ $a->strings['Content Settings'] = 'Stillingar efnis';
 $a->strings['Theme settings'] = 'Þemastillingar';
 $a->strings['Display Theme:'] = 'Útlits þema:';
 $a->strings['Mobile Theme:'] = 'Farsímaþema';
-$a->strings['Update browser every xx seconds'] = 'Endurhlaða vefsíðu á xx sekúndu fresti';
 $a->strings['Beginning of week:'] = 'Upphaf viku:';
 $a->strings['Additional Features'] = 'Viðbótareiginleikar';
 $a->strings['Connected Apps'] = 'Tengd forrit';
