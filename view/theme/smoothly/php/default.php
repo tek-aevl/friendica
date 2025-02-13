@@ -7,7 +7,7 @@
  */
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="<?php echo Friendica\DI::l10n()->getCurrentLang(); ?>">
 <head>
   <title><?php if(!empty($page['title'])) echo $page['title'] ?></title>
   <script>var baseurl="<?php echo Friendica\DI::baseUrl() ?>";</script>

@@ -14,7 +14,7 @@ $frio = 'view/theme/frio';
 
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="<?php echo DI::l10n()->getCurrentLang(); ?>">
 <head>
 	<title><?php if(!empty($page['title'])) {
 		echo $page['title'];
