@@ -595,10 +595,10 @@ class GServer
 			(((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) || (parse_url($url, PHP_URL_PATH) != parse_url($valid_url, PHP_URL_PATH))) && empty(parse_url($valid_url, PHP_URL_PATH)))) {
 				DI::logger()->debug('Found redirect. Mark old entry as failure', ['old' => $url, 'new' => $valid_url]);
 				self::setFailureByUrl($url);
-				$target_id = self::getID($valid_url, true); 
+				$target_id = self::getID($valid_url, true);
 				if (!$target_id && !Network::isUrlBlocked($valid_url)) {
 					self::detect($valid_url, $network, $only_nodeinfo);
-					$target_id = self::getID($valid_url, true); 
+					$target_id = self::getID($valid_url, true);
 				}
 				if ($target_id) {
 					self::update(['redirect-gsid' => $target_id], ['nurl' => Strings::normaliseLink($url)]);
