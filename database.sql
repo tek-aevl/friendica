@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2025.02-dev (Interrupted Fern)
--- DB_UPDATE_VERSION 1577
+-- DB_UPDATE_VERSION 1578
 -- ------------------------------------------
 
 
@@ -41,10 +41,12 @@ CREATE TABLE IF NOT EXISTS `gserver` (
 	`blocked` boolean COMMENT 'Server is blocked',
 	`failed` boolean COMMENT 'Connection failed',
 	`next_contact` datetime DEFAULT '0001-01-01 00:00:00' COMMENT 'Next connection request',
+	`redirect-gsid` int unsigned COMMENT 'Target Gserver id in case of a redirect',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `nurl` (`nurl`(190)),
 	 INDEX `next_contact` (`next_contact`),
-	 INDEX `network` (`network`)
+	 INDEX `network` (`network`),
+	FOREIGN KEY (`redirect-gsid`) REFERENCES `gserver` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Global servers';
 
 --
