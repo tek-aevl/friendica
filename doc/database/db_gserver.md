@@ -46,12 +46,13 @@ Fields
 Indexes
 ------------
 
-| Name         | Fields            |
-| ------------ | ----------------- |
-| PRIMARY      | id                |
-| nurl         | UNIQUE, nurl(190) |
-| next_contact | next_contact      |
-| network      | network           |
+| Name          | Fields            |
+| ------------- | ----------------- |
+| PRIMARY       | id                |
+| nurl          | UNIQUE, nurl(190) |
+| next_contact  | next_contact      |
+| network       | network           |
+| redirect-gsid | redirect-gsid     |
 
 Foreign Keys
 ------------

@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1578);
+	define('DB_UPDATE_VERSION', 1579);
 }
 
 return [
@@ -92,6 +92,7 @@ return [
 			"nurl" => ["UNIQUE", "nurl(190)"],
 			"next_contact" => ["next_contact"],
 			"network" => ["network"],
+			"redirect-gsid" => ["redirect-gsid"],
 		]
 	],
 	"user" => [
