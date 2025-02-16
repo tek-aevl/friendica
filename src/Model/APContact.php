@@ -426,7 +426,7 @@ class APContact
 		}
 
 		if (!empty($apcontact['baseurl']) && empty($fetched_contact['gsid'])) {
-			$apcontact['gsid'] = GServer::getID($apcontact['baseurl']);
+			$apcontact['gsid'] = GServer::getRealID($apcontact['baseurl']);
 		} elseif (!empty($fetched_contact['gsid'])) {
 			$apcontact['gsid'] = $fetched_contact['gsid'];
 		} else {
