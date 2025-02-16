@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2025.02-dev (Interrupted Fern)
--- DB_UPDATE_VERSION 1578
+-- DB_UPDATE_VERSION 1579
 -- ------------------------------------------
 
 
@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS `gserver` (
 	 UNIQUE INDEX `nurl` (`nurl`(190)),
 	 INDEX `next_contact` (`next_contact`),
 	 INDEX `network` (`network`),
+	 INDEX `redirect-gsid` (`redirect-gsid`),
 	FOREIGN KEY (`redirect-gsid`) REFERENCES `gserver` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Global servers';
 
