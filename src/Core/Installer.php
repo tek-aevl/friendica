@@ -371,6 +371,7 @@ class Installer
 	 * - libCurl
 	 * - GD Graphics
 	 * - OpenSSL
+	 * - Sodium
 	 * - PDO or MySQLi
 	 * - mb_string
 	 * - XML
@@ -447,6 +448,14 @@ class Installer
 			'openssl_public_encrypt',
 			DI::l10n()->t('OpenSSL PHP module'),
 			DI::l10n()->t('Error: openssl PHP module required but not installed.'),
+			true,
+		);
+		$returnVal = $returnVal ? $status : false;
+
+		$status = $this->checkFunction(
+			'sodium_crypto_sign_verify_detached',
+			DI::l10n()->t('Sodium PHP module'),
+			DI::l10n()->t('Error: Sodium PHP module required but not installed.'),
 			true,
 		);
 		$returnVal = $returnVal ? $status : false;

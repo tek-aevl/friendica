@@ -403,4 +403,57 @@ G1vVmRgkLDqhc4+r3wDz3qy6JpV7tg==
 			self::assertSame(1, openssl_verify($signedData, base64_decode($match[1]), $pubKey, OPENSSL_ALGO_SHA256));
 		}
 	}
+
+	/**
+	 * An RSA signature with no "alg" parameter is verified against both PKCS#1 v1.5
+	 * and PSS (the FASP discovery service signs with rsa-pss-sha512 and no "alg").
+	 */
+	public function testRfc9421RsaWithoutAlgParameter(): void
+	{
+		$keypair = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
+		openssl_pkey_export($keypair, $privKey);
+		$pubKey = openssl_pkey_get_details($keypair)['key'];
+
+		$context = ['method' => 'GET', 'scheme' => 'https', 'authority' => 'friendica.example', 'target' => '/followers/alice'];
+		$digest  = 'sha-256=:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=:';
+		$params  = '("@method" "@target-uri" "content-digest");created=1618884473;keyid="https://fasp.example/actor#main-key"';
+		$base    = HTTPSignature::rfc9421SignatureBase(['@method', '@target-uri', 'content-digest'], $params, $context, ['content-digest' => $digest]);
+
+		$key = \phpseclib3\Crypt\PublicKeyLoader::load($privKey);
+		self::assertInstanceOf(\phpseclib3\Crypt\RSA::class, $key);
+		$signer = $key->withPadding(\phpseclib3\Crypt\RSA::SIGNATURE_PSS)->withHash('sha512')->withMGFHash('sha512');
+		self::assertInstanceOf(\phpseclib3\Crypt\Common\PrivateKey::class, $signer);
+		$signature = $signer->sign($base);
+
+		$algorithms    = new \ReflectionMethod(HTTPSignature::class, 'rfc9421Algorithms');
+		$keyAlgorithms = new \ReflectionMethod(HTTPSignature::class, 'keyAlgorithms');
+		$verify        = new \ReflectionMethod(HTTPSignature::class, 'verifySignature');
+
+		$candidates = $keyAlgorithms->invoke(null, $pubKey, $algorithms->invoke(null, ''));
+		self::assertSame(['sha256', 'rsa-pss-sha512'], $candidates);
+
+		$verified = false;
+		foreach ($candidates as $candidate) {
+			$verified = $verified || $verify->invoke(null, $base, $signature, $pubKey, $candidate);
+		}
+		self::assertTrue($verified);
+
+		// A multibase key never gets an RSA verification attempt
+		self::assertSame(['ed25519'], $keyAlgorithms->invoke(null, 'z6MkExample', $algorithms->invoke(null, '')));
+	}
+
+	/**
+	 * A signature without "created" has no lower time bound and is rejected, even
+	 * when the body and its Content-Digest match.
+	 */
+	public function testRfc9421RequiresCreated(): void
+	{
+		$check = new \ReflectionMethod(HTTPSignature::class, 'rfc9421CheckContent');
+
+		$components = ['@method', '@target-uri', 'content-digest'];
+		$headers    = ['content-digest' => 'sha-256=:RBNvo1WzZ4oRRq0W9+hknpT7T8If536DEMBg9hyq/4o=:'];
+
+		self::assertFalse($check->invoke(null, '{}', $components, $headers, 0, 0));
+		self::assertTrue($check->invoke(null, '{}', $components, $headers, time(), 0));
+	}
 }

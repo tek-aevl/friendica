@@ -591,6 +591,10 @@ class HTTPSignature
 			$curl_opts[HttpClientOptions::HEADERS] = self::signGetRfc9421($header, $request, $owner);
 			$curlResult                            = DI::httpClient()->get($request, HttpClientAccept::JSON_AS, $curl_opts);
 			$return_code                           = $curlResult->getReturnCode();
+
+			if (in_array($return_code, [401, 403])) {
+				DI::logger()->info('Signature was rejected in every variant', ['url' => $request, 'return-code' => $return_code]);
+			}
 		}
 
 		DI::logger()->info('Fetched for user ' . $uid . ' from ' . $request . ' returned ' . $return_code);
@@ -899,8 +903,8 @@ class HTTPSignature
 				continue;
 			}
 
-			$algorithm = self::rfc9421Algorithm((string) ($params->alg ?? ''));
-			if (is_null($algorithm)) {
+			$algorithms = self::rfc9421Algorithms((string) ($params->alg ?? ''));
+			if ($algorithms === []) {
 				continue;
 			}
 
@@ -926,8 +930,19 @@ class HTTPSignature
 				continue;
 			}
 
-			if (!self::verifySignature($base, (string) $signature->getValue(), $key['pubkey'], $algorithm)) {
-				DI::logger()->info('RFC 9421 signature could not be verified', ['label' => $label, 'signer' => $key['url'], 'algorithm' => $algorithm]);
+			// An RSA key can be used with either PKCS#1 v1.5 or PSS padding and the
+			// "alg" parameter is often omitted, so more than one candidate is tried.
+			$algorithm = '';
+			foreach (self::keyAlgorithms($key['pubkey'], $algorithms) as $candidate) {
+				if (self::verifySignature($base, (string) $signature->getValue(), $key['pubkey'], $candidate)) {
+					$algorithm = $candidate;
+					break;
+				}
+			}
+
+			if ($algorithm === '') {
+				DI::logger()->info('RFC 9421 signature could not be verified', ['label' => $label, 'signer' => $key['url'], 'algorithms' => $algorithms, 'components' => $components]);
+				DI::logger()->debug('Rejected RFC 9421 signature base', ['label' => $label, 'base' => $base, 'signature-input' => $http_headers['HTTP_SIGNATURE_INPUT'] ?? '']);
 				continue;
 			}
 
@@ -987,13 +1002,14 @@ class HTTPSignature
 			case '@target-uri':
 				return $context['scheme'] . '://' . $context['authority'] . $context['target'];
 			case '@path':
-				return (string) parse_url((string) $context['target'], PHP_URL_PATH);
+				// RFC 9421 §2.2.6: an empty path is "/"
+				return (string) parse_url((string) $context['target'], PHP_URL_PATH) ?: '/';
 			case '@query':
 				$query = parse_url((string) $context['target'], PHP_URL_QUERY);
 				return '?' . (is_string($query) ? $query : '');
 			case '@request-target':
 				$query = parse_url((string) $context['target'], PHP_URL_QUERY);
-				return (string) parse_url((string) $context['target'], PHP_URL_PATH) . (is_string($query) && $query !== '' ? '?' . $query : '');
+				return ((string) parse_url((string) $context['target'], PHP_URL_PATH) ?: '/') . (is_string($query) && $query !== '' ? '?' . $query : '');
 		}
 
 		// Derived components we do not implement and response-only ones such as "@status"
@@ -1023,28 +1039,49 @@ class HTTPSignature
 	}
 
 	/**
-	 * Maps an RFC 9421 "alg" parameter to an algorithm identifier for verifySignature()
+	 * Maps an RFC 9421 "alg" parameter to the verifySignature() identifiers to try
 	 *
-	 * An empty value is treated as RSASSA-PKCS1-v1_5 with SHA-256, which is what the
-	 * fediverse uses together with the actor's RSA key.
+	 * The parameter is often omitted (RFC 9421 §3.3.7). An RSA key can then be used
+	 * with either PKCS#1 v1.5 / SHA-256 or PSS / SHA-512 (the FASP profile uses the
+	 * latter without an "alg"), so both are returned and tried in turn.
 	 *
-	 * @return string|null null for unsupported algorithms
+	 * @return array Empty for unsupported algorithms
 	 */
-	private static function rfc9421Algorithm(string $alg): ?string
+	private static function rfc9421Algorithms(string $alg): array
 	{
 		switch ($alg) {
 			case '':
+				return ['sha256', 'rsa-pss-sha512', 'ed25519'];
 			case 'rsa-v1_5-sha256':
 			case 'rsa-sha256':
-				return 'sha256';
+				return ['sha256'];
 			case 'rsa-pss-sha512':
-				return 'rsa-pss-sha512';
+				return ['rsa-pss-sha512'];
 			case 'ed25519':
-				return 'ed25519';
+				return ['ed25519'];
 			default:
 				DI::logger()->info('Unsupported algorithm', ['alg' => $alg]);
-				return null;
+				return [];
 		}
+	}
+
+	/**
+	 * Narrows the algorithm candidates to those that match the key material
+	 *
+	 * A multibase key is Ed25519, a PEM key is RSA. This keeps verifySignature()
+	 * from running an RSA verification against an Ed25519 key and vice versa.
+	 *
+	 * @param string $pubkey     RSA PEM or Ed25519 multibase key
+	 * @param array  $candidates Algorithm identifiers from rfc9421Algorithms()
+	 * @return array
+	 */
+	private static function keyAlgorithms(string $pubkey, array $candidates): array
+	{
+		if (str_starts_with($pubkey, 'z6Mk')) {
+			return array_values(array_intersect($candidates, ['ed25519']));
+		}
+
+		return array_values(array_diff($candidates, ['ed25519']));
 	}
 
 	/**
@@ -1052,6 +1089,8 @@ class HTTPSignature
 	 */
 	private static function rfc9421CheckContent(string $content, array $components, array $headers, int $created, int $expires): bool
 	{
+		// The digest only protects an actual body. Some senders cover (and send) a
+		// "content-digest" on an empty GET too; a mismatch there is harmless.
 		if ($content !== '') {
 			if (!in_array('content-digest', $components)) {
 				DI::logger()->info('Body is present but "content-digest" is not signed');
@@ -1063,25 +1102,29 @@ class HTTPSignature
 			}
 		}
 
-		$expired = !empty($expires) ? min($expires, $created + 3600) : $created + 3600;
-
-		if (!empty($created)) {
-			$current = time();
-
-			// Grace period of 60 seconds for slight time differences between the servers
-			if (($created - 60) > $current) {
-				DI::logger()->notice('Signature created in the future', ['created' => date(DateTimeFormat::MYSQL, $created), 'current' => date(DateTimeFormat::MYSQL, $current)]);
-				return false;
-			}
-			if ($current > $expired) {
-				DI::logger()->notice('Signature expired', ['expired' => date(DateTimeFormat::MYSQL, $expired), 'current' => date(DateTimeFormat::MYSQL, $current)]);
-				return false;
-			}
+		// Without "created" a signature has no lower time bound and could be replayed
+		// forever, so it is required just like the "Date" header on the cavage path.
+		if (empty($created)) {
+			DI::logger()->info('Missing "created" parameter');
+			return false;
 		}
 
-		// A signed GET has no body, so it has to cover the request target and a creation date
+		$current = time();
+		$expired = !empty($expires) ? min($expires, $created + 3600) : $created + 3600;
+
+		// Grace period of 60 seconds for slight time differences between the servers
+		if (($created - 60) > $current) {
+			DI::logger()->notice('Signature created in the future', ['created' => date(DateTimeFormat::MYSQL, $created), 'current' => date(DateTimeFormat::MYSQL, $current)]);
+			return false;
+		}
+		if ($current > $expired) {
+			DI::logger()->notice('Signature expired', ['expired' => date(DateTimeFormat::MYSQL, $expired), 'current' => date(DateTimeFormat::MYSQL, $current)]);
+			return false;
+		}
+
+		// A signed GET has no body, so it has to cover the request target
 		$bound = (bool) array_intersect($components, ['@target-uri', '@path', '@query', '@request-target', '@authority']);
-		if ($content === '' && (empty($created) || !$bound)) {
+		if ($content === '' && !$bound) {
 			DI::logger()->info('No good signed content');
 			return false;
 		}
