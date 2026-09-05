@@ -133,7 +133,7 @@ class HTTPClientTest extends MockedTestCase
 
 	public function testAllowedInternalHostIsRequested(): void
 	{
-		DI::config()->set('system', 'allowed_internal_hosts', ['127.0.0.1']);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
 
 		$this->httpRequestHandler->setHandler(new MockHandler([new Response(200, [], 'hello')]));
 
