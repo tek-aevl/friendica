@@ -255,7 +255,8 @@ class Network
 	/** Checks whether an outbound request targets a non-public address. */
 	public static function isPrivateTarget(UriInterface $uri): bool
 	{
-		if (!DI::config()->get('system', 'block_private_addresses', true)) {
+		// Coerce here because environment variables always arrive as strings ("false" would otherwise be truthy)
+		if (!filter_var(DI::config()->get('system', 'block_private_addresses', true), FILTER_VALIDATE_BOOLEAN)) {
 			return false;
 		}
 
@@ -268,15 +269,30 @@ class Network
 			return false;
 		}
 
-		foreach (DI::config()->get('system', 'allowed_internal_hosts', []) as $allowed) {
-			if (!empty($allowed) && fnmatch(strtolower((string) $allowed), strtolower($host))) {
-				return false;
-			}
+		if (self::isAllowedInternalHost($host, (string) DI::config()->get('system', 'allowed_internal_hosts', ''))) {
+			return false;
 		}
 
 		foreach (self::resolveHost($host) as $address) {
 			if (IpAddress::isNonPublic($address)) {
 				DI::logger()->info('Target is not on the public internet.', ['host' => $host, 'address' => $address]);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks whether $host matches an entry of the comma-separated $allowedList.
+	 *
+	 * Entries may use fnmatch() wildcards. Matching is case-insensitive.
+	 */
+	public static function isAllowedInternalHost(string $host, string $allowedList): bool
+	{
+		foreach (explode(',', $allowedList) as $allowed) {
+			$allowed = trim($allowed);
+			if ($allowed !== '' && fnmatch(strtolower($allowed), strtolower($host))) {
 				return true;
 			}
 		}
