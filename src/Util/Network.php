@@ -20,6 +20,17 @@ use Psr\Http\Message\UriInterface;
 
 class Network
 {
+	// Query parameters added by tracking and analytics platforms, removed from URLs before they are stored or fetched
+	public const TRACKING_QUERY_PARAMS = [
+		'utm_source', 'utm_medium', 'utm_term', 'utm_content', 'utm_campaign',
+		// As seen from Purism
+		'mtm_source', 'mtm_medium', 'mtm_term', 'mtm_content', 'mtm_campaign',
+		'wt_mc', 'pk_campaign', 'pk_kwd', 'mc_cid', 'mc_eid',
+		'fb_action_ids', 'fb_action_types', 'fb_ref',
+		'awesm', 'wtrid',
+		'woo_campaign', 'woo_source', 'woo_medium', 'woo_content', 'woo_term',
+	];
+
 	/**
 	 * Return raw post data from a post request
 	 *
@@ -378,44 +389,22 @@ class Network
 	{
 		$urldata = parse_url($url);
 
-		if (!empty($urldata['query'])) {
-			$query = $urldata['query'];
-			parse_str($query, $querydata);
-
-			foreach ($querydata as $param => $value) {
-				if (in_array(
-					$param,
-					[
-						'utm_source', 'utm_medium', 'utm_term', 'utm_content', 'utm_campaign',
-						// As seen from Purism
-						'mtm_source', 'mtm_medium', 'mtm_term', 'mtm_content', 'mtm_campaign',
-						'wt_mc', 'pk_campaign', 'pk_kwd', 'mc_cid', 'mc_eid',
-						'fb_action_ids', 'fb_action_types', 'fb_ref',
-						'awesm', 'wtrid',
-						'woo_campaign', 'woo_source', 'woo_medium', 'woo_content', 'woo_term'],
-				)
-				) {
-					$pair = $param . '=' . urlencode($value);
-					$url  = str_replace($pair, '', $url);
-
-					// Second try: if the url isn't encoded completely
-					$pair = $param . '=' . str_replace(' ', '+', $value);
-					$url  = str_replace($pair, '', $url);
-
-					// Third try: Maybe the url isn't encoded at all
-					$pair = $param . '=' . $value;
-					$url  = str_replace($pair, '', $url);
-
-					$url = str_replace(['?&', '&&'], ['?', ''], $url);
-				}
-			}
-
-			if (str_ends_with($url, '?')) {
-				$url = substr($url, 0, -1);
-			}
+		if (empty($urldata['query'])) {
+			return $url;
 		}
 
-		return $url;
+		parse_str($urldata['query'], $querydata);
+
+		$querydata = array_diff_key($querydata, array_flip(self::TRACKING_QUERY_PARAMS));
+
+		$urldata['query'] = http_build_query($querydata);
+
+		try {
+			return (string) Uri::fromParts($urldata);
+		} catch (\Throwable) {
+			DI::logger()->warning('Invalid URL', ['url' => $url]);
+			return $url;
+		}
 	}
 
 	/**
