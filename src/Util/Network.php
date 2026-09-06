@@ -256,6 +256,7 @@ class Network
 	public static function isPrivateTarget(UriInterface $uri): bool
 	{
 		// Coerce here because environment variables always arrive as strings ("false" would otherwise be truthy)
+		// @todo Replace this check with a proper sanitation functionality (must work for env variables, config-files and database entries)
 		if (!filter_var(DI::config()->get('system', 'block_private_addresses', true), FILTER_VALIDATE_BOOLEAN)) {
 			return false;
 		}
