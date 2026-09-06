@@ -830,10 +830,13 @@ nav.navbar .nav > li > button:focus,
 #topbar-first .topbar-nav .nav-segment > a,
 #topbar-first .topbar-actions .nav-segment > a,
 #search-mobile-btn {
-	display: inline-block;
 	text-decoration: none;
 	text-align: center;
 	max-height: 50px;
+}
+#topbar-first .topbar-nav .nav-segment > a,
+#topbar-first .topbar-actions .nav-segment > a {
+	display: inline-block;
 }
 #topbar-first .topbar-nav .nav-segment > a {
   padding-left: 35px;
