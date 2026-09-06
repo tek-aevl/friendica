@@ -612,6 +612,11 @@ code {
   transition: all 150ms ease-out;
   text-decoration: none;
   font-weight: 400;
+  text-align: center;
+
+  &i {
+    display: none;
+  }
 
   &:hover {
     border-top: 1px solid var(--bg-tertiary);
@@ -626,5 +631,11 @@ code {
   &:focus {
     outline: 2px solid #3584e4;
     outline-offset: -2px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    width: 1500px;
   }
 }
