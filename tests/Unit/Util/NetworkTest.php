@@ -79,6 +79,14 @@ class NetworkTest extends TestCase
 				'url'    => 'this is not a url',
 				'expect' => 'this is not a url',
 			],
+			'input that is not a url but has a query string is returned unchanged' => [
+				'url'    => 'this is not a url?test',
+				'expect' => 'this is not a url?test',
+			],
+			'malformed uri is returned unchanged' => [
+				'url'    => ':/test/it?query',
+				'expect' => ':/test/it?query',
+			],
 		];
 	}
 

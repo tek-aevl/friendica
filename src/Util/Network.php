@@ -389,7 +389,7 @@ class Network
 	{
 		$urldata = parse_url($url);
 
-		if (empty($urldata['query'])) {
+		if (empty($urldata['query']) || !filter_var($url, FILTER_VALIDATE_URL)) {
 			return $url;
 		}
 
