@@ -109,7 +109,7 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+window.onDocumentReady('body', function() {
 	var selectAllCheckbox = document.getElementById('select-all-reports');
 	var reportCheckboxes = document.querySelectorAll('.report-checkbox');
 
