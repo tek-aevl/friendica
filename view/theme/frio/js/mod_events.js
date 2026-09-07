@@ -265,6 +265,10 @@ function showEvent(eventid) {
 
 function changeView(action, viewName) {
 	$("#events-calendar").fullCalendar(action, viewName);
+	if (action === "changeView" && viewName) {
+		// Fire and forget, the view is remembered server-side without blocking the UI
+		$.post("calendar/api/view", {view: viewName});
+	}
 	var view = $("#events-calendar").fullCalendar("getView");
 	$("#fc-title").text(view.title);
 }
