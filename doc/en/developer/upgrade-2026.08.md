@@ -17,7 +17,7 @@ This section contains backward compatibility breaks, make sure your code is comp
 - Outbound requests to non-public IP addresses are blocked by default.
 
    This can affect internal feed servers, mail servers, media proxies and other services using private network addresses.
-   Add required hostnames to `system.allowed_internal_hosts`.
+   Add required hostnames to `system.allowed_internal_hosts` as a comma-separated string.
    The protection can be disabled with `system.block_private_addresses`, but this is not recommended on public nodes.
 
 - The web server has to serve `.mjs` files as JavaScript.

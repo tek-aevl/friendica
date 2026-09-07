@@ -91,10 +91,10 @@ return [
 		// Days of inactivity after which an admin is considered inactive. "0" means that there will be no check for inactivity.
 		'admin_inactivity_limit' => 30,
 
-		// allowed_internal_hosts (Array)
-		// Internal hosts that server-side requests may reach. Wildcards are allowed.
+		// allowed_internal_hosts (String)
+		// Comma-separated list of internal hosts that server-side requests may reach. Wildcards are allowed.
 		// See block_private_addresses.
-		'allowed_internal_hosts' => [],
+		'allowed_internal_hosts' => '',
 
 		// allowed_link_protocols (Array)
 		// Allowed protocols in links URLs, add at your own risk. http(s) is always allowed.
