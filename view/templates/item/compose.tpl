@@ -159,7 +159,7 @@
         }
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
+    window.onDocumentReady("body", function() {
         var textareas = document.querySelectorAll(".expandable-textarea");
 
         textareas.forEach(function(textarea) {
@@ -189,7 +189,7 @@
         formSubmitting = true;
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
+    window.onDocumentReady("body", function() {
         var textareas = document.querySelectorAll(".expandable-textarea");
 
         textareas.forEach(function(textarea) {

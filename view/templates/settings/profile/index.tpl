@@ -121,6 +121,12 @@
 	</form>
 </div>
 <script type="text/javascript">
-	Fill_Country('{{$country_name.2}}');
-	Fill_States('{{$region.2}}');
+	window.onDocumentReady('#profile-edit-country-name', function () {
+		if (typeof Fill_Country !== 'function') {
+			return;
+		}
+
+		Fill_Country('{{$country_name.2}}');
+		Fill_States('{{$region.2}}');
+	});
 </script>
