@@ -248,6 +248,20 @@ ul#nav-user-menu {
 	}
 }
 
+/* Fix header overflowing on narrow viewports */
+@media screen and (max-width: 400px) {
+	#topbar-first .nav > li > a,
+	#topbar-first .nav > li > button,
+	#topbar-first .navbar-toggle {
+		padding-left: 5px;
+		padding-right: 5px;
+	}
+	#topbar-first .topbar-nav .nav-segment > a,
+	button#main-menu {
+		min-width: 35px;
+	}
+}
+
 /**
  * mobile: Larger screens
  */
