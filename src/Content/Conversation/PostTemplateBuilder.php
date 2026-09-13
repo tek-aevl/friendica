@@ -87,7 +87,11 @@ final class PostTemplateBuilder
 
 		while (true) {
 			$post = Post::selectFirstPost(['thr-parent-id', 'parent-uri-id'], ['uri-id' => $uriid]);
-			if (!$post || $uriid == $post['parent-uri-id']) {
+			// A federated root post's parent-uri-id doesn't necessarily equal its own
+			// uri-id (that's a local-post convention), but its thr-parent-id always
+			// self-references once we've reached the root — check that too, or this
+			// never terminates for such posts.
+			if (!$post || $uriid == $post['parent-uri-id'] || $uriid == $post['thr-parent-id']) {
 				return $threadlevel;
 			}
 
