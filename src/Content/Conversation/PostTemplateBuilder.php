@@ -91,7 +91,7 @@ final class PostTemplateBuilder
 			// uri-id (that's a local-post convention), but its thr-parent-id always
 			// self-references once we've reached the root — check that too, or this
 			// never terminates for such posts.
-			if (!$post || $uriid == $post['parent-uri-id'] || $uriid == $post['thr-parent-id']) {
+			if (!$post || $uriid === $post['parent-uri-id'] || $uriid === $post['thr-parent-id']) {
 				return $threadlevel;
 			}
 
