@@ -1166,7 +1166,7 @@ class BBCode
 		}
 
 		$data = Contact::getByURL($match[2], false, ['url', 'alias', 'nick', 'network']);
-		if (empty($data['nick']) && str_starts_with((string) $match[2], 'did:plc:')) {
+		if (empty($data['nick']) && (str_starts_with((string) $match[2], 'did:plc:') || str_starts_with((string) $match[2], 'did:web:'))) {
 			$data = [
 				'url'     => $match[2],
 				'alias'   => $match[2],

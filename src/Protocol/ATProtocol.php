@@ -433,14 +433,57 @@ final class ATProtocol
 	}
 
 	/**
+	 * Fetch the DID document for a given DID.
+	 *
+	 * did:plc identities are resolved via the PLC directory. did:web identities
+	 * don't use a directory, their document is hosted on the domain that is
+	 * encoded in the DID itself.
+	 *
+	 * @param string $did DID (did:plc:... or did:web:...)
+	 * @return stdClass|null DID document
+	 */
+	public function getDidDocument(string $did): ?stdClass
+	{
+		if (str_starts_with($did, 'did:web:')) {
+			$url = $this->getDidWebUrl($did);
+			return $url ? $this->get($url) : null;
+		}
+
+		return $this->get($this->getPLCDirectory() . '/' . $did);
+	}
+
+	/**
+	 * Translate a did:web DID into the URL of its DID document
+	 *
+	 * @see https://w3c-ccg.github.io/did-method-web/
+	 *
+	 * @param string $did DID (did:web:...)
+	 * @return string|null URL of the DID document
+	 */
+	private function getDidWebUrl(string $did): ?string
+	{
+		$parts  = array_map(rawurldecode(...), explode(':', substr($did, strlen('did:web:'))));
+		$domain = array_shift($parts);
+		if (empty($domain)) {
+			return null;
+		}
+
+		if (empty($parts)) {
+			return 'https://' . $domain . '/.well-known/did.json';
+		}
+
+		return 'https://' . $domain . '/' . implode('/', $parts) . '/did.json';
+	}
+
+	/**
 	 * Fetch the PDS URL for a given DID
 	 *
-	 * @param string $did DID (did:plc:...)
+	 * @param string $did DID (did:plc:... or did:web:...)
 	 * @return string|null URL of the PDS, e.g. https://enoki.us-east.host.bsky.network
 	 */
 	public function getPdsOfDid(string $did): ?string
 	{
-		$data = $this->get($this->getPLCDirectory() . '/' . $did);
+		$data = $this->getDidDocument($did);
 		if (empty($data) || empty($data->service)) {
 			return null;
 		}
@@ -566,13 +609,13 @@ final class ATProtocol
 	/**
 	 * Checks if the provided DID matches the handle
 	 *
-	 * @param string $did DID (did:plc:...)
+	 * @param string $did DID (did:plc:... or did:web:...)
 	 * @param string $handle The user handle
 	 * @return boolean
 	 */
 	public function isValidDid(string $did, string $handle): bool
 	{
-		$data = $this->get($this->getPLCDirectory() . '/' . $did);
+		$data = $this->getDidDocument($did);
 		if (empty($data) || empty($data->alsoKnownAs)) {
 			return false;
 		}
