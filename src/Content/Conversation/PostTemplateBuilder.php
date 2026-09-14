@@ -87,7 +87,7 @@ final class PostTemplateBuilder
 
 		while (true) {
 			$post = Post::selectFirstPost(['thr-parent-id', 'parent-uri-id'], ['uri-id' => $uriid]);
-			if (!$post || $uriid == $post['parent-uri-id']) {
+			if (!$post || $uriid === $post['parent-uri-id'] || $uriid === $post['thr-parent-id']) {
 				return $threadlevel;
 			}
 
