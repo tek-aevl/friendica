@@ -399,6 +399,10 @@ class Item
 			self::markForDeletion(['uri-id' => $item['uri-id'], 'uid' => 0, 'deleted' => false], $priority);
 		}
 
+		if ($item['gravity'] == self::GRAVITY_PARENT && !Post::exists(["`uri-id` = ? AND NOT `deleted`", $item['uri-id']])) {
+			Post\Engagement::delete($item['uri-id']);
+		}
+
 		Post\DeliveryData::delete($item['uri-id']);
 
 		// If it's the parent of a comment thread, kill all the kids
