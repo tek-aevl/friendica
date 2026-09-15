@@ -205,7 +205,7 @@ return [
 			'/accounts/verify_credentials'             => [Module\Api\Mastodon\Accounts\VerifyCredentials::class, [R::GET       ]],
 			'/accounts/{name}'                         => [Module\Api\Mastodon\Accounts::class,                 [R::GET         ]],
 			'/admin/accounts/{id:\d+}'                 => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
-			'/admin/accounts/{id:\d+}/{action}'        => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
+			'/admin/accounts/{id:\d+}/{action}'        => [Module\Api\Mastodon\Admin\Accounts::class,           [        R::POST]],
 			'/admin/dimensions'                        => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
 			'/admin/measures'                          => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
 			'/admin/retention'                         => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
@@ -304,7 +304,7 @@ return [
 			'/trends/tags'                             => [Module\Api\Mastodon\Trends\Tags::class,              [R::GET         ]],
 		],
 		'/v2' => [
-			'/instance' => [Module\Api\Mastodon\InstanceV2::class,            [R::GET         ]], // not supported
+			'/instance' => [Module\Api\Mastodon\InstanceV2::class,            [R::GET         ]],
 		],
 		'/v{version:\d+}' => [
 			'/admin/accounts' => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
