@@ -7,6 +7,7 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
+use Friendica\App\Router;
 use Friendica\DI;
 use Friendica\Model\Attach;
 use Friendica\Model\Contact;
@@ -75,6 +76,13 @@ class Media extends BaseApi
 		@unlink($tempFileName);
 		$this->logger->info('Uploaded media', ['id' => $id]);
 		$this->earlyJsonExit(DI::mstdnAttachment()->createFromAttach($id));
+	}
+
+	protected function delete(array $request = [])
+	{
+		$this->checkAllowedScope(self::SCOPE_WRITE);
+
+		$this->response->unsupported(Router::DELETE, $request);
 	}
 
 	public function put(array $request = [])
