@@ -38,7 +38,7 @@ final readonly class ConversationRenderer
 	public const MODE_CHANNEL       = 'channel';
 	public const MODE_COMMENTS      = 'comments';
 	public const MODE_COMMUNITY     = 'community';
-	public const MODE_CONTACTS      = 'contacts';
+	public const MODE_CONTACTS      = 'contact';
 	public const MODE_CONTACT_POSTS = 'contact-posts';
 	public const MODE_DISPLAY       = 'display';
 	public const MODE_FILED         = 'filed';

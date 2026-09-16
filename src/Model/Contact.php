@@ -1704,14 +1704,14 @@ class Contact
 	/**
 	 * Returns threads from a given contact id
 	 *
-	 * @param int   $cid     Contact ID
-	 * @param int   $update  Update mode
-	 * @param int   $parent  Item parent ID for the update mode
-	 * @param array $request Request variables
+	 * @param int   $cid          Contact ID
+	 * @param int   $update       Update mode
+	 * @param int   $parentUriId  Thread parent URI-ID for the update mode
+	 * @param array $request      Request variables
 	 * @return string posts in HTML
 	 * @throws Exception
 	 */
-	public static function getThreadsFromId(int $cid, int $uid, int $update = 0, int $parent = 0, array $request = []): string
+	public static function getThreadsFromId(int $cid, int $uid, int $update = 0, int $parentUriId = 0, array $request = []): string
 	{
 		$contact = DBA::selectFirst('contact', ['contact-type', 'network', 'name', 'nick'], ['id' => $cid]);
 		if (!DBA::isResult($contact)) {
@@ -1728,8 +1728,8 @@ class Contact
 			$condition = ["`uid` = ?", $uid];
 		}
 
-		if (!empty($parent)) {
-			$condition = DBA::mergeConditions($condition, ['parent' => $parent]);
+		if (!empty($parentUriId)) {
+			$condition = DBA::mergeConditions($condition, ['parent-uri-id' => $parentUriId]);
 		} elseif (isset($request['last_created'])) {
 			$condition = DBA::mergeConditions($condition, ["`created` < ?", $request['last_created']]);
 		}
