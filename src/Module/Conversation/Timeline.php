@@ -514,7 +514,12 @@ class Timeline extends BaseModule
 	protected function getCommunityItems()
 	{
 		$items = $this->selectItems();
-		$key   = '';
+
+		if (count($items) < $this->itemsPerPage) {
+			return $items;
+		}
+
+		$key = '';
 
 		$maxpostperauthor = 0;
 		if ($this->selectedTab == Community::LOCAL) {
