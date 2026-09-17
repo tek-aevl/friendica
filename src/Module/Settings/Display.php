@@ -122,7 +122,6 @@ class Display extends BaseSettings
 		$display_eventlist       = (bool) $request['display_eventlist'];
 		$preview_mode            = (int) $request['preview_mode'];
 		$update_content          = (int) $request['update_content'];
-		$embed_remote_media      = (bool) $request['embed_remote_media'];
 		$embed_media             = (bool) $request['embed_media'];
 		$widget_timelineorder    = trim($request['widget_timelineorder']);
 		$menu_timelineorder      = trim($request['menu_timelineorder']);
@@ -185,7 +184,6 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'show_page_drop', $show_page_drop);
 		$this->pConfig->set($uid, 'system', 'display_eventlist', $display_eventlist);
 		$this->pConfig->set($uid, 'system', 'preview_mode', $preview_mode);
-		$this->pConfig->set($uid, 'system', 'embed_remote_media', $embed_remote_media);
 		$this->pConfig->set($uid, 'system', 'embed_media', $embed_media);
 		if ($widget_timeline_reset) {
 			$this->pConfig->delete($uid, 'system', 'widget_timeline_order');
@@ -314,10 +312,10 @@ class Display extends BaseSettings
 			ConversationRenderer::COMMENTS_MODE_HIDDEN  => $this->t('Hide comments in feeds'),
 		];
 		$click_to_display   = $this->pConfig->get($uid, 'system', 'click_to_display', false);
-		$show_page_drop     = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
-		$display_eventlist  = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
-		$embed_remote_media = $this->pConfig->get($uid, 'system', 'embed_remote_media', false);
-		$embed_media        = $this->pConfig->get($uid, 'system', 'embed_media', false);
+		$compact_timeline       = $this->pConfig->get($uid, 'system', 'compact_timeline', false);
+		$show_page_drop         = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
+		$display_eventlist      = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
+		$embed_media            = $this->pConfig->get($uid, 'system', 'embed_media', false);
 
 		$hide_empty_descriptions = $this->pConfig->get($uid, 'accessibility', 'hide_empty_descriptions', false);
 		$hide_custom_emojis      = $this->pConfig->get($uid, 'accessibility', 'hide_custom_emojis', false);
