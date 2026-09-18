@@ -465,7 +465,7 @@ class Processor
 			$item['direction'] = Conversation::RELAY;
 		}
 
-		if ($activity['object_type'] == 'as:Article') {
+		if (in_array($activity['object_type'], ['as:Article', 'as:Review'])) {
 			$item['post-type'] = Item::PT_ARTICLE;
 		} elseif ($activity['object_type'] == 'as:Audio') {
 			$item['post-type'] = Item::PT_AUDIO;
