@@ -3228,7 +3228,7 @@ class Item
 			}
 
 			if ($PostMedia->hasDimensions()) {
-				$pattern = '#<a href="' . preg_quote($PostMedia->url) . '">(.*?)"></a>#';
+				$pattern = '#<a href="' . preg_quote($PostMedia->url) . '"[^>]*>(.*?)"></a>#';
 
 				$s = preg_replace_callback($pattern, function () use ($PostMedia) {
 					return Renderer::replaceMacros(Renderer::getMarkupTemplate('content/image/single_with_height_allocation.tpl'), [
