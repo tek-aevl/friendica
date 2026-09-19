@@ -46,6 +46,25 @@ class Images
 	}
 
 	/**
+	 * Get the best available image type for generated images, in order of preference.
+	 * Falls back down to JPEG if AVIF, WebP and PNG aren't supported by the installed GD library.
+	 *
+	 * @return integer
+	 */
+	public static function getPreferredImageType(): int
+	{
+		if (function_exists('imageavif')) {
+			return IMAGETYPE_AVIF;
+		} elseif (function_exists('imagewebp')) {
+			return IMAGETYPE_WEBP;
+		} elseif (function_exists('imagepng')) {
+			return IMAGETYPE_PNG;
+		}
+
+		return IMAGETYPE_JPEG;
+	}
+
+	/**
 	 * Sanitize the provided mime type, replace invalid mime types with valid ones.
 	 *
 	 * @param string $mimetype
