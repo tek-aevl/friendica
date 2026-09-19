@@ -136,6 +136,7 @@ function bindResponseHooks() {
 
     syncHeadState(newDoc);
     syncStylesheets(newDoc);
+    syncBodyClasses(newDoc);
 
     // Superseded navigations never get consumed in bindNavigationCompleted(),
     // so drop stale entries before they accumulate.
@@ -334,6 +335,23 @@ function syncHeadState(newDoc) {
   if (localUser !== null) {
     window.localUser = JSON.parse(localUser);
   }
+}
+
+/**
+ * <body class="mod-{module} ..."> is set per request by the theme's page
+ * template (frio's php/default.php, the core theme's php/default.php) and
+ * carries layout-relevant state such as which module is active. Unpoly only
+ * swaps fragments inside <body> and never touches <body> itself, so this
+ * class list goes stale after a SPA navigation - CSS rules keyed off it
+ * (e.g. the Advanced Composer's wide layout, keyed off .mod-compose) keep
+ * matching whatever module was active before the navigation.
+ */
+function syncBodyClasses(newDoc) {
+  if (!newDoc.body) {
+    return;
+  }
+
+  document.body.className = newDoc.body.className;
 }
 
 function focusContentAfterNavigation() {
