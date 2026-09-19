@@ -187,7 +187,7 @@
 
 											$notificationCheckbox.prop('checked', false);
 										} else if (Notification.permission === 'default') {
-											Notification.requestPermission(function(choice) {
+											Notification.requestPermission().then(function(choice) {
 												if (choice === 'granted') {
 													localStorage.setItem('notification-permissions', $notificationCheckbox.prop('checked') ? 'granted' : 'denied');
 												} else {
