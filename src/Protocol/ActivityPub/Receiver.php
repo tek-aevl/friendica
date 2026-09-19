@@ -51,7 +51,7 @@ class Receiver
 	public const PUBLIC_COLLECTION = 'as:Public';
 
 	public const ACCOUNT_TYPES  = ['as:Person', 'as:Organization', 'as:Service', 'as:Group', 'as:Application'];
-	public const CONTENT_TYPES  = ['as:Note', 'as:Article', 'as:Video', 'as:Image', 'as:Event', 'as:Audio', 'as:Page', 'as:Question', 'as:Comment', 'as:Quotation', 'as:Review'];
+	public const CONTENT_TYPES  = ['as:Note', 'as:Article', 'as:Video', 'as:Image', 'as:Event', 'as:Audio', 'as:Page', 'as:Question', '_:Comment', '_:Quotation', '_:Review'];
 	public const ACTIVITY_TYPES = ['as:Like', 'as:Dislike', 'as:Accept', 'as:Reject', 'as:TentativeAccept', 'as:View', 'as:Read', 'litepub:EmojiReact'];
 
 	public const TARGET_UNKNOWN  = 0;
