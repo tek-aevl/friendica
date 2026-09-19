@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.08-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 04:47+0000\n"
+"POT-Creation-Date: 2026-09-19 09:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -10596,7 +10596,7 @@ msgid "Activate desktop notifications"
 msgstr ""
 
 #: src/Module/Settings/Account.php:579
-msgid "Show desktop popup on new notifications"
+msgid "Show a popup on new notifications while this browser window is open. Your browser will ask you to allow this once, and the setting only applies to the browser and device you enable it on."
 msgstr ""
 
 #: src/Module/Settings/Account.php:583
