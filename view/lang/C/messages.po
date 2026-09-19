@@ -2234,7 +2234,7 @@ msgstr ""
 msgid "End this session"
 msgstr ""
 
-#: src/Content/Nav.php:203 src/Module/Bookmarklet.php:30
+#: src/Content/Nav.php:203 src/Module/Bookmarklet.php:34
 #: src/Module/Security/Login.php:160
 msgid "Sign in"
 msgstr ""
@@ -6243,11 +6243,11 @@ msgstr ""
 msgid "Remove account"
 msgstr ""
 
-#: src/Module/Bookmarklet.php:40
-msgid "This page is missing a url parameter."
+#: src/Module/Bookmarklet.php:44
+msgid "This page is missing a url or text parameter."
 msgstr ""
 
-#: src/Module/Bookmarklet.php:52
+#: src/Module/Bookmarklet.php:59
 msgid "The post was created"
 msgstr ""
 
