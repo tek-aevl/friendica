@@ -403,6 +403,24 @@ function bindNavigationCompleted() {
   });
 }
 
+/**
+ * Bootstrap modals (#modal, used e.g. for calendar events and contacts, and
+ * #jot-modal for composing) live outside the containers Unpoly swaps. A
+ * plain link inside one of them - "View related post" on a calendar event,
+ * for instance - still gets followed via SPA navigation, which updates the
+ * main content but never fires the modal's hidden.bs.modal cleanup, so it
+ * stays open over the new page. Close it first, same as a full page load
+ * would.
+ */
+function bindModalCleanup() {
+  up.on('up:link:follow', function (event) {
+    const modal = event.target.closest('.modal');
+    if (modal && typeof jQuery === 'function') {
+      jQuery(modal).modal('hide');
+    }
+  });
+}
+
 function bindLoadingIndicatorHooks() {
   up.on('up:request:load', function () {
     if (typeof showFetching === 'function') {
@@ -460,6 +478,7 @@ function initSPANavigation() {
   configureUnpoly();
   bindResponseHooks();
   bindNavigationCompleted();
+  bindModalCleanup();
   bindLoadingIndicatorHooks();
   bindInitialLifecycleEvents();
 }
