@@ -46,7 +46,6 @@ Extensions to the [Mastodon Notification Entities](https://docs.joinmastodon.org
 ### Status Entities
 Extensions to the [Mastodon Status Entities](https://docs.joinmastodon.org/entities/Status/)
 * `in_reply_to_status`: A fully populated Mastodon Status entity for the replied to status or null it is a post rather than a response
-* `quote`: Unlike the official `Quote`/`ShallowQuote` entities introduced in Mastodon 4.4, Friendica returns a fully populated Status entity for the quoted post under `quoted_status` inside this object
 * `friendica`: Friendica specific properties of a status including:
   * `title`: The Friendica title for a post, or empty if the status is a comment
   * `delivery_data`: Information about the state of federating a message from the server
