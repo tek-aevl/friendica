@@ -1230,28 +1230,34 @@ class Media
 	 */
 	public static function insertFromAttachmentData(int $uriid, string $body)
 	{
-		$data = BBCode::getAttachmentData($body);
-		if (empty($data)) {
+		if (!preg_match_all("/\[attachment.*?\].*?\[\/attachment\]/ism", $body, $matches)) {
 			return;
 		}
 
-		DI::logger()->info('Adding attachment data', ['data' => $data]);
-		$attachment = [
-			'uri-id'         => $uriid,
-			'type'           => PostMedia::TYPE_HTML,
-			'url'            => $data['url'],
-			'preview'        => $data['preview']       ?? null,
-			'description'    => $data['description']   ?? null,
-			'name'           => $data['title']         ?? null,
-			'author-url'     => $data['author_url']    ?? null,
-			'author-name'    => $data['author_name']   ?? null,
-			'publisher-url'  => $data['provider_url']  ?? null,
-			'publisher-name' => $data['provider_name'] ?? null,
-		];
-		if (!empty($data['image'])) {
-			$attachment['preview'] = $data['image'];
+		foreach ($matches[0] as $match) {
+			$data = BBCode::getAttachmentData($match);
+			if (empty($data)) {
+				continue;
+			}
+
+			DI::logger()->info('Adding attachment data', ['data' => $data]);
+			$attachment = [
+				'uri-id'         => $uriid,
+				'type'           => PostMedia::TYPE_HTML,
+				'url'            => $data['url'],
+				'preview'        => $data['preview']       ?? null,
+				'description'    => $data['description']   ?? null,
+				'name'           => $data['title']         ?? null,
+				'author-url'     => $data['author_url']    ?? null,
+				'author-name'    => $data['author_name']   ?? null,
+				'publisher-url'  => $data['provider_url']  ?? null,
+				'publisher-name' => $data['provider_name'] ?? null,
+			];
+			if (!empty($data['image'])) {
+				$attachment['preview'] = $data['image'];
+			}
+			self::insert($attachment);
 		}
-		self::insert($attachment);
 	}
 
 	/**

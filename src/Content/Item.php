@@ -1025,9 +1025,9 @@ class Item
 		} else {
 			Attach::setPermissionFromBody($post);
 		}
-		if (preg_match("/\[attachment\](.*?)\[\/attachment\]/ism", (string) $post['body'], $matches)) {
-			$post['body'] = preg_replace("/\[attachment].*?\[\/attachment\]/ism", PageInfo::getFooterFromUrl($matches[1]), (string) $post['body']);
-		}
+		$post['body'] = preg_replace_callback("/\[attachment\](.*?)\[\/attachment\]/ism", function ($matches) {
+			return PageInfo::getFooterFromUrl($matches[1]);
+		}, (string) $post['body']);
 
 		// Convert links with empty descriptions to links without an explicit description
 		$post['body'] = trim((string) preg_replace('#\[url=([^\]]*?)\]\[/url\]#ism', '[url]$1[/url]', (string) $post['body']));
