@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.08-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-12 18:51+0200\n"
+"POT-Creation-Date: 2026-10-22 04:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1053,109 +1053,109 @@ msgid_plural "<button type=\"button\" %2$s>%1$d people</button> reshared this"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:976
-#: src/Content/Conversation/ConversationDataProvider.php:979
-#: src/Content/Conversation/ConversationDataProvider.php:982
-#: src/Content/Conversation/ConversationDataProvider.php:985
-#: src/Content/Conversation/ConversationDataProvider.php:988
+#: src/Content/Conversation/ConversationDataProvider.php:986
+#: src/Content/Conversation/ConversationDataProvider.php:989
+#: src/Content/Conversation/ConversationDataProvider.php:992
+#: src/Content/Conversation/ConversationDataProvider.php:995
+#: src/Content/Conversation/ConversationDataProvider.php:998
 #, php-format
 msgid "You had been addressed (%s)."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:991
+#: src/Content/Conversation/ConversationDataProvider.php:1001
 #, php-format
 msgid "You are following %s."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:995
+#: src/Content/Conversation/ConversationDataProvider.php:1005
 msgid "You subscribed to one or more tags in this post."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:995
+#: src/Content/Conversation/ConversationDataProvider.php:1005
 #, php-format
 msgid "You subscribed to %s."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1013
+#: src/Content/Conversation/ConversationDataProvider.php:1023
 #, php-format
 msgid "%s reshared this."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1015
+#: src/Content/Conversation/ConversationDataProvider.php:1025
 msgid "Reshared"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1015
+#: src/Content/Conversation/ConversationDataProvider.php:1025
 #, php-format
 msgid "Reshared by %s <%s>"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1018
+#: src/Content/Conversation/ConversationDataProvider.php:1028
 #, php-format
 msgid "%s is participating in this thread."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1021
+#: src/Content/Conversation/ConversationDataProvider.php:1031
 msgid "Stored for general reasons"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1024
+#: src/Content/Conversation/ConversationDataProvider.php:1034
 msgid "Global post"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1027
+#: src/Content/Conversation/ConversationDataProvider.php:1037
 msgid "Sent via an relay server"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1027
+#: src/Content/Conversation/ConversationDataProvider.php:1037
 #, php-format
 msgid "Sent via the relay server %s <%s>"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1030
+#: src/Content/Conversation/ConversationDataProvider.php:1040
 msgid "Fetched"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1030
+#: src/Content/Conversation/ConversationDataProvider.php:1040
 #, php-format
 msgid "Fetched because of %s <%s>"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1033
+#: src/Content/Conversation/ConversationDataProvider.php:1043
 msgid "Stored because of a child post to complete this thread."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1036
+#: src/Content/Conversation/ConversationDataProvider.php:1046
 msgid "Local delivery"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1039
+#: src/Content/Conversation/ConversationDataProvider.php:1049
 msgid "Stored because of your activity (like, comment, bookmark, ...)"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1042
+#: src/Content/Conversation/ConversationDataProvider.php:1052
 msgid "Distributed"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1045
+#: src/Content/Conversation/ConversationDataProvider.php:1055
 msgid "Pushed to us"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1050
+#: src/Content/Conversation/ConversationDataProvider.php:1060
 #, php-format
 msgid "Channel \"%s\": %s"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1050
+#: src/Content/Conversation/ConversationDataProvider.php:1060
 #, php-format
 msgid "Channel \"%s\""
 msgstr ""
 
-#: src/Content/Conversation/ConversationRenderer.php:459
+#: src/Content/Conversation/ConversationRenderer.php:502
 msgid "Delete Selected Items"
 msgstr ""
 
-#: src/Content/Conversation/ConversationRenderer.php:475
+#: src/Content/Conversation/ConversationRenderer.php:518
 msgid "remove"
 msgstr ""
 
@@ -1922,7 +1922,7 @@ msgid "Add an abstract from ActivityPub content warnings"
 msgstr ""
 
 #: src/Content/Feature.php:115
-msgid "Add an abstract when commenting on ActivityPub posts with a content warning. Abstracts are displayed as content warning on systems like Mastodon or Pleroma."
+msgid "Add an abstract when commenting on a sensitive ActivityPub post that has a content warning. Abstracts are displayed as content warning on systems like Mastodon or Pleroma. The \"sensitive\" flag itself is always taken over from the post that is being commented on, independent of this setting."
 msgstr ""
 
 #: src/Content/Feature.php:120
@@ -2508,8 +2508,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:938 src/Model/Item.php:3715
-#: src/Model/Item.php:3721 src/Model/Item.php:3722
+#: src/Content/Text/BBCode.php:938 src/Model/Item.php:3759
+#: src/Model/Item.php:3765 src/Model/Item.php:3766
 msgid "Link to source"
 msgstr ""
 
@@ -3652,77 +3652,77 @@ msgstr ""
 msgid "post"
 msgstr ""
 
-#: src/Model/Item.php:3068
+#: src/Model/Item.php:3090
 #, php-format
 msgid "%s is blocked"
 msgstr ""
 
-#: src/Model/Item.php:3070
+#: src/Model/Item.php:3092
 #, php-format
 msgid "%s is ignored"
 msgstr ""
 
-#: src/Model/Item.php:3072
+#: src/Model/Item.php:3094
 #, php-format
 msgid "Content from %s is collapsed"
 msgstr ""
 
-#: src/Model/Item.php:3076
+#: src/Model/Item.php:3098
 msgid "Sensitive content"
 msgstr ""
 
-#: src/Model/Item.php:3583
+#: src/Model/Item.php:3627
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3617
+#: src/Model/Item.php:3661
 #, php-format
 msgid "The media in this post is not displayed to visitors. To view it, please go to the <a href=\"%s\">original post</a>."
 msgstr ""
 
-#: src/Model/Item.php:3619
+#: src/Model/Item.php:3663
 msgid "The media in this post is not displayed to visitors. To view it, please log in."
 msgstr ""
 
-#: src/Model/Item.php:3644
+#: src/Model/Item.php:3688
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3646
+#: src/Model/Item.php:3690
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3651
+#: src/Model/Item.php:3695
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3653
+#: src/Model/Item.php:3697
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3655
+#: src/Model/Item.php:3699
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3698 src/Model/Item.php:3699
+#: src/Model/Item.php:3742 src/Model/Item.php:3743
 #: src/Module/Calendar/Event/Show.php:80
 msgid "View related post"
 msgstr ""
 
-#: src/Model/Mail.php:120
+#: src/Model/Mail.php:150
 msgid "[no subject]"
 msgstr ""
 
@@ -12783,7 +12783,7 @@ msgstr ""
 msgid "%s posted an update."
 msgstr ""
 
-#: src/Protocol/ActivityPub/Receiver.php:612
+#: src/Protocol/ActivityPub/Receiver.php:611
 msgid "Chat"
 msgstr ""
 
