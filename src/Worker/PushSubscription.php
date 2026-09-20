@@ -9,6 +9,7 @@ namespace Friendica\Worker;
 
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\Plaintext;
+use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Factory\Api\Mastodon\Notification as NotificationFactory;
@@ -110,7 +111,7 @@ class PushSubscription
 
 		// The 'TTL' has to be a string, else a deprecation warning is thrown by the "guzzlehttp/psr7" library.
 		// @see https://github.com/friendica/friendica/issues/15818#issuecomment-5749515821
-		$report = $webPush->sendOneNotification($push, json_encode($payload), ['urgency' => 'normal', 'TTL' => '86400']);
+		$report = $webPush->sendOneNotification($push, json_encode($payload), ['urgency' => 'normal', 'TTL' => (string) Duration::DAY]);
 
 		$endpoint = $report->getRequest()->getUri()->__toString();
 
