@@ -292,7 +292,9 @@ class Nav
 				$nav['delegation'] = ['settings/delegation', $nav_accounts_name, '', $nav_accounts_description, 'add'];
 			}
 
-			$nav['settings'] = ['settings', $this->l10n->t('Settings'), '', $this->l10n->t('Account settings')];
+			if (!$this->session->getSubManagedUserId()) {
+				$nav['settings'] = ['settings', $this->l10n->t('Settings'), '', $this->l10n->t('Account settings')];
+			}
 
 			$nav['contacts'] = ['contact', $this->l10n->t('Contacts'), '', $this->l10n->t('Manage/edit friends and contacts')];
 		}
