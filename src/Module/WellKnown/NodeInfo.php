@@ -9,6 +9,7 @@ namespace Friendica\Module\WellKnown;
 
 use Friendica\BaseModule;
 use Friendica\DI;
+use Friendica\Util\HTTPCache;
 
 /**
  * Standardized way of exposing metadata about a server running one of the distributed social networks.
@@ -39,6 +40,7 @@ class NodeInfo extends BaseModule
 			],
 		];
 
+		header(sprintf('Cache-Control: max-age=%d, public, immutable', HTTPCache::DISCOVERY_MAX_AGE));
 		$this->earlyJsonExit($nodeinfo);
 	}
 }
