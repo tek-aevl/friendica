@@ -68,14 +68,17 @@ class Tos extends BaseModule
 			$this->baseUrl->redirect('profile/' . $this->config->get('system', 'singleuser'));
 		}
 
-		$tpl = Renderer::getMarkupTemplate('tos.tpl');
+		$displayTos              = false;
+		$displayPrivateStatement = false;
+
 		if ($this->config->get('system', 'tosdisplay')) {
-			$displaytos  = (bool) true;
-			$tos_title   = $this->t('Terms of Service');
-			$tos_text    = BBCode::convertForUriId(User::getSystemUriId(), $this->config->get('system', 'tostext'));
-			$rules_title = $this->t('Rules'); 
-			$lines = trim((string) $this->config->get('system', 'tosrules') ?: '');
-			if ($lines) {
+			$lines = $this->config->get('system', 'tosrules', '');
+			if (isset($lines)) {
+				$displayTos = true;
+				$tosTitle   = $this->t('Terms of Service');
+				$tosText    = BBCode::convertForUriId(User::getSystemUriId(), $this->config->get('system', 'tostext'));
+				$rulesTitle = $this->t('Rules');
+
 				$rules = "[ol]";
 				foreach (explode("\n", $lines) as $line) {
 					if (trim($line)) {
@@ -83,39 +86,29 @@ class Tos extends BaseModule
 					}
 				}
 				$rules .= "\n[/ol]\n";
-				$tos_rules  = BBCode::convertForUriId(User::getSystemUriId(), $rules);
-			} else {
-				$displaytos  = (bool) false;
-				$tos_title   = '';
-				$tos_text    = '';
-				$rules_title = '';
-				$tos_rules       = '';
+				$tosRules = BBCode::convertForUriId(User::getSystemUriId(), $rules);
 			}
 		}
+
 		if ($this->config->get('system', 'tosprivstatement')) {
-			$displayprivstatement = (bool) true;
-			$priv_title   	   = $this->t('Privacy Statement');
-			$priv_operate      = $this->t('At the time of registration, and for providing communications between the user account and their contacts, the user has to provide a display name, a username and a working email address. The names will be accessible on the profile page of the account by any visitor of the page, even if other profile details are not displayed. The email address will only be used to send the user notifications about interactions, but wont be visibly displayed. The listing of an account in the node\'s user directory or the global user directory is optional and can be controlled in the user settings, it is not necessary for communication.');
-			$priv_distribute   = $this->t('This data is required for communication and is passed on to the nodes of the communication partners and is stored there. Users can enter additional private data that may be transmitted to the communication partners accounts.');
-			$priv_delete       = $this->t('At any point in time a logged in user can export their account data from the <a href="%1$s">account settings</a>. If the user wants to delete their account they can do so at <a href="%1$s">%1$s</a>. The deletion of the account will be permanent. Deletion of the data will also be requested from the nodes of the communication partners.', $this->baseUrl . '/settings/userexport', $this->baseUrl . '/settings/removeme', );
-		} else {
-			$displayprivstatement = (bool) false;
-			$priv_title        = '';
-			$priv_operate      = '';
-			$priv_distribute   = '';
-			$priv_delete       = '';
-		}			
-		if ($displaytos || $displayprivstatement){
-			return Renderer::replaceMacros($tpl, [
-				'$title'                => $tos_title,
-				'$tostext'              => $tos_text,
-				'$rulestitle'           => $rules_title,
-				'$rules'                => $tos_rules,
-				'$displayprivstatement' => $displayprivstatement,
-				'$privstatementtitle'   => $priv_title,
-				'$privacy_operate'      => $priv_operate,
-				'$privacy_distribute'   => $priv_distribute,
-				'$privacy_delete'       => $priv_delete,
+			$displayPrivateStatement = true;
+			$privTitle               = $this->t('Privacy Statement');
+			$privOperate             = $this->t('At the time of registration, and for providing communications between the user account and their contacts, the user has to provide a display name, a username and a working email address. The names will be accessible on the profile page of the account by any visitor of the page, even if other profile details are not displayed. The email address will only be used to send the user notifications about interactions, but wont be visibly displayed. The listing of an account in the node\'s user directory or the global user directory is optional and can be controlled in the user settings, it is not necessary for communication.');
+			$privDistribute          = $this->t('This data is required for communication and is passed on to the nodes of the communication partners and is stored there. Users can enter additional private data that may be transmitted to the communication partners accounts.');
+			$privDelete              = $this->t('At any point in time a logged in user can export their account data from the <a href="%1$s">account settings</a>. If the user wants to delete their account they can do so at <a href="%1$s">%1$s</a>. The deletion of the account will be permanent. Deletion of the data will also be requested from the nodes of the communication partners.', $this->baseUrl . '/settings/userexport', $this->baseUrl . '/settings/removeme', );
+		}
+
+		if ($displayTos || $displayPrivateStatement) {
+			return Renderer::replaceMacros(Renderer::getMarkupTemplate('tos.tpl'), [
+				'$title'                => $tosTitle   ?? '',
+				'$tostext'              => $tosText    ?? '',
+				'$rulestitle'           => $rulesTitle ?? '',
+				'$rules'                => $tosRules   ?? '',
+				'$displayprivstatement' => $displayPrivateStatement,
+				'$privstatementtitle'   => $privTitle      ?? '',
+				'$privacy_operate'      => $privOperate    ?? '',
+				'$privacy_distribute'   => $privDistribute ?? '',
+				'$privacy_delete'       => $privDelete     ?? '',
 			]);
 		} else {
 			return '';
