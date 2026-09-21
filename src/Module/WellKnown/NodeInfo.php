@@ -9,6 +9,7 @@ namespace Friendica\Module\WellKnown;
 
 use Friendica\BaseModule;
 use Friendica\DI;
+use Friendica\Util\HTTPCache;
 
 /**
  * Standardized way of exposing metadata about a server running one of the distributed social networks.
@@ -39,8 +40,7 @@ class NodeInfo extends BaseModule
 			],
 		];
 
-		// A cache time of 3 days is a good compromise between performance and freshness of the data (the same values are used by Mastodon).
-		header('Cache-Control: max-age=259200, public, immutable');
+		header(sprintf('Cache-Control: max-age=%d, public, immutable', HTTPCache::DISCOVERY_MAX_AGE));
 		$this->earlyJsonExit($nodeinfo);
 	}
 }

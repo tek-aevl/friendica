@@ -14,6 +14,7 @@ use Friendica\Model\User;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Protocol\ActivityNamespace;
+use Friendica\Util\HTTPCache;
 use Friendica\Util\Network;
 use Friendica\Util\XML;
 
@@ -61,8 +62,7 @@ class Xrd extends BaseModule
 		}
 
 		header('Vary: Accept', false);
-		// A cache time of 3 days is a good compromise between performance and freshness of the data (the same values are used by Mastodon).
-		header('Cache-Control: max-age=259200, public');
+		header(sprintf('Cache-Control: max-age=%d, public', HTTPCache::DISCOVERY_MAX_AGE));
 
 		$alias = '';
 
