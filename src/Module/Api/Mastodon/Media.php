@@ -7,10 +7,11 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\App\Router;
+use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Attach;
 use Friendica\Model\Contact;
+use Friendica\Model\Item;
 use Friendica\Model\Photo;
 use Friendica\Model\Post;
 use Friendica\Module\BaseApi;
@@ -81,8 +82,44 @@ class Media extends BaseApi
 	protected function delete(array $request = [])
 	{
 		$this->checkAllowedScope(self::SCOPE_WRITE);
+		$uid = self::getCurrentUserID();
 
-		$this->response->unsupported(Router::DELETE, $request);
+		if (empty($this->parameters['id'])) {
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+		}
+
+		$id = $this->parameters['id'];
+
+		if (DI::mstdnAttachment()->isAttach($id)) {
+			$attachId = (int) substr((string) $id, 7);
+			if (!Attach::exists(['id' => $attachId, 'uid' => $uid])) {
+				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
+			}
+
+			if (DBA::exists('post-media', ['attach-id' => $attachId])) {
+				$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+			}
+
+			Attach::delete(['id' => $attachId, 'uid' => $uid]);
+			$this->earlyJsonExit([]);
+		}
+
+		$photo = Photo::selectFirst(['resource-id'], ['id' => $id, 'uid' => $uid]);
+		if (empty($photo['resource-id'])) {
+			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
+		}
+
+		if (Post::exists(['uid' => $uid, 'resource-id' => $photo['resource-id'], 'post-type' => Item::PT_IMAGE, 'origin' => true])) {
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+		}
+
+		Photo::delete(['uid' => $uid, 'resource-id' => $photo['resource-id']]);
+		// This is only needed for images that had been stored in older versions.
+		// @todo Possibly add an update job that deletes the related items and then remove the line here.
+		Item::deleteForUser(['uid' => $uid, 'resource-id' => $photo['resource-id'], 'post-type' => Item::PT_IMAGE, 'origin' => true], $uid);
+		Photo::clearAlbumCache($uid);
+
+		$this->earlyJsonExit([]);
 	}
 
 	public function put(array $request = [])
