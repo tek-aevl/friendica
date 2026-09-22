@@ -199,6 +199,10 @@ return [
 		// Maximum numbers of comments per post on the display page
 		'max_display_comments' => 1000,
 
+		// maxfilesize (Integer)
+		// Maximum size in bytes of uploaded media files. 0 means no limit.
+		'maxfilesize' => 0,
+
 		// maximagesize (Integer)
 		// Maximum size in bytes of an uploaded photo.
 		'maximagesize' => 800000,
