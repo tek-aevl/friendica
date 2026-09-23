@@ -101,7 +101,7 @@ class Media extends BaseApi
 			}
 
 			Attach::delete(['id' => $attachId, 'uid' => $uid]);
-			$this->earlyJsonExit([]);
+			$this->earlyJsonExit(new \stdClass());
 		}
 
 		$photo = Photo::selectFirst(['resource-id'], ['id' => $id, 'uid' => $uid]);
@@ -119,7 +119,7 @@ class Media extends BaseApi
 		Item::deleteForUser(['uid' => $uid, 'resource-id' => $photo['resource-id'], 'post-type' => Item::PT_IMAGE, 'origin' => true], $uid);
 		Photo::clearAlbumCache($uid);
 
-		$this->earlyJsonExit([]);
+		$this->earlyJsonExit(new \stdClass());
 	}
 
 	public function put(array $request = [])
