@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Attach;
 use Friendica\Model\Contact;
@@ -96,12 +95,12 @@ class Media extends BaseApi
 				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 			}
 
-			if (DBA::exists('post-media', ['attach-id' => $attachId])) {
+			if (DI::postMediaRepository()->existsForAttachment($attachId)) {
 				$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 			}
 
 			Attach::delete(['id' => $attachId, 'uid' => $uid]);
-			$this->earlyJsonExit([]);
+			$this->earlyJsonExit(new \stdClass());
 		}
 
 		$photo = Photo::selectFirst(['resource-id'], ['id' => $id, 'uid' => $uid]);
@@ -120,7 +119,7 @@ class Media extends BaseApi
 		Item::deleteForUser(['uid' => $uid, 'resource-id' => $photo['resource-id'], 'post-type' => Item::PT_IMAGE, 'origin' => true], $uid);
 		Photo::clearAlbumCache($uid);
 
-		$this->earlyJsonExit([]);
+		$this->earlyJsonExit(new \stdClass());
 	}
 
 	public function put(array $request = [])

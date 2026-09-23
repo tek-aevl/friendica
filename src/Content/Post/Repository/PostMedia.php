@@ -105,7 +105,22 @@ class PostMedia extends BaseRepository
 	{
 		$pattern = addcslashes($this->baseURL . '/photo/' . $resourceId . '-', '\\%_') . '%';
 
-		return $this->db->exists(static::$table_name, ['`url` LIKE ? OR `preview` LIKE ?', $pattern, $pattern]);
+		return $this->existsForLivePost(['(`url` LIKE ? OR `preview` LIKE ?)', $pattern, $pattern]);
+	}
+
+	public function existsForAttachment(int $attachmentId): bool
+	{
+		return $this->existsForLivePost(['attach-id' => $attachmentId]);
+	}
+
+	/** @param array $condition DBA-style media selection conditions. */
+	private function existsForLivePost(array $condition): bool
+	{
+		$condition = DBA::mergeConditions($condition, [
+			'EXISTS (SELECT 1 FROM `post-user` WHERE `post-user`.`uri-id` = `post-media`.`uri-id` AND NOT `post-user`.`deleted`)',
+		]);
+
+		return $this->db->exists(static::$table_name, $condition);
 	}
 
 	/**
