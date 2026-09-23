@@ -173,7 +173,8 @@ class HttpClient implements ICanSendHttpRequests
 			) {
 				return new GuzzleResponse($exception->getResponse(), $url, $exception->getCode(), '');
 			} else {
-				return new CurlResult($this->logger, $url, '', ['http_code' => 500], $exception->getCode(), '');
+				$this->logger->info('HTTP request failed.', ['url' => $url, 'method' => $method, 'exception' => $exception]);
+				return new CurlResult($this->logger, $url, '', ['http_code' => 500], $exception->getCode(), $exception->getMessage());
 			}
 		} catch (InvalidArgumentException|\InvalidArgumentException $argumentException) {
 			$this->logger->info('Invalid Argument for HTTP call.', ['url' => $url, 'method' => $method, 'exception' => $argumentException]);

@@ -164,6 +164,9 @@ class Summary extends BaseAdmin
 		// We can do better, but this is a quick queue status
 		$queues = ['label' => DI::l10n()->t('Message queues'), 'deferred' => $deferred, 'workerq' => $workerqueue];
 
+		$db_version = (string) DBA::getVariable('version');
+		$curl       = curl_version();
+
 		$server_settings = [
 			'label' => DI::l10n()->t('Server Settings'),
 			'php'   => [
@@ -174,7 +177,13 @@ class Summary extends BaseAdmin
 				'memory_limit'        => ini_get('memory_limit'),
 			],
 			'mysql' => [
+				'type'               => str_contains($db_version, 'MariaDB') ? 'MariaDB' : 'MySQL',
+				'version'            => $db_version,
 				'max_allowed_packet' => DBA::getVariable('max_allowed_packet'),
+			],
+			'curl' => [
+				'version' => $curl['version'],
+				'HTTP/2'  => ($curl['features'] & CURL_VERSION_HTTP2) ? DI::l10n()->t('Yes') : DI::l10n()->t('No'),
 			],
 		];
 
