@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.08-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-19 09:24+0000\n"
+"POT-Creation-Date: 2026-09-23 16:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1951,7 +1951,7 @@ msgid "Add categories to your posts"
 msgstr ""
 
 #: src/Content/Feature.php:122 src/Model/Profile.php:826
-#: src/Module/Admin/Summary.php:207 src/Module/Item/Compose.php:161
+#: src/Module/Admin/Summary.php:216 src/Module/Item/Compose.php:161
 #: src/Module/Moderation/Report/Create.php:320
 #: src/Module/Moderation/Summary.php:60
 msgid "Summary"
@@ -2161,7 +2161,7 @@ msgstr ""
 msgid "Posts"
 msgstr ""
 
-#: src/Content/Item.php:431 src/Content/Nav.php:296 src/Model/Contact.php:1298
+#: src/Content/Item.php:431 src/Content/Nav.php:297 src/Model/Contact.php:1298
 #: src/Model/Contact.php:1309 src/Module/Admin/Addons/Details.php:140
 #: src/Module/Admin/Themes/Details.php:85 src/Module/BaseAdmin.php:89
 #: src/Module/BaseSettings.php:184 src/Module/Welcome.php:39
@@ -2341,7 +2341,7 @@ msgstr ""
 msgid "Tags"
 msgstr ""
 
-#: src/Content/Nav.php:240 src/Content/Nav.php:298
+#: src/Content/Nav.php:240 src/Content/Nav.php:300
 #: src/Content/Text/HTML.php:898 src/Module/BaseProfile.php:112
 #: src/Module/BaseProfile.php:115 src/Module/Contact.php:191
 #: src/Module/Contact.php:409 src/Module/Contact.php:519
@@ -2380,7 +2380,7 @@ msgstr ""
 
 #: src/Content/Nav.php:267 src/Module/Admin/Tos.php:64
 #: src/Module/BaseAdmin.php:81 src/Module/Register.php:243
-#: src/Module/Tos.php:87
+#: src/Module/Tos.php:78
 msgid "Terms of Service"
 msgstr ""
 
@@ -2438,23 +2438,23 @@ msgstr ""
 msgid "Add Account"
 msgstr ""
 
-#: src/Content/Nav.php:296
+#: src/Content/Nav.php:297
 msgid "Account settings"
 msgstr ""
 
-#: src/Content/Nav.php:298 view/theme/frio/theme.php:232
+#: src/Content/Nav.php:300 view/theme/frio/theme.php:232
 msgid "Manage/edit friends and contacts"
 msgstr ""
 
-#: src/Content/Nav.php:303 src/Module/BaseAdmin.php:115
+#: src/Content/Nav.php:305 src/Module/BaseAdmin.php:115
 msgid "Admin"
 msgstr ""
 
-#: src/Content/Nav.php:303
+#: src/Content/Nav.php:305
 msgid "Site setup and configuration"
 msgstr ""
 
-#: src/Content/Nav.php:307 src/Module/BaseModeration.php:117
+#: src/Content/Nav.php:309 src/Module/BaseModeration.php:117
 #: src/Module/Moderation/Blocklist/Contact.php:99
 #: src/Module/Moderation/Blocklist/Contact/Import.php:101
 #: src/Module/Moderation/Blocklist/Server/Add.php:105
@@ -2472,15 +2472,15 @@ msgstr ""
 msgid "Moderation"
 msgstr ""
 
-#: src/Content/Nav.php:307
+#: src/Content/Nav.php:309
 msgid "Content and user moderation"
 msgstr ""
 
-#: src/Content/Nav.php:310
+#: src/Content/Nav.php:312
 msgid "Navigation"
 msgstr ""
 
-#: src/Content/Nav.php:310
+#: src/Content/Nav.php:312
 msgid "Site map"
 msgstr ""
 
@@ -4130,7 +4130,7 @@ msgstr ""
 #: src/Module/Admin/Federation.php:225 src/Module/Admin/Logs/Settings.php:74
 #: src/Module/Admin/Logs/View.php:71 src/Module/Admin/Queue.php:64
 #: src/Module/Admin/Roles.php:130 src/Module/Admin/Site.php:457
-#: src/Module/Admin/Storage.php:118 src/Module/Admin/Summary.php:206
+#: src/Module/Admin/Storage.php:118 src/Module/Admin/Summary.php:215
 #: src/Module/Admin/Themes/Details.php:82 src/Module/Admin/Themes/Index.php:103
 #: src/Module/Admin/Tos.php:63 src/Module/Moderation/Users/Pending.php:81
 msgid "Administration"
@@ -4244,14 +4244,15 @@ msgstr ""
 msgid "Attempt to execute this update step automatically"
 msgstr ""
 
-#: src/Module/Admin/Features.php:53
+#: src/Module/Admin/Features.php:53 src/Module/Admin/Summary.php:186
 #: src/Module/Notifications/Introductions.php:140
 #: src/Module/OAuth/Acknowledge.php:39 src/Module/Register.php:138
 #: src/Module/Settings/TwoFactor/Trusted.php:128
 msgid "No"
 msgstr ""
 
-#: src/Module/Admin/Features.php:53 src/Module/Contact/Revoke.php:91
+#: src/Module/Admin/Features.php:53 src/Module/Admin/Summary.php:186
+#: src/Module/Contact/Revoke.php:91
 #: src/Module/Notifications/Introductions.php:140
 #: src/Module/OAuth/Acknowledge.php:38 src/Module/Register.php:137
 #: src/Module/Settings/TwoFactor/Trusted.php:128
@@ -5792,19 +5793,19 @@ msgstr ""
 msgid "Message queues"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:168
+#: src/Module/Admin/Summary.php:171
 msgid "Server Settings"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:209
+#: src/Module/Admin/Summary.php:218
 msgid "Version"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:213
+#: src/Module/Admin/Summary.php:222
 msgid "Active addons"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:216
+#: src/Module/Admin/Summary.php:225
 msgid "Enable new addons"
 msgstr ""
 
@@ -12031,11 +12032,11 @@ msgstr ""
 msgid "Exception thrown in %s:%d"
 msgstr ""
 
-#: src/Module/Tos.php:44 src/Module/Tos.php:93
+#: src/Module/Tos.php:44 src/Module/Tos.php:96
 msgid "At the time of registration, and for providing communications between the user account and their contacts, the user has to provide a display name, a username and a working email address. The names will be accessible on the profile page of the account by any visitor of the page, even if other profile details are not displayed. The email address will only be used to send the user notifications about interactions, but wont be visibly displayed. The listing of an account in the node's user directory or the global user directory is optional and can be controlled in the user settings, it is not necessary for communication."
 msgstr ""
 
-#: src/Module/Tos.php:45 src/Module/Tos.php:94
+#: src/Module/Tos.php:45 src/Module/Tos.php:97
 msgid "This data is required for communication and is passed on to the nodes of the communication partners and is stored there. Users can enter additional private data that may be transmitted to the communication partners accounts."
 msgstr ""
 
@@ -12044,15 +12045,15 @@ msgstr ""
 msgid "At any point in time a logged in user can export their account data from the <a href=\"%1$s\">account settings</a>. If the user wants to delete their account they can do so at <a href=\"%2$s\">%2$s</a>. The deletion of the account will be permanent. Deletion of the data will also be requested from the nodes of the communication partners."
 msgstr ""
 
-#: src/Module/Tos.php:49 src/Module/Tos.php:92
+#: src/Module/Tos.php:49 src/Module/Tos.php:95
 msgid "Privacy Statement"
 msgstr ""
 
-#: src/Module/Tos.php:89
+#: src/Module/Tos.php:80
 msgid "Rules"
 msgstr ""
 
-#: src/Module/Tos.php:95
+#: src/Module/Tos.php:98
 #, php-format
 msgid "At any point in time a logged in user can export their account data from the <a href=\"%1$s\">account settings</a>. If the user wants to delete their account they can do so at <a href=\"%1$s\">%1$s</a>. The deletion of the account will be permanent. Deletion of the data will also be requested from the nodes of the communication partners."
 msgstr ""
@@ -12877,11 +12878,11 @@ msgstr ""
 msgid "%1$d %2$s ago"
 msgstr ""
 
-#: src/Worker/PushSubscription.php:95
+#: src/Worker/PushSubscription.php:96
 msgid "Notification from Friendica"
 msgstr ""
 
-#: src/Worker/PushSubscription.php:96
+#: src/Worker/PushSubscription.php:97
 msgid "Empty Post"
 msgstr ""
 
