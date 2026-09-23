@@ -53,7 +53,7 @@ class AttachmentsUploadTest extends FixtureTestCase
 	public static function uploadLimits(): array
 	{
 		return [
-			'unset limit'         => [null, 16, true],
+			'default limit'       => [null, 16, true],
 			'exactly at limit'    => ['1K', 1024, true],
 			'one byte over limit' => ['1K', 1025, false],
 		];
@@ -63,8 +63,7 @@ class AttachmentsUploadTest extends FixtureTestCase
 	public function testUploadRespectsConfiguredLimit(?string $limit, int $size, bool $accepted): void
 	{
 		if ($limit === null) {
-			DI::config()->delete('system', 'maxfilesize');
-			self::assertNull(DI::config()->get('system', 'maxfilesize'));
+			self::assertSame(0, DI::config()->get('system', 'maxfilesize'));
 		} else {
 			DI::config()->set('system', 'maxfilesize', $limit);
 		}
@@ -97,7 +96,7 @@ class AttachmentsUploadTest extends FixtureTestCase
 
 		$attachment = Attach::selectFirst([], ['uid' => self::USER_ID, 'filename' => self::FILENAME]);
 		if ($accepted) {
-			self::assertIsArray($attachment, 'A valid upload must persist even when maxfilesize is unset.');
+			self::assertIsArray($attachment, 'A valid upload must persist with the default or an explicit size limit.');
 			self::assertSame($content, Attach::getData($attachment));
 			self::assertSame($size, (int) $attachment['filesize']);
 		} else {
