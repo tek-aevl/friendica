@@ -448,7 +448,7 @@ class Timeline extends BaseModule
 
 		$condition = DBA::mergeConditions($condition, ["NOT EXISTS(SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND `cid` = `$table`.`owner-id` AND (`ignored` OR `blocked` OR `collapsed` OR `is-blocked` OR `channel-frequency` = ?))", $uid, Contact\User::FREQUENCY_NEVER]);
 
-		$condition = DBA::mergeConditions($condition, ["NOT EXISTS(SELECT `gsid` FROM `user-gserver` INNER JOIN `contact` ON `contact`.`gsid` = `user-gserver`.`gsid` WHERE `user-gserver`.`uid` = ? AND `user-gserver`.`ignored` AND `contact`.`id` = `$table`.`owner-id`)", $uid]);
+		$condition = DBA::mergeConditions($condition, ["NOT EXISTS(SELECT `user-gserver`.`gsid` FROM `user-gserver` INNER JOIN `contact` ON `contact`.`gsid` = `user-gserver`.`gsid` WHERE `user-gserver`.`uid` = ? AND `user-gserver`.`ignored` AND `contact`.`id` = `$table`.`owner-id`)", $uid]);
 
 		if (($this->selectedTab != ChannelEntity::WHATSHOT) && !is_null($this->accountType)) {
 			$condition = DBA::mergeConditions($condition, ['contact-type' => $this->accountType]);
