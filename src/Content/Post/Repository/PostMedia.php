@@ -101,48 +101,6 @@ class PostMedia extends BaseRepository
 	}
 
 	/**
-	 * Checks all scales and file extensions, including media previews.
-	 *
-	 * @param string $resourceId The resource id of the photo
-	 * @return bool True if the media exists, false otherwise
-	 * @throws \Exception
-	 */
-	public function existsForPhotoResource(string $resourceId): bool
-	{
-		$pattern = addcslashes($this->baseURL . '/photo/' . $resourceId . '-', '\\%_') . '%';
-
-		return $this->existsForLivePost(['(`url` LIKE ? OR `preview` LIKE ?)', $pattern, $pattern]);
-	}
-
-	/**
-	 * Checks if media exists for the given attachment id.
-	 *
-	 * @param int $attachmentId The attachment id to check
-	 * @return bool True if the media exists, false otherwise
-	 * @throws \Exception
-	 */
-	public function existsForAttachment(int $attachmentId): bool
-	{
-		return $this->existsForLivePost(['attach-id' => $attachmentId]);
-	}
-
-	/**
-	 * Checks if media exists for the given live post conditions.
-	 *
-	 * @param array $condition DBA-style media selection conditions.
-	 * @return bool True if the media exists, false otherwise
-	 * @throws \Exception
-	 */
-	private function existsForLivePost(array $condition): bool
-	{
-		$condition = DBA::mergeConditions($condition, [
-			'EXISTS (SELECT 1 FROM `post-user` WHERE `post-user`.`uri-id` = `post-media`.`uri-id` AND NOT `post-user`.`deleted`)',
-		]);
-
-		return $this->db->exists(static::$table_name, $condition);
-	}
-
-	/**
 	 * Select PostMedia collection for the given uri-id and optional types.
 	 *
 	 * @param int $uriId URI id to select media for

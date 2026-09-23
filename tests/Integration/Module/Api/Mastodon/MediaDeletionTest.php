@@ -16,7 +16,6 @@ use Friendica\Core\Storage\Type\Database;
 use Friendica\DI;
 use Friendica\Model\Attach;
 use Friendica\Model\Item;
-use Friendica\Model\Post;
 use Friendica\Module\Api\Mastodon\Media;
 use Friendica\Test\ApiTestCase;
 use GuzzleHttp\Psr7\ServerRequest;
@@ -37,28 +36,21 @@ class MediaDeletionTest extends ApiTestCase
 		DI::config()->set('storage', 'name', Database::NAME);
 	}
 
-	/** @return array<string, array{0: string, 1: bool, 2: bool, 3: bool, 4?: int, 5?: bool, 6?: bool, 7?: bool}> */
+	/** @return array<string, array{string, bool, bool, bool}> */
 	public static function deletionCases(): array
 	{
 		return [
-			'photo still used by another post'      => ['photo', true, true, false, 0, false, true, true],
-			'attachment still used by another post' => ['attach', true, true, false, 0, false, true, true],
-			'owned unused photo'                    => ['photo', true, false, false],
-			'owned posted photo'                    => ['photo', true, true, false],
-			'owned scaled photo'                    => ['photo', true, true, false, 1],
-			'owned preview photo'                   => ['photo', true, true, false, 2, true],
-			'owned image-post photo'                => ['photo', true, true, true],
-			'foreign photo'                         => ['photo', false, false, false],
-			'owned unused attachment'               => ['attach', true, false, false],
-			'owned posted attachment'               => ['attach', true, true, false],
-			'foreign attachment'                    => ['attach', false, false, false],
-			'photo after post deletion'             => ['photo', true, true, false, 0, false, true],
-			'attachment after post deletion'        => ['attach', true, true, false, 0, false, true],
+			'owned unused photo'      => ['photo', true, false, false],
+			'owned image-post photo'  => ['photo', true, true, true],
+			'foreign photo'           => ['photo', false, false, false],
+			'owned unused attachment' => ['attach', true, false, false],
+			'owned posted attachment' => ['attach', true, true, false],
+			'foreign attachment'      => ['attach', false, false, false],
 		];
 	}
 
 	#[DataProvider('deletionCases')]
-	public function testDeletionPreservesInUseAndForeignMedia(string $table, bool $owned, bool $inUse, bool $imagePost, int $scale = 0, bool $preview = false, bool $deletePost = false, bool $otherPost = false): void
+	public function testDeletionPreservesInUseAndForeignMedia(string $table, bool $owned, bool $inUse, bool $imagePost): void
 	{
 		$uid = $owned ? self::SELF_USER['id'] : self::OTHER_USER['id'];
 		if (!$owned) {
@@ -77,14 +69,13 @@ class MediaDeletionTest extends ApiTestCase
 				'resource-id'   => self::PHOTO_RESOURCE_ID,
 				'filename'      => 'fixture.png',
 				'type'          => 'image/png',
-				'scale'         => $scale,
 				'data'          => '',
 				'backend-class' => Database::NAME,
 				'backend-ref'   => $reference,
 			]));
 			$id    = (int) DI::dba()->lastInsertId();
 			$apiId = (string) $id;
-			$url   = DI::baseUrl() . '/photo/' . self::PHOTO_RESOURCE_ID . '-' . $scale . '.png';
+			$url   = DI::baseUrl() . '/photo/' . self::PHOTO_RESOURCE_ID . '-0.png';
 		}
 
 		$media = DI::dba()->selectFirst($table, ['backend-ref'], ['id' => $id]);
@@ -100,36 +91,14 @@ class MediaDeletionTest extends ApiTestCase
 			self::assertTrue(DI::dba()->exists('post-user', ['uri-id' => self::POST_URI_ID, 'uid' => $uid, 'deleted' => false]));
 			self::assertTrue(DI::dba()->insert('post-media', [
 				'uri-id'    => self::POST_URI_ID,
-				'url'       => $preview ? 'https://example.com/article' : $url,
-				'preview'   => $preview ? $url : null,
+				'url'       => $url,
 				'attach-id' => $table === 'attach' ? $id : null,
 				'type'      => $table === 'attach' ? PostMedia::TYPE_DOCUMENT : PostMedia::TYPE_IMAGE,
 			]));
 		}
 
-		if ($deletePost) {
-			if ($otherPost) {
-				// Independent parent status from api.fixture.php, outside the deleted thread.
-				self::assertTrue(DI::dba()->insert('post-media', [
-					'uri-id'    => 3,
-					'url'       => $url,
-					'attach-id' => $table === 'attach' ? $id : null,
-					'type'      => $table === 'attach' ? PostMedia::TYPE_DOCUMENT : PostMedia::TYPE_IMAGE,
-				]));
-			}
-			$post = Post::selectFirst(['id'], ['uri-id' => self::POST_URI_ID, 'uid' => $uid]);
-			self::assertIsArray($post);
-			// Run the status endpoint's deletion operation without scheduling delivery workers.
-			self::assertTrue(Item::markForDeletionById((int) $post['id'], 0));
-			self::assertFalse(DI::dba()->exists('post-user', ['uri-id' => self::POST_URI_ID, 'deleted' => false]));
-			self::assertTrue(DI::dba()->exists($table, ['id' => $id]));
-			if ($otherPost) {
-				self::assertTrue(DI::dba()->exists('post-user', ['uri-id' => 3, 'deleted' => false]));
-			}
-		}
-
 		$response       = $this->deleteMedia($apiId);
-		$shouldPreserve = !$owned || ($inUse && !$deletePost) || $otherPost;
+		$shouldPreserve = !$owned || $inUse;
 		self::assertSame(!$owned ? 404 : ($shouldPreserve ? 422 : 200), $response->getStatusCode());
 
 		self::assertSame($shouldPreserve, DI::dba()->exists($table, ['id' => $id]), 'In-use or foreign media must survive; unused owned media must be removed.');
@@ -140,9 +109,9 @@ class MediaDeletionTest extends ApiTestCase
 			self::assertEquals(new \stdClass(), json_decode((string) $response->getBody(), false, 512, JSON_THROW_ON_ERROR));
 		}
 
-		if ($inUse && !$deletePost) {
+		if ($inUse) {
 			self::assertTrue(DI::dba()->exists('post-user', ['uri-id' => self::POST_URI_ID, 'uid' => $uid, 'deleted' => false]));
-			self::assertTrue(DI::dba()->exists('post-media', ['uri-id' => self::POST_URI_ID, $preview ? 'preview' : 'url' => $url]));
+			self::assertTrue(DI::dba()->exists('post-media', ['uri-id' => self::POST_URI_ID, 'url' => $url]));
 		}
 	}
 

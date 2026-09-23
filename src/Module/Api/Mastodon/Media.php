@@ -7,6 +7,7 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
+use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Attach;
 use Friendica\Model\Contact;
@@ -95,7 +96,7 @@ class Media extends BaseApi
 				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 			}
 
-			if (DI::postMediaRepository()->existsForAttachment($attachId)) {
+			if (DBA::exists('post-media', ['attach-id' => $attachId])) {
 				$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 			}
 
@@ -108,8 +109,7 @@ class Media extends BaseApi
 			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}
 
-		if (Post::exists(['uid' => $uid, 'resource-id' => $photo['resource-id'], 'post-type' => Item::PT_IMAGE, 'origin' => true])
-			|| DI::postMediaRepository()->existsForPhotoResource($photo['resource-id'])) {
+		if (Post::exists(['uid' => $uid, 'resource-id' => $photo['resource-id'], 'post-type' => Item::PT_IMAGE, 'origin' => true])) {
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
