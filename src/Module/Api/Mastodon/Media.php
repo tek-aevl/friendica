@@ -109,7 +109,8 @@ class Media extends BaseApi
 			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}
 
-		if (Post::exists(['uid' => $uid, 'resource-id' => $photo['resource-id'], 'post-type' => Item::PT_IMAGE, 'origin' => true])) {
+		if (Post::exists(['uid' => $uid, 'resource-id' => $photo['resource-id'], 'post-type' => Item::PT_IMAGE, 'origin' => true])
+			|| DI::postMediaRepository()->existsForPhotoResource($photo['resource-id'])) {
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 

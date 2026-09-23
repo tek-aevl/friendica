@@ -48,7 +48,7 @@ class Attachments extends BaseSettings
 			return;
 		}
 
-		$maxfilesize = Strings::getBytesFromShorthand(DI::config()->get('system', 'maxfilesize'));
+		$maxfilesize = Strings::getBytesFromShorthand(DI::config()->get('system', 'maxfilesize') ?? '');
 		if ($maxfilesize && $filesize > $maxfilesize) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('File exceeds size limit of %s', Strings::formatBytes($maxfilesize)));
 			@unlink($src);

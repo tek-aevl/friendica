@@ -100,6 +100,14 @@ class PostMedia extends BaseRepository
 		return $this->getFactory()->createFromTableRow($fields);
 	}
 
+	/** Checks all scales and file extensions, including media previews. */
+	public function existsForPhotoResource(string $resourceId): bool
+	{
+		$pattern = addcslashes($this->baseURL . '/photo/' . $resourceId . '-', '\\%_') . '%';
+
+		return $this->db->exists(static::$table_name, ['`url` LIKE ? OR `preview` LIKE ?', $pattern, $pattern]);
+	}
+
 	/**
 	 * Select PostMedia collection for the given uri-id and optional types.
 	 *
