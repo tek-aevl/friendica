@@ -100,7 +100,13 @@ class PostMedia extends BaseRepository
 		return $this->getFactory()->createFromTableRow($fields);
 	}
 
-	/** Checks all scales and file extensions, including media previews. */
+	/**
+	 * Checks all scales and file extensions, including media previews.
+	 *
+	 * @param string $resourceId The resource id of the photo
+	 * @return bool True if the media exists, false otherwise
+	 * @throws \Exception
+	 */
 	public function existsForPhotoResource(string $resourceId): bool
 	{
 		$pattern = addcslashes($this->baseURL . '/photo/' . $resourceId . '-', '\\%_') . '%';
@@ -108,12 +114,25 @@ class PostMedia extends BaseRepository
 		return $this->existsForLivePost(['(`url` LIKE ? OR `preview` LIKE ?)', $pattern, $pattern]);
 	}
 
+	/**
+	 * Checks if media exists for the given attachment id.
+	 *
+	 * @param int $attachmentId The attachment id to check
+	 * @return bool True if the media exists, false otherwise
+	 * @throws \Exception
+	 */
 	public function existsForAttachment(int $attachmentId): bool
 	{
 		return $this->existsForLivePost(['attach-id' => $attachmentId]);
 	}
 
-	/** @param array $condition DBA-style media selection conditions. */
+	/**
+	 * Checks if media exists for the given live post conditions.
+	 *
+	 * @param array $condition DBA-style media selection conditions.
+	 * @return bool True if the media exists, false otherwise
+	 * @throws \Exception
+	 */
 	private function existsForLivePost(array $condition): bool
 	{
 		$condition = DBA::mergeConditions($condition, [
