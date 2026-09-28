@@ -960,7 +960,7 @@ class Processor
 		}
 
 		$item['title']           = trim(BBCode::toPlaintext($item['title']));
-		$item['content-warning'] = HTML::toBBCode($activity['summary'] ?? '');
+		$item['content-warning'] = trim(BBCode::toPlaintext(HTML::toBBCode($activity['summary'] ?? '')));
 
 		if (!empty($activity['languages'])) {
 			$item['language'] = self::processLanguages($activity['languages']);
