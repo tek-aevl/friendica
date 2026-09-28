@@ -79,6 +79,11 @@
 					{{/foreach}}
 				</tbody>
 			</table>
+			{{if $data->isScanLimitReached()}}
+				<p>{{$l10n.Scan_limit_reached}}</p>
+			{{elseif $data->isTimeoutReached()}}
+				<p>{{$l10n.Timeout_reached}}</p>
+			{{/if}}
 		</form>
 	{{/if}}
 	</div>
