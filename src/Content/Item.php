@@ -1483,7 +1483,7 @@ class Item
 			return trim($text);
 		};
 
-		$summary_norm = $normalize($summary ?? '');
+		$summary_norm = $normalize(BBCode::toPlaintext($summary ?? '', false));
 		if ($summary_norm === '') {
 			return false;
 		}
