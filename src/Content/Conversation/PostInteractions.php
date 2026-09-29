@@ -195,11 +195,11 @@ final readonly class PostInteractions
 	}
 
 	/**
-	 * Likes and dislikes that carry a single emoji as content are emoji reactions (see Model\Post\Counts)
+	 * Likes and dislikes that carry an emoji as content are emoji reactions (see Model\Post\Counts)
 	 */
 	private function isEmojiReaction(string $body): bool
 	{
-		return mb_strlen($body) === 1 && Smilies::isEmojiPost($body);
+		return Smilies::isReaction($body);
 	}
 
 	private function getActivityCondition(string $type, int $uriId, int $uid): array
