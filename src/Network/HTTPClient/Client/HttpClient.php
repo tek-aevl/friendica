@@ -199,9 +199,11 @@ class HttpClient implements ICanSendHttpRequests
 	/**
 	 * Creates the temp file that receives the response body.
 	 *
-	 * The file is deleted right after opening, it only exists as long as the handle is open.
-	 * This way the space is freed even when the process ends without cleanup
-	 * (fatal error, killed worker).
+	 * The file is deleted right after opening. On Linux/Unix, unlink() only removes the
+	 * name from the directory: the open handle keeps working, Guzzle writes the body into
+	 * it and reads it back as usual. The kernel frees the space when the last handle is
+	 * closed - which also happens when the process dies without running any PHP cleanup
+	 * (fatal error, exit(), killed worker). A named file would stay behind in these cases.
 	 *
 	 * @return resource|null File handle, null when the default sink (php://temp) has to be used
 	 */
@@ -218,7 +220,7 @@ class HttpClient implements ICanSendHttpRequests
 			return null;
 		}
 
-		// Some systems can't delete an open file
+		// Some systems (Windows) can't delete an open file, fall back to php://temp there
 		if (!@unlink($filename)) {
 			fclose($sink);
 			@unlink($filename);
