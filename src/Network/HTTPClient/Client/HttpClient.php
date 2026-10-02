@@ -19,6 +19,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\FileCookieJar;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use mattwright\URLResolver;
@@ -140,25 +141,35 @@ class HttpClient implements ICanSendHttpRequests
 			$conf[RequestOptions::AUTH] = $opts[HttpClientOptions::AUTH];
 		}
 
-		$conf[RequestOptions::ON_HEADERS] = function (ResponseInterface $response) use ($opts): void {
+		// Handle streaming requests - don't use sink for streaming
+		$sink = null;
+		if (empty($opts[HttpClientOptions::STREAM])) {
+			$sink = $this->createSink();
+			if ($sink !== null) {
+				$conf[RequestOptions::SINK] = new Stream($sink);
+			}
+		} else {
+			$conf[RequestOptions::STREAM] = true;
+		}
+
+		$conf[RequestOptions::ON_HEADERS] = function (ResponseInterface $response) use ($opts, $sink): void {
 			if (
 				!empty($opts[HttpClientOptions::CONTENT_LENGTH])
 				&& (int) $response->getHeaderLine('Content-Length') > $opts[HttpClientOptions::CONTENT_LENGTH]
 			) {
 				throw new TransferException('The file is too big!');
 			}
+
+			// The sink is shared by all responses of a redirect chain, only the last body must remain
+			if ($sink !== null) {
+				ftruncate($sink, 0);
+				rewind($sink);
+			}
 		};
 
 		if (empty($conf[HttpClientOptions::HEADERS]['Accept']) && in_array($method, ['GET', 'HEAD'])) {
 			$this->logger->info('Accept header was missing, using default.', ['url' => $url]);
 			$conf[HttpClientOptions::HEADERS]['Accept'] = HttpClientAccept::DEFAULT;
-		}
-
-		// Handle streaming requests - don't use sink for streaming
-		if (empty($opts[HttpClientOptions::STREAM])) {
-			$conf['sink'] = tempnam(System::getTempPath(), 'http-');
-		} else {
-			$conf[RequestOptions::STREAM] = true;
 		}
 
 		try {
@@ -180,12 +191,41 @@ class HttpClient implements ICanSendHttpRequests
 			$this->logger->info('Invalid Argument for HTTP call.', ['url' => $url, 'method' => $method, 'exception' => $argumentException]);
 			return new CurlResult($this->logger, $url, '', ['http_code' => 500], $argumentException->getCode(), $argumentException->getMessage());
 		} finally {
-			if (!empty($conf['sink']) && file_exists($conf['sink'])) {
-				unlink($conf['sink']);
-			}
 			$this->logger->debug('Request stop.', ['url' => $url, 'method' => $method]);
 			$this->profiler->stopRecording();
 		}
+	}
+
+	/**
+	 * Creates the temp file that receives the response body.
+	 *
+	 * The file is deleted right after opening, it only exists as long as the handle is open.
+	 * This way the space is freed even when the process ends without cleanup
+	 * (fatal error, killed worker).
+	 *
+	 * @return resource|null File handle, null when the default sink (php://temp) has to be used
+	 */
+	private function createSink()
+	{
+		$filename = tempnam(System::getTempPath(), 'http-');
+		if ($filename === false) {
+			return null;
+		}
+
+		$sink = @fopen($filename, 'w+');
+		if ($sink === false) {
+			@unlink($filename);
+			return null;
+		}
+
+		// Some systems can't delete an open file
+		if (!@unlink($filename)) {
+			fclose($sink);
+			@unlink($filename);
+			return null;
+		}
+
+		return $sink;
 	}
 
 	/** {@inheritDoc}
