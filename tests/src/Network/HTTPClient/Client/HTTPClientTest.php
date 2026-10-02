@@ -7,17 +7,24 @@
 
 namespace Friendica\Test\src\Network\HTTPClient\Client;
 
+use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Util\Network;
 use Friendica\Test\DiceHttpMockHandlerTrait;
 use Friendica\Test\MockedTestCase;
+use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\FnStream;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class HTTPClientTest extends MockedTestCase
 {
 	use DiceHttpMockHandlerTrait;
+
+	/** @var resource|null Built-in PHP web server */
+	private $server = null;
 
 	protected function setUp(): void
 	{
@@ -28,6 +35,11 @@ class HTTPClientTest extends MockedTestCase
 
 	protected function tearDown(): void
 	{
+		if (is_resource($this->server)) {
+			proc_terminate($this->server);
+			proc_close($this->server);
+		}
+
 		$this->tearDownHandler();
 
 		parent::tearDown();
@@ -147,5 +159,118 @@ class HTTPClientTest extends MockedTestCase
 		$this->httpRequestHandler->setHandler(new MockHandler([new Response(200, [], 'internal')]));
 
 		self::assertTrue(DI::httpClient()->get('http://127.0.0.1:9999/')->isSuccess());
+	}
+
+	/**
+	 * Starts the built-in PHP web server with SinkTestRouter.php and sends requests through curl
+	 *
+	 * @return string Base URL of the server
+	 */
+	private function startServer(): string
+	{
+		$socket = stream_socket_server('tcp://127.0.0.1:0');
+		$port   = (int) substr((string) strrchr((string) stream_socket_get_name($socket, false), ':'), 1);
+		fclose($socket);
+
+		$this->server = proc_open(
+			[PHP_BINARY, '-S', '127.0.0.1:' . $port, __DIR__ . '/SinkTestRouter.php'],
+			[['pipe', 'r'], ['file', '/dev/null', 'w'], ['file', '/dev/null', 'w']],
+			$pipes,
+		);
+
+		for ($i = 0; $i < 50; $i++) {
+			$connection = @fsockopen('127.0.0.1', $port);
+			if ($connection) {
+				fclose($connection);
+				break;
+			}
+			usleep(100000);
+		}
+
+		DI::config()->set('system', 'block_private_addresses', false);
+		$this->httpRequestHandler->setHandler(new CurlHandler());
+
+		return 'http://127.0.0.1:' . $port;
+	}
+
+	/**
+	 * Returns the response body temp files in the temp path
+	 */
+	private static function getSinkFiles(): array
+	{
+		return glob(System::getTempPath() . '/http-*') ?: [];
+	}
+
+	/**
+	 * The response body must not be stored in a named file, not even during the transfer.
+	 * A process that ends before deleting such a file leaves it behind.
+	 */
+	public function testResponseBodyIsNotStoredInNamedFile(): void
+	{
+		$before = self::getSinkFiles();
+		$during = null;
+
+		// The mock handler copies the body into the sink during the transfer
+		$body = FnStream::decorate(Utils::streamFor('hello'), [
+			'__toString' => function () use (&$during): string {
+				$during ??= self::getSinkFiles();
+				return 'hello';
+			},
+		]);
+
+		$this->httpRequestHandler->setHandler(new MockHandler([new Response(200, [], $body)]));
+
+		$result = DI::httpClient()->get('https://mastodon.social');
+
+		self::assertSame($before, $during);
+		self::assertSame($before, self::getSinkFiles());
+		self::assertEquals('hello', $result->getBodyString());
+	}
+
+	/**
+	 * The body of a redirect response must not end up in the body of the final response.
+	 */
+	public function testRedirectBodyIsNotPartOfFinalBody(): void
+	{
+		$url = $this->startServer();
+
+		$result = DI::httpClient()->get($url . '/redirect');
+
+		self::assertEquals($url . '/final', $result->getRedirectUrl());
+		self::assertEquals('final', $result->getBodyString());
+	}
+
+	/**
+	 * A worker process that is killed during a download must not leave the received data behind.
+	 */
+	public function testKilledRequestLeavesNoTempFile(): void
+	{
+		if (!function_exists('pcntl_fork')) {
+			self::markTestSkipped('pcntl is required');
+		}
+
+		$url    = $this->startServer();
+		$before = self::getSinkFiles();
+
+		$pid = pcntl_fork();
+		if ($pid === 0) {
+			try {
+				DI::httpClient()->get($url . '/slow');
+			} finally {
+				// Never return into the test runner
+				posix_kill(posix_getpid(), SIGKILL);
+			}
+		}
+
+		// The download takes 10 seconds
+		sleep(2);
+		posix_kill($pid, SIGKILL);
+		pcntl_waitpid($pid, $status);
+
+		$leftover = array_values(array_diff(self::getSinkFiles(), $before));
+		array_map(unlink(...), $leftover);
+
+		self::assertTrue(pcntl_wifsignaled($status));
+		self::assertSame([], $leftover);
 	}
 }
