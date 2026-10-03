@@ -304,7 +304,8 @@ class ExpirePosts
 				AND NOT `uri-id` IN (SELECT `parent-uri-id` FROM `post-user`
 					WHERE (`origin` OR `event-id` != 0 OR `post-type` = ?) AND `parent-uri-id` = `post-thread`.`uri-id`)
 				AND NOT `uri-id` IN (SELECT `uri-id` FROM `post-content`
-					WHERE `resource-id` != 0 AND `uri-id` = `post-thread`.`uri-id`)",
+					WHERE `resource-id` != 0 AND `uri-id` = `post-thread`.`uri-id`)
+				AND NOT EXISTS (SELECT 1 FROM `contact` WHERE `contact`.`uri-id` = `post-thread`.`uri-id`)",
 				DateTimeFormat::utc('now - ' . (int) $expire_days . ' days'), Item::PT_PERSONAL_NOTE,
 			];
 			$pass = 0;
@@ -332,7 +333,8 @@ class ExpirePosts
 				AND NOT `uri-id` IN (SELECT `parent-uri-id` FROM `post-user` AS `i` WHERE `i`.`uid` != ?
 					AND `i`.`parent-uri-id` = `post-user`.`uri-id`)
 				AND NOT `uri-id` IN (SELECT `parent-uri-id` FROM `post-user` AS `i` WHERE `i`.`uid` = ?
-					AND `i`.`parent-uri-id` = `post-user`.`uri-id` AND `i`.`received` > ?)",
+					AND `i`.`parent-uri-id` = `post-user`.`uri-id` AND `i`.`received` > ?)
+				AND NOT EXISTS (SELECT 1 FROM `contact` WHERE `contact`.`uri-id` = `post-user`.`uri-id`)",
 				Item::GRAVITY_PARENT, 0, DateTimeFormat::utc('now - ' . (int) $expire_days_unclaimed . ' days'), 0, 0, DateTimeFormat::utc('now - ' . (int) $expire_days_unclaimed . ' days'),
 			];
 			$pass = 0;
