@@ -333,18 +333,23 @@ class Network
 	 */
 	public static function isEmailDomainAllowed(string $email): bool
 	{
-		$domain = strtolower(substr($email, strpos($email, '@') + 1));
+		$pos = strrpos($email, '@');
+		if ($pos === false) {
+			return false;
+		}
+
+		$domain = strtolower(trim(substr($email, $pos + 1)));
 		if (!$domain) {
 			return false;
 		}
 
-		$allowed = DI::config()->get('system', 'allowed_email');
-		if (!empty($allowed) && self::isDomainMatch($domain, explode(',', (string) $allowed))) {
-			return true;
+		$allowed = trim((string) DI::config()->get('system', 'allowed_email'));
+		if ($allowed !== '' && !self::isDomainMatch($domain, explode(',', $allowed))) {
+			return false;
 		}
 
-		$disallowed = DI::config()->get('system', 'disallowed_email');
-		if (!empty($disallowed) && self::isDomainMatch($domain, explode(',', (string) $disallowed))) {
+		$disallowed = trim((string) DI::config()->get('system', 'disallowed_email'));
+		if ($disallowed !== '' && self::isDomainMatch($domain, explode(',', $disallowed))) {
 			return false;
 		}
 
