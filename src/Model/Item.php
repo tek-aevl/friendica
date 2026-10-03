@@ -728,6 +728,8 @@ class Item
 			$parent_id     = (int) $toplevel_parent['id'];
 			$item          = $itemHelper->handleToplevelParent($item, $toplevel_parent, $defined_permissions);
 			$parent_origin = $toplevel_parent['origin'];
+
+			Post\ThreadUser::ensure($toplevel_parent['uri-id'], $toplevel_parent['uid'], $parent_id);
 		} else {
 			$parent_id     = 0;
 			$parent_origin = $item['origin'];
@@ -995,7 +997,7 @@ class Item
 		if ($item['gravity'] == self::GRAVITY_PARENT) {
 			$item['post-user-id'] = $post_user_id;
 			if (!Post\ThreadUser::insert($item['uri-id'], $item['uid'], $item)) {
-				DI::logger()->error('Post-Thread-User entry was not inserted', ['uri-id' => $item['uri-id']]);
+				DI::logger()->error('Post-Thread-User entry was not inserted', ['uri-id' => $item['uri-id'], 'uid' => $item['uid'], 'network' => $item['network'], 'post-user-id' => $post_user_id, 'error' => DBA::errorNo() . ': ' . DBA::errorMessage()]);
 			}
 		}
 

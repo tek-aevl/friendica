@@ -168,9 +168,15 @@ class ExpirePosts
 			DI::logger()->notice('No post-thread entries added');
 		}
 
+		// Entries that exist but lack the link to "post-user"
+		DBA::e("UPDATE `post-thread-user` INNER JOIN `post-user` ON `post-user`.`uri-id` = `post-thread-user`.`uri-id` AND `post-user`.`uid` = `post-thread-user`.`uid`
+			SET `post-thread-user`.`post-user-id` = `post-user`.`id` WHERE `post-thread-user`.`post-user-id` IS NULL");
+
 		$rows      = 0;
-		$userposts = DBA::select('post-user', [], ["`gravity` = ? AND `id` not in (select `post-user-id` from `post-thread-user`)", Item::GRAVITY_PARENT]);
+		$userposts = DBA::p("SELECT `post-user`.* FROM `post-user` WHERE `gravity` = ? AND NOT EXISTS
+			(SELECT 1 FROM `post-thread-user` WHERE `post-thread-user`.`uri-id` = `post-user`.`uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`)", Item::GRAVITY_PARENT);
 		while ($fields = DBA::fetch($userposts)) {
+			$fields['post-user-id']   = $fields['id'];
 			$post_fields              = DI::dbaDefinition()->truncateFieldsForTable('post-thread-user', $fields);
 			$post_fields['commented'] = $post_fields['changed'] = $post_fields['created'];
 			DBA::insert('post-thread-user', $post_fields, Database::INSERT_IGNORE);
