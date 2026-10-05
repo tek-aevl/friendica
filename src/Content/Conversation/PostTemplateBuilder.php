@@ -37,6 +37,9 @@ use Psr\Log\LoggerInterface;
  */
 final class PostTemplateBuilder
 {
+	/** Number of columns in the action button grid; the reactions below must fit into it */
+	private const MAX_DISPLAYED_REACTIONS = 5;
+
 	public function __construct(
 		private readonly L10n $l10n,
 		private readonly IManageConfigValues $config,
@@ -307,10 +310,11 @@ final class PostTemplateBuilder
 		$attend       = $eventData['attend'];
 		$attend_label = $eventData['attend_label'];
 
-		$reactionData = $this->buildReactionData($item, $convResponses);
-		$emojis       = $reactionData['emojis'];
-		$reactions    = $reactionData['reactions'];
-		$responses    = $reactionData['responses'];
+		$reactionData  = $this->buildReactionData($item, $convResponses);
+		$emojis        = $reactionData['emojis'];
+		$reactions     = $reactionData['reactions'];
+		$reactionsMore = $reactionData['reactions_more'];
+		$responses     = $reactionData['responses'];
 
 		$actionButtons = $this->buildActionButtons($item, $writable, $likeable, $shareable, $announceable);
 		$buttons       = $actionButtons['buttons'];
@@ -404,9 +408,13 @@ final class PostTemplateBuilder
 			'num_comments'           => $this->l10n->tt('%d comment', '%d comments', $item['counts'] ?? 0),
 			'quoteshares'            => $this->getQuoteShares($item['quoteshares'] ?? []),
 			'reactions'              => $reactions,
+			'reactions_more'         => $reactionsMore,
 			'responses'              => $responses,
 			'legacy_activities'      => $this->config->get('system', 'legacy_activities'),
 			'switchcomment'          => $this->l10n->t('Comment'),
+			'like_label'             => $this->l10n->t('Like'),
+			'dislike_label'          => $this->l10n->t('Dislike'),
+			'announce_label'         => $this->l10n->t('Reshare'),
 			'reply_label'            => $this->l10n->t('Reply to %s', $profileName),
 			'comment_html'           => $comment_html,
 			'remote_comment'         => $remote_comment_output,
@@ -662,7 +670,7 @@ final class PostTemplateBuilder
 	 *
 	 * @param array<string, mixed> $item
 	 * @param array $convResponses
-	 * @return array{emojis: array, reactions: array, responses: array}
+	 * @return array{emojis: array, reactions: array, reactions_more: array, responses: array}
 	 */
 	private function buildReactionData(array $item, array $convResponses): array
 	{
@@ -700,7 +708,18 @@ final class PostTemplateBuilder
 
 		unset($reactions[Activity::POST]);
 
-		return ['emojis' => $emojis, 'reactions' => $reactions, 'responses' => $responses];
+		// The reactions are displayed in a grid below the action buttons, so only the most used ones are shown
+		$reactions = array_values($reactions);
+		usort($reactions, fn (array $a, array $b): int => (int) $b['total'] <=> (int) $a['total']);
+
+		$more = [];
+		if (count($reactions) > self::MAX_DISPLAYED_REACTIONS) {
+			$hidden    = array_slice($reactions, self::MAX_DISPLAYED_REACTIONS - 1);
+			$reactions = array_slice($reactions, 0, self::MAX_DISPLAYED_REACTIONS - 1);
+			$more      = ['total' => count($hidden), 'title' => implode("\n", array_column($hidden, 'title'))];
+		}
+
+		return ['emojis' => $emojis, 'reactions' => $reactions, 'reactions_more' => $more, 'responses' => $responses];
 	}
 
 	/**
