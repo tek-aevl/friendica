@@ -37,6 +37,11 @@ class NodeInfo extends BaseModule
 					'rel'  => 'http://nodeinfo.diaspora.software/ns/schema/2.2',
 					'href' => DI::baseUrl() . '/nodeinfo/2.2',
 				],
+				// @see https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md
+				[
+					'rel'  => 'https://www.w3.org/ns/activitystreams#Application',
+					'href' => DI::baseUrl() . '/friendica',
+				],
 			],
 		];
 
