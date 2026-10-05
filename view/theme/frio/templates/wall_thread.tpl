@@ -335,7 +335,7 @@ as the value of $top_child_total (this is done at the end of this file)
 					</button>
 				{{/if}}
 
-				{{if $item.vote.announce OR $item.vote.share}}
+				{{if $item.vote.announce OR $item.vote.share OR $item.browsershare}}
 					<div class="share-links btn-group{{if $item.thread_level > 1}} dropup{{/if}}" role="group">
 						<button type="button" class="btn dropdown-toggle{{if $item.responses.announce.self}} active{{/if}}" data-toggle="dropdown" id="shareMenuOptions-{{$item.id}}" aria-haspopup="true" aria-expanded="false" title="{{$item.menu}}">
 							<i class="ri ri-share-forward-line" aria-hidden="true"></i>
@@ -350,7 +350,7 @@ as the value of $top_child_total (this is done at the end of this file)
 							{{assign var=quotes value=0}}
 							{{/if}}
 							<span class="total" title="{{$item.responses.announce.title}} {{$item.responses.quoteshares.title}}">{{if $quotes+$shares > 0}}{{$quotes+$shares}}{{/if}}</span>
-							<span class="action-label">{{$item.vote.announce.1}}</span>
+							<span class="action-label">{{$item.announce_label}}</span>
 						</button>
 						<ul class="dropdown-menu dropdown-menu-left" role="menu" aria-labelledby="shareMenuOptions-{{$item.id}}">
 							{{if $item.vote.announce}} {{* edit the posting *}}
@@ -382,6 +382,13 @@ as the value of $top_child_total (this is done at the end of this file)
 							{{/if}}
 						</ul>
 					</div>
+				{{else}}
+					<div class="share-links btn-group" role="group">
+						<button type="button" class="btn" id="shareMenuOptions-{{$item.id}}" title="{{$item.announce_label}}" disabled>
+							<i class="ri ri-share-forward-line" aria-hidden="true"></i>
+							<span class="action-label">{{$item.announce_label}}</span>
+						</button>
+					</div>
 				{{/if}}
 
 				{{* Buttons for like and dislike *}}
@@ -392,12 +399,22 @@ as the value of $top_child_total (this is done at the end of this file)
 						<span class="total" title="{{$item.responses.like.title}}">{{$item.responses.like.total}}</span>
 						<span class="action-label">{{$item.vote.like.1}}</span>
 					</button>
+					{{else}}
+					<button type="button" class="btn button-likes" id="like-{{$item.id}}" title="{{$item.like_label}}" disabled>
+						<i class="ri ri-thumb-up-line" aria-hidden="true"></i>
+						<span class="action-label">{{$item.like_label}}</span>
+					</button>
 					{{/if}}
 					{{if $item.vote.dislike}}
 					<button type="button" class="btn button-likes{{if $item.responses.dislike.self}} active" aria-pressed="true{{/if}}" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.0}}" onclick="doActivityItemAction({{$item.id}}, 'dislike'{{if $item.responses.dislike.self}}, true{{/if}});" >
 						<i class="ri ri-thumb-down-line" aria-hidden="true"></i>
 						<span class="total" title="{{$item.responses.dislike.title}}">{{$item.responses.dislike.total}}</span>
 						<span class="action-label">{{$item.vote.dislike.1}}</span>
+					</button>
+					{{elseif !$item.hide_dislike}}
+					<button type="button" class="btn button-likes" id="dislike-{{$item.id}}" title="{{$item.dislike_label}}" disabled>
+						<i class="ri ri-thumb-down-line" aria-hidden="true"></i>
+						<span class="action-label">{{$item.dislike_label}}</span>
 					</button>
 					{{/if}}
 				{{/if}}
@@ -420,6 +437,19 @@ as the value of $top_child_total (this is done at the end of this file)
 					<span class="action-label">{{$item.attend_label.2}}</span>
 				</button>
 				{{/if}}
+
+				{{* Emoji reactions, displayed in the same grid below the buttons *}}
+				<div class="wall-item-reactions">
+					{{foreach $item.reactions as $emoji}}
+						<span class="wall-item-emoji" title="{{$emoji.title}}">
+							{{if $emoji.icon.fa}}<i class="ri {{$emoji.icon.fa}}" aria-hidden="true"></i>{{else}}<span class="emoji" aria-hidden="true">{{$emoji.emoji}}</span>{{/if}}
+							<span class="total">{{$emoji.total}}</span>
+						</span>
+					{{/foreach}}
+					{{if $item.reactions_more}}
+						<span class="wall-item-emoji wall-item-emoji-more" title="{{$item.reactions_more.title}}">+{{$item.reactions_more.total}}</span>
+					{{/if}}
+				</div>
 
 				{{* Put additional actions in a dropdown menu *}}
 				{{if $item.edpost || $item.tagger || $item.filer || $item.pin || $item.star || $item.follow_thread || $item.ignore || ($item.drop && $item.drop.dropping)}}
@@ -576,15 +606,6 @@ as the value of $top_child_total (this is done at the end of this file)
 		</div><!--./wall-item-actions-->
 
 		<div class="wall-item-links"></div>
-		<div class="wall-emoji-responses">
-				{{foreach $item.reactions as $emoji}}
-					{{if $emoji.icon.fa}}
-						<span class="wall-item-emoji" title="{{$emoji.title}}"><i class="ri {{$emoji.icon.fa}}" aria-hidden="true"></i> {{$emoji.total}}</span>
-					{{else}}
-						<span class="wall-item-emoji" title="{{$emoji.title}}">{{$emoji.emoji}} {{$emoji.total}}</span>
-					{{/if}}
-				{{/foreach}}
-		</div>
 		{{* Display likes, dislike and attendance stats *}}
 		{{if $item.legacy_activities}}
 			<div class="wall-item-responses">

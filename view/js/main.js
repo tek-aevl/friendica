@@ -1390,8 +1390,8 @@ function refreshItemActivity(itemId, data) {
 				$shown.replaceWith($fresh);
 			});
 
-			var $shownEmoji = $liveArticle.find('.wall-emoji-responses').first();
-			var $freshEmoji = $newArticle.find('.wall-emoji-responses').first();
+			var $shownEmoji = $liveArticle.find('.wall-item-reactions').first();
+			var $freshEmoji = $newArticle.find('.wall-item-reactions').first();
 			if ($shownEmoji.length && $freshEmoji.length) {
 				$shownEmoji.replaceWith($freshEmoji);
 			}

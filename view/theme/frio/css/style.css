@@ -2387,7 +2387,8 @@ body.show-action-labels .action-label {
 	grid-template-columns: 1fr 1fr 1fr 1fr 1fr min-content;	/* collapse column if checkbox is hidden */
 	 grid-template-areas:
 		"comments shares likes dislikes more delete"
-		"attend . decline . maybe .";
+		"attend . decline . maybe ."
+		"reactions reactions reactions reactions reactions .";
 	/* grid bug fix */
 	width: 100%;
 	min-width: 0;
@@ -2426,6 +2427,26 @@ body.show-action-labels .action-label {
 	.wall-item-actions-row .checkbox {
 		grid-area: delete;
 	}
+	.wall-item-actions-row .wall-item-reactions {
+		grid-area: reactions;
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);	/* same width as the button columns above */
+	}
+.wall-item-reactions .wall-item-emoji {
+	display: flex;
+	margin-right: 0;
+	justify-content: center;
+	align-items: center;
+	min-width: 0;
+	padding: 5px;
+	color: $font_color_darker;
+}
+.wall-item-reactions .wall-item-emoji .total {
+	margin-left: 3px;
+}
+.wall-item-reactions .wall-item-emoji-more {
+	cursor: help;
+}
 .wall-item-actions .btn,
 .wall-item-actions a,
 .wall-item-actions button {
@@ -2437,6 +2458,11 @@ body.show-action-labels .action-label {
 .wall-item-actions button:disabled,
 button[disabled] {
   	color: $font_color_lighter;
+}
+.wall-item-actions button:disabled:hover {
+	color: $font_color_lighter;
+	font-weight: normal;
+	cursor: not-allowed;
 }
 .wall-item-actions .active,
 .wall-item-actions button:focus,
@@ -2485,10 +2511,6 @@ button[disabled] {
 }
 .wall-item-actions .separator {
 	margin: 0 0.3em;
-}
-.wall-emoji-responses {
-	display: flex;
-	flex-basis: auto;
 }
 .wall-item-responses {
 	margin-top: .3em;
