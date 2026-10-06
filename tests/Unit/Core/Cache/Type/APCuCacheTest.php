@@ -13,24 +13,19 @@ use Friendica\Core\Cache\Exception\InvalidCacheDriverException;
 use Friendica\Core\Cache\Type\APCuCache;
 use phpmock\phpunit\PHPMock;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Availability checks only, the cache operations are covered by tests/src/Core/Cache/APCuCacheTest.php.
+ * Separate processes, because php-mock can't mock functions which were already called in the namespace (e.g. by the legacy APCu tests).
  */
+#[RunTestsInSeparateProcesses]
 class APCuCacheTest extends TestCase
 {
 	use PHPMock;
 
 	private const NAMESPACE = 'Friendica\Core\Cache\Type';
-
-	public static function setUpBeforeClass(): void
-	{
-		// php-mock needs the mocks to exist before the first unqualified call in this namespace
-		self::defineFunctionMock(self::NAMESPACE, 'extension_loaded');
-		self::defineFunctionMock(self::NAMESPACE, 'ini_get');
-		self::defineFunctionMock(self::NAMESPACE, 'phpversion');
-	}
 
 	/**
 	 * @param array<string, string|false> $ini

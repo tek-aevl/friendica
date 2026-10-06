@@ -23,18 +23,17 @@ use Friendica\Core\Lock\Type\DatabaseLock;
 use Friendica\Database\Database;
 use Friendica\Util\Profiler;
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
+/**
+ * Separate processes, because php-mock can't mock functions which were already called in the namespace (e.g. by other lock tests).
+ */
+#[RunTestsInSeparateProcesses]
 class LockTest extends TestCase
 {
 	use PHPMock;
-
-	public static function setUpBeforeClass(): void
-	{
-		// php-mock needs the mock to exist before the first unqualified call in this namespace
-		self::defineFunctionMock('Friendica\Core\Lock\Factory', 'function_exists');
-	}
 
 	protected function setUp(): void
 	{
