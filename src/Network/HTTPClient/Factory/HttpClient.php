@@ -110,6 +110,6 @@ class HttpClient extends BaseFactory
 		// Some websites test the browser for cookie support, so this enhances results.
 		$resolver->setCookieJar(System::getTempPath() . '/resolver-cookie-' . Strings::getRandomName(10));
 
-		return new Client\HttpClient($logger, $this->profiler, $guzzle, $resolver, $this->baseUrl);
+		return new Client\HttpClient($logger, $this->profiler, $guzzle, $resolver, $this->baseUrl, (int) $this->config->get('performance', 'max_download_size', 0));
 	}
 }

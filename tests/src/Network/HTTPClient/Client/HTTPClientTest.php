@@ -9,6 +9,8 @@ namespace Friendica\Test\src\Network\HTTPClient\Client;
 
 use Friendica\Core\System;
 use Friendica\DI;
+use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Util\Network;
 use Friendica\Test\DiceHttpMockHandlerTrait;
 use Friendica\Test\MockedTestCase;
@@ -238,6 +240,59 @@ class HTTPClientTest extends MockedTestCase
 
 		self::assertEquals($url . '/final', $result->getRedirectUrl());
 		self::assertEquals('final', $result->getBodyString());
+	}
+
+	public static function oversizedResponseProvider(): array
+	{
+		return [
+			'announced, call site limit'   => ['/big', [HttpClientOptions::CONTENT_LENGTH => 1000000], 0],
+			'unannounced, call site limit' => ['/big-unannounced', [HttpClientOptions::CONTENT_LENGTH => 1000000], 0],
+			'announced, global limit'      => ['/big', [], 1000000],
+			'unannounced, global limit'    => ['/big-unannounced', [], 1000000],
+		];
+	}
+
+	/**
+	 * A response body above the limit must not be received, whether the size is announced or not.
+	 */
+	#[DataProvider('oversizedResponseProvider')]
+	public function testOversizedResponseIsAborted(string $path, array $opts, int $globalLimit): void
+	{
+		DI::config()->set('performance', 'max_download_size', $globalLimit);
+
+		$url    = $this->startServer();
+		$result = DI::httpClient()->get($url . $path, HttpClientAccept::DEFAULT, $opts);
+
+		self::assertFalse($result->isSuccess());
+		self::assertSame('', $result->getBodyString());
+	}
+
+	/**
+	 * The limit applies to each response of a redirect chain, not to their sum.
+	 */
+	public function testRedirectBodiesDoNotAddUp(): void
+	{
+		DI::config()->set('performance', 'max_download_size', 1000000);
+
+		$url    = $this->startServer();
+		$result = DI::httpClient()->get($url . '/redirect-big');
+
+		self::assertTrue($result->isSuccess());
+		self::assertSame(str_repeat('f', 600000), $result->getBodyString());
+	}
+
+	/**
+	 * A disabled global limit keeps large responses working.
+	 */
+	public function testGlobalLimitCanBeDisabled(): void
+	{
+		DI::config()->set('performance', 'max_download_size', 0);
+
+		$url    = $this->startServer();
+		$result = DI::httpClient()->get($url . '/big-unannounced');
+
+		self::assertTrue($result->isSuccess());
+		self::assertSame(3000000, strlen($result->getBodyString()));
 	}
 
 	/**

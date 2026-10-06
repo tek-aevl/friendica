@@ -32,7 +32,7 @@ use Psr\Log\LoggerInterface;
  */
 class HttpClient implements ICanSendHttpRequests
 {
-	public function __construct(private readonly LoggerInterface $logger, private readonly Profiler $profiler, private readonly Client $client, private readonly URLResolver $resolver, private readonly App\BaseURL $baseUrl) {}
+	public function __construct(private readonly LoggerInterface $logger, private readonly Profiler $profiler, private readonly Client $client, private readonly URLResolver $resolver, private readonly App\BaseURL $baseUrl, private readonly int $maxBodySize = 0) {}
 
 	/**
 	 * {@inheritDoc}
@@ -141,22 +141,25 @@ class HttpClient implements ICanSendHttpRequests
 			$conf[RequestOptions::AUTH] = $opts[HttpClientOptions::AUTH];
 		}
 
+		$maxBodySize = (int) ($opts[HttpClientOptions::CONTENT_LENGTH] ?? 0);
+
 		// Handle streaming requests - don't use sink for streaming
 		$sink = null;
 		if (empty($opts[HttpClientOptions::STREAM])) {
+			$maxBodySize = $maxBodySize ?: $this->maxBodySize;
+
 			$sink = $this->createSink();
 			if ($sink !== null) {
-				$conf[RequestOptions::SINK] = new Stream($sink);
+				$stream = new Stream($sink);
+
+				$conf[RequestOptions::SINK] = $maxBodySize > 0 ? new SizeLimitedStream($stream, $maxBodySize) : $stream;
 			}
 		} else {
 			$conf[RequestOptions::STREAM] = true;
 		}
 
-		$conf[RequestOptions::ON_HEADERS] = function (ResponseInterface $response) use ($opts, $sink): void {
-			if (
-				!empty($opts[HttpClientOptions::CONTENT_LENGTH])
-				&& (int) $response->getHeaderLine('Content-Length') > $opts[HttpClientOptions::CONTENT_LENGTH]
-			) {
+		$conf[RequestOptions::ON_HEADERS] = function (ResponseInterface $response) use ($maxBodySize, $sink): void {
+			if ($maxBodySize > 0 && (int) $response->getHeaderLine('Content-Length') > $maxBodySize) {
 				throw new TransferException('The file is too big!');
 			}
 
@@ -178,9 +181,11 @@ class HttpClient implements ICanSendHttpRequests
 			$response = $this->client->request($method, $url, $conf);
 			return new GuzzleResponse($response, $url);
 		} catch (TransferException $exception) {
+			// A previous exception aborted the transfer in a callback, the response is incomplete
 			if (
 				$exception instanceof RequestException
 				&& $exception->hasResponse()
+				&& $exception->getPrevious() === null
 			) {
 				return new GuzzleResponse($exception->getResponse(), $url, $exception->getCode(), '');
 			} else {
@@ -205,29 +210,37 @@ class HttpClient implements ICanSendHttpRequests
 	 * closed - which also happens when the process dies without running any PHP cleanup
 	 * (fatal error, exit(), killed worker). A named file would stay behind in these cases.
 	 *
-	 * @return resource|null File handle, null when the default sink (php://temp) has to be used
+	 * @return resource|null File handle, php://temp when no temp file can be used, null when that fails as well
 	 */
 	private function createSink()
 	{
 		$filename = tempnam(System::getTempPath(), 'http-');
 		if ($filename === false) {
-			return null;
+			return $this->createMemorySink();
 		}
 
 		$sink = @fopen($filename, 'w+');
 		if ($sink === false) {
 			@unlink($filename);
-			return null;
+			return $this->createMemorySink();
 		}
 
 		// Some systems (Windows) can't delete an open file, fall back to php://temp there
 		if (!@unlink($filename)) {
 			fclose($sink);
 			@unlink($filename);
-			return null;
+			return $this->createMemorySink();
 		}
 
 		return $sink;
+	}
+
+	/**
+	 * @return resource|null
+	 */
+	private function createMemorySink()
+	{
+		return fopen('php://temp', 'w+') ?: null;
 	}
 
 	/** {@inheritDoc}
