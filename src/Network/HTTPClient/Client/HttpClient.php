@@ -32,9 +32,6 @@ use Psr\Log\LoggerInterface;
  */
 class HttpClient implements ICanSendHttpRequests
 {
-	/**
-	 * @param int $maxBodySize Maximum size in bytes of a response body for requests without own limit, 0 for no limit
-	 */
 	public function __construct(private readonly LoggerInterface $logger, private readonly Profiler $profiler, private readonly Client $client, private readonly URLResolver $resolver, private readonly App\BaseURL $baseUrl, private readonly int $maxBodySize = 0) {}
 
 	/**
