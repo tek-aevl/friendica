@@ -1162,7 +1162,8 @@ class Processor
 		ksort($activity['receiver']);
 
 		if (!self::isSolicitedMessage($activity, $item)) {
-			DBA::delete('item-uri', ['id' => $item['uri-id']]);
+			// The item-uri can be in use by a parallel insert, ExpirePosts removes it once it is unused.
+			DI::logger()->notice('Unsolicited message dropped', ['uri-id' => $item['uri-id'], 'uri' => $item['uri']]);
 			if (!empty($activity['entry-id'])) {
 				Queue::deleteById($activity['entry-id']);
 			}
