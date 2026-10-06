@@ -258,7 +258,7 @@ class HTTPClientTest extends MockedTestCase
 	#[DataProvider('oversizedResponseProvider')]
 	public function testOversizedResponseIsAborted(string $path, array $opts, int $globalLimit): void
 	{
-		DI::config()->set('performance', 'max_response_body_size', $globalLimit);
+		DI::config()->set('performance', 'max_download_size', $globalLimit);
 
 		$url    = $this->startServer();
 		$result = DI::httpClient()->get($url . $path, HttpClientAccept::DEFAULT, $opts);
@@ -272,7 +272,7 @@ class HTTPClientTest extends MockedTestCase
 	 */
 	public function testRedirectBodiesDoNotAddUp(): void
 	{
-		DI::config()->set('performance', 'max_response_body_size', 1000000);
+		DI::config()->set('performance', 'max_download_size', 1000000);
 
 		$url    = $this->startServer();
 		$result = DI::httpClient()->get($url . '/redirect-big');
@@ -286,7 +286,7 @@ class HTTPClientTest extends MockedTestCase
 	 */
 	public function testGlobalLimitCanBeDisabled(): void
 	{
-		DI::config()->set('performance', 'max_response_body_size', 0);
+		DI::config()->set('performance', 'max_download_size', 0);
 
 		$url    = $this->startServer();
 		$result = DI::httpClient()->get($url . '/big-unannounced');

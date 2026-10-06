@@ -707,14 +707,14 @@ return [
 	],
 	'performance' => [
 		// max_response_data_size (Integer)
-		// Maximum allowed outgoing HTTP request response data size in Bytes. Does not affect incoming requests to this node.
+		// Maximum size in bytes of a response that is buffered in memory while resolving URLs. Does not affect incoming requests to this node.
 		// Warning: Lowering this value can help with some PHP memory exhaustion issues, but can also partially break some federation features e.g. large posts may not be fetched or received from remote servers.
 		'max_response_data_size' => 1000000,
 
-		// max_response_body_size (Integer)
+		// max_download_size (Integer)
 		// Maximum size in bytes of a response body that is received for an outgoing HTTP request without own limit. 0 disables the limit.
 		// The body is counted while it is received, larger transfers are aborted. Requests with an own limit (e.g. server probing) keep it.
-		'max_response_body_size' => 100000000,
+		'max_download_size' => 100000000,
 	],
 	'channel' => [
 		// max_search_length (Integer)
