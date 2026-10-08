@@ -74,6 +74,41 @@ class HTTPClientTest extends MockedTestCase
 		self::assertEquals('https://mastodon.social/about', $result->getRedirectUrl());
 	}
 
+	private static function cookieResponse(): Response
+	{
+		return new Response(200, ['Set-Cookie' => 'session=abc; Domain=mastodon.social; Max-Age=3600'], 'hello');
+	}
+
+	public function testCookieJarIsSaved(): void
+	{
+		$cookiejar = tempnam(System::getTempPath(), 'cookiejar-test-');
+
+		try {
+			$this->httpRequestHandler->setHandler(new MockHandler([self::cookieResponse()]));
+
+			DI::httpClient()->get('https://mastodon.social', HttpClientAccept::DEFAULT, [HttpClientOptions::COOKIEJAR => $cookiejar]);
+
+			self::assertStringContainsString('"Name":"session"', (string) file_get_contents($cookiejar));
+		} finally {
+			unlink($cookiejar);
+		}
+	}
+
+	/**
+	 * A cookie jar that can't be saved (e.g. full disk) must not fail the request.
+	 */
+	public function testCookieJarSaveFailureKeepsResponse(): void
+	{
+		$cookiejar = System::getTempPath() . '/missing-' . bin2hex(random_bytes(8)) . '/cookiejar';
+
+		$this->httpRequestHandler->setHandler(new MockHandler([self::cookieResponse()]));
+
+		$result = @DI::httpClient()->get('https://mastodon.social', HttpClientAccept::DEFAULT, [HttpClientOptions::COOKIEJAR => $cookiejar]);
+
+		self::assertTrue($result->isSuccess());
+		self::assertEquals('hello', $result->getBodyString());
+	}
+
 	public static function privateTargetProvider(): array
 	{
 		return [
