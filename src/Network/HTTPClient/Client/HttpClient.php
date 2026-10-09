@@ -212,7 +212,7 @@ class HttpClient implements ICanSendHttpRequests
 	{
 		try {
 			$jar->save($filename);
-		} catch (\RuntimeException|\InvalidArgumentException $exception) { // @phpstan-ignore catch.neverThrown (json_encode error, not declared by Guzzle)
+		} catch (\Exception $exception) {
 			$this->logger->warning('Unable to save the cookie jar.', ['file' => $filename, 'url' => $url, 'exception' => $exception]);
 		}
 	}
