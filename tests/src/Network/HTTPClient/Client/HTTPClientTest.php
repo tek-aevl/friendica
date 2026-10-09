@@ -109,6 +109,27 @@ class HTTPClientTest extends MockedTestCase
 		self::assertEquals('hello', $result->getBodyString());
 	}
 
+	/**
+	 * A remote cookie that can't be encoded must not fail the request.
+	 */
+	public function testInvalidCookieKeepsResponse(): void
+	{
+		$cookiejar = tempnam(System::getTempPath(), 'cookiejar-test-');
+
+		try {
+			$this->httpRequestHandler->setHandler(new MockHandler([
+				new Response(200, ['Set-Cookie' => "session=\xff\xfe; Domain=mastodon.social; Max-Age=3600"], 'hello'),
+			]));
+
+			$result = DI::httpClient()->get('https://mastodon.social', HttpClientAccept::DEFAULT, [HttpClientOptions::COOKIEJAR => $cookiejar]);
+
+			self::assertTrue($result->isSuccess());
+			self::assertEquals('hello', $result->getBodyString());
+		} finally {
+			unlink($cookiejar);
+		}
+	}
+
 	public static function privateTargetProvider(): array
 	{
 		return [
