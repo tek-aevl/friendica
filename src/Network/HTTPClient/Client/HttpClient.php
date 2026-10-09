@@ -160,7 +160,7 @@ class HttpClient implements ICanSendHttpRequests
 
 		$conf[RequestOptions::ON_HEADERS] = function (ResponseInterface $response) use ($maxBodySize, $sink): void {
 			if ($maxBodySize > 0 && (int) $response->getHeaderLine('Content-Length') > $maxBodySize) {
-				throw new TransferException('The file is too big!');
+				throw new ResponseTooLargeException($maxBodySize);
 			}
 
 			// The sink is shared by all responses of a redirect chain, only the last body must remain
@@ -188,10 +188,16 @@ class HttpClient implements ICanSendHttpRequests
 				&& $exception->getPrevious() === null
 			) {
 				return new GuzzleResponse($exception->getResponse(), $url, $exception->getCode(), '');
+			}
+
+			$tooLarge = self::findResponseTooLarge($exception);
+			if ($tooLarge !== null) {
+				$this->logger->notice('Response exceeds the size limit.', ['url' => $url, 'method' => $method, 'limit' => $tooLarge->limit]);
 			} else {
 				$this->logger->info('HTTP request failed.', ['url' => $url, 'method' => $method, 'exception' => $exception]);
-				return new CurlResult($this->logger, $url, '', ['http_code' => 500], $exception->getCode(), $exception->getMessage());
 			}
+
+			return new CurlResult($this->logger, $url, '', ['http_code' => 500], $exception->getCode(), $exception->getMessage());
 		} catch (InvalidArgumentException|\InvalidArgumentException $argumentException) {
 			$this->logger->info('Invalid Argument for HTTP call.', ['url' => $url, 'method' => $method, 'exception' => $argumentException]);
 			return new CurlResult($this->logger, $url, '', ['http_code' => 500], $argumentException->getCode(), $argumentException->getMessage());
@@ -257,6 +263,20 @@ class HttpClient implements ICanSendHttpRequests
 	private function createMemorySink()
 	{
 		return fopen('php://temp', 'w+') ?: null;
+	}
+
+	/**
+	 * Guzzle wraps exceptions thrown in callbacks or by the sink, the size limit abort can be nested
+	 */
+	private static function findResponseTooLarge(\Throwable $exception): ?ResponseTooLargeException
+	{
+		for ($current = $exception; $current !== null; $current = $current->getPrevious()) {
+			if ($current instanceof ResponseTooLargeException) {
+				return $current;
+			}
+		}
+
+		return null;
 	}
 
 	/** {@inheritDoc}
