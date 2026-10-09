@@ -16,7 +16,6 @@ use Friendica\Network\HTTPClient\Capability\ICanHandleHttpResponses;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\FileCookieJar;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\Stream;
@@ -99,8 +98,9 @@ class HttpClient implements ICanSendHttpRequests
 
 		$conf = [];
 
+		$jar = null;
 		if (!empty($opts[HttpClientOptions::COOKIEJAR])) {
-			$jar                           = new FileCookieJar($opts[HttpClientOptions::COOKIEJAR]);
+			$jar                           = new ExplicitFileCookieJar($opts[HttpClientOptions::COOKIEJAR]);
 			$conf[RequestOptions::COOKIES] = $jar;
 		}
 
@@ -196,8 +196,24 @@ class HttpClient implements ICanSendHttpRequests
 			$this->logger->info('Invalid Argument for HTTP call.', ['url' => $url, 'method' => $method, 'exception' => $argumentException]);
 			return new CurlResult($this->logger, $url, '', ['http_code' => 500], $argumentException->getCode(), $argumentException->getMessage());
 		} finally {
+			if ($jar !== null) {
+				$this->saveCookieJar($jar, $opts[HttpClientOptions::COOKIEJAR], $url);
+			}
+
 			$this->logger->debug('Request stop.', ['url' => $url, 'method' => $method]);
 			$this->profiler->stopRecording();
+		}
+	}
+
+	/**
+	 * A failed save must not fail the request, the response is already complete.
+	 */
+	private function saveCookieJar(ExplicitFileCookieJar $jar, string $filename, string $url): void
+	{
+		try {
+			$jar->save($filename);
+		} catch (\Exception $exception) {
+			$this->logger->warning('Unable to save the cookie jar.', ['file' => $filename, 'url' => $url, 'exception' => $exception]);
 		}
 	}
 
