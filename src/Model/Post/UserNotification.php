@@ -444,7 +444,7 @@ class UserNotification
 
 		// Only check on posts by the user itself
 		$cdata = Contact::getPublicAndUserContactID($item['contact-id'], $item['uid']);
-		if (empty($cdata['user']) || ($item['author-id'] != $cdata['public'])) {
+		if (empty($cdata['user']) || !in_array($cdata['public'], [$item['author-id'], $item['owner-id']])) {
 			return false;
 		}
 
