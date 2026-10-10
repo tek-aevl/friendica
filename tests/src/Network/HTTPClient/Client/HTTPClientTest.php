@@ -11,6 +11,7 @@ use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
+use Friendica\Network\HTTPClient\Factory\HttpClient as HttpClientFactory;
 use Friendica\Util\Network;
 use Friendica\Test\DiceHttpMockHandlerTrait;
 use Friendica\Test\MockedTestCase;
@@ -20,6 +21,8 @@ use GuzzleHttp\Psr7\FnStream;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LogLevel;
 
 class HTTPClientTest extends MockedTestCase
 {
@@ -321,6 +324,60 @@ class HTTPClientTest extends MockedTestCase
 
 		self::assertFalse($result->isSuccess());
 		self::assertSame('', $result->getBodyString());
+	}
+
+	/**
+	 * An aborted oversized response must be visible at the default log level, it names the URL and the limit.
+	 */
+	#[DataProvider('oversizedResponseProvider')]
+	public function testOversizedResponseIsLoggedAsNotice(string $path, array $opts, int $globalLimit): void
+	{
+		DI::config()->set('performance', 'max_download_size', $globalLimit);
+
+		$url    = $this->startServer();
+		$logger = self::createRecordingLogger();
+		$client = (new HttpClientFactory($logger, DI::config(), DI::profiler(), DI::baseUrl()))->createClient($this->httpRequestHandler);
+
+		$client->get($url . $path, HttpClientAccept::DEFAULT, $opts);
+
+		$notices = array_values(array_filter($logger->records, fn (array $record): bool => $record['level'] === LogLevel::NOTICE));
+		self::assertCount(1, $notices);
+		self::assertSame('Response exceeds the size limit.', $notices[0]['message']);
+		self::assertSame($url . $path, $notices[0]['context']['url']);
+		self::assertSame(1000000, $notices[0]['context']['limit']);
+	}
+
+	/**
+	 * Other transfer errors keep their log level, the notice only covers the size limit.
+	 */
+	public function testOtherTransferErrorIsNotLoggedAsOversized(): void
+	{
+		$url = $this->startServer();
+		proc_terminate($this->server);
+		proc_close($this->server);
+		$this->server = null;
+
+		$logger = self::createRecordingLogger();
+		$client = (new HttpClientFactory($logger, DI::config(), DI::profiler(), DI::baseUrl()))->createClient($this->httpRequestHandler);
+
+		self::assertFalse($client->get($url . '/final')->isSuccess());
+		self::assertSame([], array_filter($logger->records, fn (array $record): bool => $record['level'] === LogLevel::NOTICE));
+	}
+
+	/**
+	 * @return AbstractLogger&object{records: list<array{level: mixed, message: string, context: array<mixed>}>}
+	 */
+	private static function createRecordingLogger(): AbstractLogger
+	{
+		return new class () extends AbstractLogger {
+			/** @var list<array{level: mixed, message: string, context: array<mixed>}> */
+			public array $records = [];
+
+			public function log($level, string|\Stringable $message, array $context = []): void
+			{
+				$this->records[] = ['level' => $level, 'message' => (string) $message, 'context' => $context];
+			}
+		};
 	}
 
 	/**

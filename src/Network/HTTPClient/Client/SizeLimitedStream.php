@@ -7,7 +7,6 @@
 
 namespace Friendica\Network\HTTPClient\Client;
 
-use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\StreamDecoratorTrait;
 use Psr\Http\Message\StreamInterface;
 
@@ -32,12 +31,12 @@ final class SizeLimitedStream implements StreamInterface
 	}
 
 	/**
-	 * @throws TransferException when the body would exceed the maximum size
+	 * @throws ResponseTooLargeException when the body would exceed the maximum size
 	 */
 	public function write(string $string): int
 	{
 		if ($this->stream->tell() + strlen($string) > $this->maxSize) {
-			throw new TransferException('The file is too big!');
+			throw new ResponseTooLargeException($this->maxSize);
 		}
 
 		return $this->stream->write($string);
