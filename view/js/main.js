@@ -638,7 +638,9 @@ function triggerLiveUpdates(force, guid) {
 	}
 	force_update = force;
 	['network', 'profile', 'channel', 'community', 'notes', 'display', 'contact'].forEach(function (src) {
-		if ($('#live-' + src).length && (force || (updateContent && src !== 'display'))) {
+		// updateContent: 0 = never, 1 = only at the top of the page, 2 = always. The display page is never updated automatically.
+		var autoUpdate = src !== 'display' && (updateContent === 2 || (updateContent === 1 && $(window).scrollTop() === 0));
+		if ($('#live-' + src).length && (force || autoUpdate)) {
 			liveUpdate(src, force, guid);
 		}
 	});
@@ -818,11 +820,9 @@ function updateConvItems(data, guid) {
 
 function getUpdateUrl(src)
 {
-	let force = force_update || $(document).scrollTop() === 0;
-
 	var udargs = ((netargs.length) ? '/' + netargs : '');
 
-	var update_url = src + udargs + '&p=' + profile_uid + '&force=' + (force ? 1 : 0) + '&item=' + update_item;
+	var update_url = src + udargs + '&p=' + profile_uid + '&force=1&item=' + update_item;
 
 	if (getUrlParameter('page')) {
 		update_url += '&page=' + getUrlParameter('page');
@@ -876,8 +876,6 @@ function liveUpdate(src, force, guid) {
 
 	in_progress = true;
 
-	var orgHeight = $(document).height();
-
 	var update_url = getUpdateUrl(src);
 
 	if (force_update) {
@@ -896,6 +894,22 @@ function liveUpdate(src, force, guid) {
 			}
 
 			$('.wall-item-body', data).imagesLoaded(function() {
+				var atTop = $(window).scrollTop() === 0;
+
+				// Remember the first visible thread, so it can be kept at the same screen position.
+				var anchorId = null;
+				var anchorTop = 0;
+				if (!guid && !force && !atTop) {
+					$('.toplevel_item').each(function() {
+						var rect = this.getBoundingClientRect();
+						if (rect.bottom > 0) {
+							anchorId = this.id;
+							anchorTop = rect.top;
+							return false;
+						}
+					});
+				}
+
 				updateConvItems(data, guid);
 
 				document.dispatchEvent(new Event('postprocess_liveupdate'));
@@ -903,10 +917,12 @@ function liveUpdate(src, force, guid) {
 				// Update the scroll position.
 				if (guid) {
 					scrollToItem("item-" + guid);
-				} else if (!force) {
+				} else if (anchorId) {
 					// Keep the current reading position when new items are inserted above it.
-					var delta = $(document).height() - orgHeight;
-					$('html, body').animate({scrollTop: $(window).scrollTop() + delta}, 200);
+					var anchor = document.getElementById(anchorId);
+					if (anchor) {
+						window.scrollBy(0, anchor.getBoundingClientRect().top - anchorTop);
+					}
 				}
 			})
 		})
