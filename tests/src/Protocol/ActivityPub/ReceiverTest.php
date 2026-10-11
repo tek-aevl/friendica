@@ -53,4 +53,81 @@ class ReceiverTest extends TestCase
 
 		self::assertSame($expected, $method->invoke(null, $activity));
 	}
+
+	public static function dataLocationParts(): array
+	{
+		return [
+			'name only' => [
+				'place'    => ['@type' => 'as:Place', 'as:name' => ['@value' => 'Café X']],
+				'expected' => ['Café X'],
+			],
+			'mobilizon address in name' => [
+				'place' => [
+					'@type'      => 'as:Place',
+					'as:name'    => ['@value' => 'Apenrader Straße 49, 24939 Flensburg, Schleswig-Holstein'],
+					'sc:address' => [
+						'@type'              => 'sc:PostalAddress',
+						'sc:streetAddress'   => ['@value' => '49 Apenrader Straße'],
+						'sc:addressLocality' => ['@value' => 'Flensburg'],
+						'sc:addressRegion'   => ['@value' => 'Schleswig-Holstein'],
+						'sc:addressCountry'  => ['@value' => 'Germany'],
+					],
+				],
+				'expected' => ['Apenrader Straße 49, 24939 Flensburg, Schleswig-Holstein', 'Germany'],
+			],
+			'venue name and address' => [
+				'place' => [
+					'@type'      => 'as:Place',
+					'as:name'    => ['@value' => 'Café X'],
+					'sc:address' => [
+						'@type'              => 'sc:PostalAddress',
+						'sc:streetAddress'   => ['@value' => 'Hauptstr. 1'],
+						'sc:addressLocality' => ['@value' => 'Berlin'],
+						'sc:addressRegion'   => ['@value' => 'Berlin'],
+						'sc:addressCountry'  => ['@value' => 'Germany'],
+					],
+				],
+				'expected' => ['Café X', 'Hauptstr. 1', 'Berlin', 'Germany'],
+			],
+			'partial address without name' => [
+				'place' => [
+					'@type'      => 'as:Place',
+					'sc:address' => ['sc:addressLocality' => ['@value' => 'Wien'], 'sc:addressCountry' => ['@value' => 'Austria']],
+				],
+				'expected' => ['Wien', 'Austria'],
+			],
+			'address as string' => [
+				'place' => [
+					'@type'      => 'as:Place',
+					'as:name'    => ['@value' => 'Rathaus'],
+					'sc:address' => ['@value' => 'Rathausplatz 1, Wien'],
+				],
+				'expected' => ['Rathaus', 'Rathausplatz 1, Wien'],
+			],
+			'name repeated in address' => [
+				'place' => [
+					'@type'      => 'as:Place',
+					'as:name'    => ['@value' => 'Berlin'],
+					'sc:address' => ['sc:addressLocality' => ['@value' => 'Berlin']],
+				],
+				'expected' => ['Berlin'],
+			],
+			'pixelfed country' => [
+				'place'    => ['@type' => 'as:Place', 'as:name' => ['@value' => 'Vancouver'], 'sc:addressCountry' => ['@value' => 'Canada']],
+				'expected' => ['Vancouver', 'Canada'],
+			],
+			'no place' => [
+				'place'    => null,
+				'expected' => [],
+			],
+		];
+	}
+
+	#[DataProvider('dataLocationParts')]
+	public function testFetchLocationParts(?array $place, array $expected): void
+	{
+		$method = new \ReflectionMethod(Receiver::class, 'fetchLocationParts');
+
+		self::assertSame($expected, $method->invoke(null, $place));
+	}
 }
