@@ -3843,19 +3843,22 @@ class Item
 			return is_numeric($hook_data['item_id']) ? $hook_data['item_id'] : 0;
 		}
 
+		$head_not_found = false;
 		if (!$mimetype) {
 			try {
-				$curlResult = DI::httpClient()->head($uri, [HttpClientOptions::ACCEPT_CONTENT => HttpClientAccept::JSON_AS, HttpClientOptions::REQUEST => HttpClientRequest::ACTIVITYPUB]);
-				$mimetype   = $curlResult->getContentType();
+				$curlResult     = DI::httpClient()->head($uri, [HttpClientOptions::ACCEPT_CONTENT => HttpClientAccept::JSON_AS, HttpClientOptions::REQUEST => HttpClientRequest::ACTIVITYPUB]);
+				$mimetype       = $curlResult->getContentType();
+				$head_not_found = ($curlResult->getReturnCode() == 404);
 			} catch (\Throwable $th) {
 				DI::logger()->info('Error while fetching HTTP link via HEAD', ['uid' => $uid, 'uri' => $uri, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
 				return 0;
 			}
 		}
 
-		if (!HTTPSignature::isValidContentType($mimetype, $uri) && (current(explode(';', $mimetype)) == 'application/json')) {
+		if (!HTTPSignature::isValidContentType($mimetype, $uri) && ($head_not_found || (current(explode(';', $mimetype)) == 'application/json'))) {
 			try {
 				// Issue 14126: Workaround for Mastodon servers that return "application/json" on a "head" request.
+				// Issue 14536: Lemmy answers a "head" request with an error (404), so we retry with a signed "get" request.
 				$curlResult = HTTPSignature::fetchRaw($uri, $uid);
 				$mimetype   = $curlResult->getContentType();
 			} catch (\Throwable $th) {
