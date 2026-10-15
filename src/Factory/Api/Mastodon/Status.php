@@ -288,9 +288,6 @@ class Status extends BaseFactory
 	 */
 	private function createQuote(array $item, int $uid, int $level): array
 	{
-		if ($level > 2) {
-			return [];
-		}
 		if (empty($item['quote-uri-id'])) {
 			$media = Post\Media::getByURIId($item['uri-id'], [PostMedia::TYPE_ACTIVITY]);
 			if (!empty($media)) {
@@ -306,6 +303,17 @@ class Status extends BaseFactory
 		}
 
 		if (!empty($quote_id) && ($quote_id != $item['uri-id'])) {
+			// Like Mastodon, only the first quote level is delivered completely.
+			// A quote inside a quoted status is reduced to a reference, since
+			// clients can't handle arbitrarily nested statuses.
+			// @see https://github.com/pachli/pachli-android/issues/2406
+			if ($level > 0) {
+				return [
+					'state'            => 'accepted',
+					'quoted_status_id' => (string) $quote_id,
+				];
+			}
+
 			try {
 				$quote = [
 					'state'         => 'accepted',
