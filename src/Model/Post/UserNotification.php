@@ -434,6 +434,12 @@ class UserNotification
 			return false;
 		}
 
+		// Don't notify twice about the same post, e.g. when a community has posted and announced it
+		$target = ($item['gravity'] == Item::GRAVITY_ACTIVITY) ? $item['thr-parent-id'] : $item['uri-id'];
+		if (DI::notification()->existsForUser($uid, ['type' => self::TYPE_SHARED, 'target-uri-id' => $target])) {
+			return false;
+		}
+
 		// Don't notify about reshares by communities of our own posts or each time someone comments
 		if (($item['verb'] == Activity::ANNOUNCE) && DBA::exists('contact', ['id' => $item['contact-id'], 'contact-type' => Contact::TYPE_COMMUNITY])) {
 			$post = Post::selectFirst(['origin', 'gravity'], ['uri-id' => $item['thr-parent-id'], 'uid' => $uid]);
