@@ -435,7 +435,7 @@ class UserNotification
 		}
 
 		// Don't notify twice about the same post, e.g. when a community has posted and announced it
-		$target = ($item['gravity'] == Item::GRAVITY_ACTIVITY) ? $item['thr-parent-id'] : $item['uri-id'];
+		$target = ($item['gravity'] === Item::GRAVITY_ACTIVITY) ? $item['thr-parent-id'] : $item['uri-id'];
 		if (DI::notification()->existsForUser($uid, ['type' => self::TYPE_SHARED, 'target-uri-id' => $target])) {
 			return false;
 		}
