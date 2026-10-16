@@ -965,7 +965,6 @@ function updateCounter(type, counter) {
 }
 
 function updateItem(itemNo, guid) {
-	console.trace('updateItem', itemNo, guid);
 	update_item = itemNo;
 	triggerLiveUpdates(true, guid);
 }
@@ -1370,7 +1369,6 @@ function insertPostedComment(parentItemId, data) {
 				var $oldWrap = $old.closest('.children');
 				var $newWrap = $new.closest('.children');
 
-				console.trace('insertPostedComment', data['comment-uri-id']);
 				if ($oldWrap.length && $newWrap.length) {
 					$oldWrap.replaceWith($newWrap);
 				} else {
@@ -1411,7 +1409,6 @@ function insertRootComment($oldRoot, $newRoot, commentUriId) {
 
 	var $container = $oldRoot.children('.comment-container').last();
 	if ($container.length) {
-		console.trace('insertRootComment', commentUriId);
 		$container.append($comment);
 
 		// The thread starter has no fake comment form until it is rendered with comments
@@ -1436,10 +1433,6 @@ function insertRootComment($oldRoot, $newRoot, commentUriId) {
 		$fakeForm = $oldRoot.children('.comment-fake-form').first();
 	}
 
-	console.trace('insertRootComment (first comment)', commentUriId, {
-		roots:    $oldRoot.length,
-		children: $oldRoot.children().map(function () { return this.tagName + '.' + this.className; }).get().join(' | ')
-	});
 	($fakeForm.length ? $fakeForm : $box).before($newContainer);
 	return true;
 }

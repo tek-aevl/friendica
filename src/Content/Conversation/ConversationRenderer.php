@@ -192,12 +192,7 @@ final readonly class ConversationRenderer
 		$page_dropping = $viewerUid && $this->pConfig->get($viewerUid, 'system', 'show_page_drop', true);
 		$root          = $this->dataProvider->getRootTemplateDataFromItem($comment, $viewerUid, self::MODE_DISPLAY, [], $page_dropping, $smartThreading);
 
-		if ($root && ($comment['thr-parent-id'] == $comment['parent-uri-id'])) {
-			// A reply to the thread starter has no parent subtree to swap
-			$parent = $this->isolateReply($root, (int) $comment['uri-id']);
-		} else {
-			$parent = $root ? $this->findNodeByUriId($root, (int) $comment['thr-parent-id']) : null;
-		}
+		$parent = $root ? $this->selectInsertNode($root, $comment) : null;
 
 		$html = $parent ? $this->renderItemHtml($parent, self::MODE_DISPLAY) : '';
 
@@ -246,6 +241,25 @@ final readonly class ConversationRenderer
 		$this->profiler->stopRecording();
 
 		return $html;
+	}
+
+	/**
+	 * Select the node to render for a freshly posted comment.
+	 *
+	 * A reply to the thread starter has no parent subtree to swap, so it is
+	 * isolated below the root. Any other reply is rendered as its parent's subtree.
+	 *
+	 * @param array $root The thread root
+	 * @param array $comment The freshly posted comment
+	 * @return array|null The node to render, or null when it isn't in the tree
+	 */
+	private function selectInsertNode(array $root, array $comment): ?array
+	{
+		if ($comment['thr-parent-id'] == $comment['parent-uri-id']) {
+			return $this->isolateReply($root, (int) $comment['uri-id']);
+		}
+
+		return $this->findNodeByUriId($root, (int) $comment['thr-parent-id']);
 	}
 
 	/**

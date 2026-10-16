@@ -90,6 +90,34 @@ class ConversationRendererTest extends TestCase
 		self::assertNull($this->call('isolateReply', [$this->thread(), 99]));
 	}
 
+	public function testSelectInsertNodeIsolatesAReplyToTheThreadStarter(): void
+	{
+		$comment = ['uri-id' => 3, 'thr-parent-id' => 1, 'parent-uri-id' => 1];
+
+		$result = $this->call('selectInsertNode', [$this->thread(), $comment]);
+
+		self::assertSame(1, $result['uriid']);
+		self::assertCount(1, $result['children']);
+		self::assertSame(3, $result['children'][0]['uriid']);
+	}
+
+	public function testSelectInsertNodeReturnsTheParentSubtreeOfANestedReply(): void
+	{
+		$comment = ['uri-id' => 5, 'thr-parent-id' => 4, 'parent-uri-id' => 1];
+
+		$result = $this->call('selectInsertNode', [$this->thread(), $comment]);
+
+		self::assertSame(4, $result['uriid']);
+		self::assertSame(5, $result['children'][0]['uriid']);
+	}
+
+	public function testSelectInsertNodeReturnsNullForUnknownParent(): void
+	{
+		$comment = ['uri-id' => 8, 'thr-parent-id' => 99, 'parent-uri-id' => 1];
+
+		self::assertNull($this->call('selectInsertNode', [$this->thread(), $comment]));
+	}
+
 	public function testIsolateReplyLeavesTheSuppliedThreadUntouched(): void
 	{
 		$thread = $this->thread();
