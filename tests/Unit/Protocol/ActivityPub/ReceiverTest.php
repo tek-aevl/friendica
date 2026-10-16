@@ -5,14 +5,31 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Friendica\Test\src\Protocol\ActivityPub;
+namespace Friendica\Test\Unit\Protocol\ActivityPub;
 
+use Dice\Dice;
+use Friendica\DI;
 use Friendica\Protocol\ActivityPub\Receiver;
+use Friendica\Util\Profiler;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ReceiverTest extends TestCase
 {
+	protected function setUp(): void
+	{
+		parent::setUp();
+
+		// HTML::toPlaintext() records its runtime in the profiler
+		$dice = $this->createMock(Dice::class);
+		$dice->method('create')->willReturnCallback(fn (string $name): object => match ($name) {
+			Profiler::class => $this->createStub(Profiler::class),
+			default         => throw new \InvalidArgumentException('Unexpected DI::create() call for class: ' . $name),
+		});
+
+		DI::init($dice, true);
+	}
+
 	public static function dataQuoteRequestInstrument(): array
 	{
 		return [
@@ -115,6 +132,14 @@ class ReceiverTest extends TestCase
 			'pixelfed country' => [
 				'place'    => ['@type' => 'as:Place', 'as:name' => ['@value' => 'Vancouver'], 'sc:addressCountry' => ['@value' => 'Canada']],
 				'expected' => ['Vancouver', 'Canada'],
+			],
+			'name as plain string' => [
+				'place'    => ['@type' => 'as:Place', 'as:name' => 'Café X'],
+				'expected' => ['Café X'],
+			],
+			'html in name' => [
+				'place'    => ['@type' => 'as:Place', 'as:name' => '<p>Café X</p>', 'sc:address' => ['sc:addressLocality' => ['@value' => 'P']]],
+				'expected' => ['Café X', 'P'],
 			],
 			'no place' => [
 				'place'    => null,

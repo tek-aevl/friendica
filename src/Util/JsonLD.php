@@ -254,7 +254,7 @@ class JsonLD
 		// Issue 14448: Peertube transmits an unexpected type and schema URL.
 		$pixelfed = false;
 		array_walk_recursive($json['@context'], function (&$value, $key) use (&$pixelfed): void {
-			if ($value == 'http://pixelfed.org/ns#') {
+			if (is_string($value) && str_contains($value, 'pixelfed.org/ns')) {
 				$pixelfed = true;
 			}
 			if ($key == '@type' && $value == '@json') {

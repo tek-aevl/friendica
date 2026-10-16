@@ -1581,7 +1581,8 @@ class Receiver
 		$words  = fn (string $text): array => preg_split('/[^\p{L}\p{N}]+/u', mb_strtolower($text), -1, PREG_SPLIT_NO_EMPTY);
 		$result = [];
 		foreach ($parts as $part) {
-			$part = is_string($part) ? trim($part) : '';
+			// Some AP software allow formatted text in post location, so we boil it down to plaintext.
+			$part = is_string($part) ? trim(HTML::toPlaintext($part, 0)) : '';
 			if ($part !== '' && !empty(array_diff($words($part), $words(implode(' ', $result))))) {
 				$result[] = $part;
 			}
@@ -1598,10 +1599,7 @@ class Receiver
 	 */
 	private static function fetchLocationName(?array $place): ?string
 	{
-		// Some AP software allow formatted text in post location, so we boil it down to plaintext.
-		$parts = array_map(fn (string $part): string => trim(HTML::toPlaintext($part, 0)), self::fetchLocationParts($place));
-
-		return mb_substr(implode(', ', array_filter($parts)), 0, 255) ?: null;
+		return mb_substr(implode(', ', self::fetchLocationParts($place)), 0, 255) ?: null;
 	}
 
 	/**
