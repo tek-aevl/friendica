@@ -21,14 +21,15 @@ class MediaTest extends TestCase
 		$preview = 'https://example.org/photo/abc-1.png';
 
 		return [
-			'linked preview' => ["Text\n[url={$full}][img={$preview}]desc[/img][/url]\n#tag", "Text\n\n#tag"],
-			'image with url' => ["[img={$full}]desc[/img] text", ' text'],
-			'plain image'    => ["[img]{$full}[/img] text", ' text'],
-			'sized image'    => ["[img=10x20]{$full}[/img] text", ' text'],
-			'other image'    => ['[img]https://example.org/photo/other-0.png[/img] text', '[img]https://example.org/photo/other-0.png[/img] text'],
-			'other link'     => ["[url=https://example.org/page][img]https://example.org/photo/other-0.png[/img][/url]", "[url=https://example.org/page][img]https://example.org/photo/other-0.png[/img][/url]"],
-			'link to page'   => ["[url=https://example.org/page][img={$preview}]d[/img][/url] text", ' text'],
-			'image in share' => [
+			'linked preview'          => ["Text\n[url={$full}][img={$preview}]desc[/img][/url]\n#tag", "Text\n\n#tag"],
+			'image with url'          => ["[img={$full}]desc[/img] text", ' text'],
+			'brackets in description' => ["[img={$full}]a [b] c[/img] text", ' text'],
+			'plain image'             => ["[img]{$full}[/img] text", ' text'],
+			'sized image'             => ["[img=10x20]{$full}[/img] text", ' text'],
+			'other image'             => ['[img]https://example.org/photo/other-0.png[/img] text', '[img]https://example.org/photo/other-0.png[/img] text'],
+			'other link'              => ["[url=https://example.org/page][img]https://example.org/photo/other-0.png[/img][/url]", "[url=https://example.org/page][img]https://example.org/photo/other-0.png[/img][/url]"],
+			'link to page'            => ["[url=https://example.org/page][img={$preview}]d[/img][/url] text", ' text'],
+			'image in share'          => [
 				"Comment\n[share author='A' link='https://example.org/p/1']Quoted [url={$full}][img={$preview}]desc[/img][/url] text[/share]",
 				"Comment\n[share author='A' link='https://example.org/p/1']Quoted  text[/share]",
 			],

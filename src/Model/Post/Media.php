@@ -967,7 +967,7 @@ class Media
 	{
 		foreach ($urls as $url) {
 			$url = preg_quote($url, '#');
-			$img = '(?:\[img=' . $url . '\][^\[]*|\[img(?:=\d*x\d*)?\]' . $url . ')\[/img\]';
+			$img = '(?:\[img=' . $url . '\].*?|\[img(?:=\d*x\d*)?\]' . $url . ')\[/img\]';
 
 			$body = preg_replace([
 				"#\[url=[^\]]*\]\s*$img\s*\[/url\]#ism",

@@ -3071,7 +3071,7 @@ class Item
 		$hidden_urls  = array_merge($hidden_urls, self::getHiddenImageUrls($sharedSplitAttachments['hidden'] ?? new PostMedias()));
 		$visible_body = Post\Media::removeImagesByUrl($hidden_urls, $item['body']);
 
-		if ($visible_body !== $item['body']) {
+		if (!$only_cache && ($visible_body !== $item['body'])) {
 			$item = self::renderBody($item, $visible_body, $body);
 		} else {
 			self::putInCache($item);
@@ -3387,7 +3387,7 @@ class Item
 		$urls = [];
 		/** @var PostMedia $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
-			if ($PostMedia->type != PostMedia::TYPE_IMAGE) {
+			if ($PostMedia->type !== PostMedia::TYPE_IMAGE) {
 				continue;
 			}
 			$urls[] = (string) $PostMedia->url;
