@@ -829,6 +829,11 @@ final readonly class ConversationDataProvider
 				$row['featured'] = false;
 			}
 
+			// Pinned posts of other authors (e.g. reshared ones) must not show up as pinned on the profile.
+			if (!empty($row['featured']) && ($mode === ConversationRenderer::MODE_PROFILE) && ((int) $row['author-id'] !== (int) Contact::getPublicIdByUserId($row['uid']))) {
+				$row['featured'] = false;
+			}
+
 			if ($maxComments > 0) {
 				if (!isset($commentCounter[$row['parent-uri-id']])) {
 					$commentCounter[$row['parent-uri-id']] = 0;
