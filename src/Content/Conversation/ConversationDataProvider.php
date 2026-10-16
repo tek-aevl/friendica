@@ -193,7 +193,7 @@ final readonly class ConversationDataProvider
 
 		if (!$preview) {
 			$parentUriIds = array_values(array_unique(array_column($items, 'parent-uri-id')));
-			$emojis       = $this->getEmojis($parentUriIds, $viewerUid);
+			$emojis       = $this->getEmojis($parentUriIds, $viewerUid, $uriIds);
 			$quoteshares  = $this->getQuoteShares($uriIds);
 			$counts       = $this->getCounts($parentUriIds);
 
@@ -229,7 +229,8 @@ final readonly class ConversationDataProvider
 			$item['counts']      = $item['gravity'] === ItemModel::GRAVITY_PARENT ? ($counts[$item['uri-id']] ?? 0) : 0;
 			$item['pagedrop']    = false;
 
-			$templateData = $this->postTemplateBuilder->renderFlatItem($item, $preview, $viewerUid !== 0 && !$preview, $viewerUid, $convResponses, $formSecurityToken, $item['gravity'] === ItemModel::GRAVITY_PARENT ? [] : ($parents[$item['thr-parent-id'] ?? 0] ?? []), $remoteComment);
+			$parent       = $item['gravity'] === ItemModel::GRAVITY_PARENT ? [] : ($parents[$item['thr-parent-id'] ?? 0] ?? []);
+			$templateData = $this->postTemplateBuilder->renderFlatItem($item, $preview, $viewerUid !== 0 && !$preview, $viewerUid, $convResponses, $formSecurityToken, $parent, $remoteComment);
 			if ($templateData !== null) {
 				$result[] = $templateData;
 			}
@@ -610,12 +611,16 @@ final readonly class ConversationDataProvider
 	 *
 	 * @param array<int, int> $uriIds The URI IDs to get emojis for
 	 * @param int $uid The user ID of the viewer
+	 * @param array<int, int> $targetUriIds Restrict the reactions to these reacted posts, empty for all posts of the threads
 	 * @return array<int, array> The emoji reactions data
 	 */
-	private function getEmojis(array $uriIds, int $uid): array
+	private function getEmojis(array $uriIds, int $uid, array $targetUriIds = []): array
 	{
+		$targetCondition = $targetUriIds ? ['thr-parent-id' => $targetUriIds] : [];
+		$countCondition  = $targetUriIds ? ['uri-id' => $targetUriIds] : [];
+
 		$emojis = [];
-		foreach (Post\Counts::get(['parent-uri-id' => $uriIds]) as $count) {
+		foreach (Post\Counts::get(array_merge(['parent-uri-id' => $uriIds], $countCondition)) as $count) {
 			$emojis[$count['uri-id']][$count['reaction']]['emoji'] = $count['reaction'];
 			$emojis[$count['uri-id']][$count['reaction']]['verb']  = Verb::getByID($count['vid']);
 			$emojis[$count['uri-id']][$count['reaction']]['total'] = $count['count'];
@@ -634,7 +639,7 @@ final readonly class ConversationDataProvider
 			Activity::READ,
 		];
 		$verbs     = array_merge($activityVerbs, [Activity::EMOJIREACT, Activity::POST]);
-		$condition = DBA::mergeConditions(['parent-uri-id' => $uriIds, 'gravity' => [ItemModel::GRAVITY_ACTIVITY, ItemModel::GRAVITY_COMMENT], 'verb' => $verbs], ["NOT `deleted`"]);
+		$condition = DBA::mergeConditions(array_merge(['parent-uri-id' => $uriIds, 'gravity' => [ItemModel::GRAVITY_ACTIVITY, ItemModel::GRAVITY_COMMENT], 'verb' => $verbs], $targetCondition), ["NOT `deleted`"]);
 		$condition = DBA::mergeConditions($condition, ["((`uid` = ? AND `global`) OR (`uid` = ? AND NOT `global`))", 0, $uid]);
 		$separator = chr(255) . chr(255) . chr(255);
 		$sql       = "SELECT `parent-uri-id`, `thr-parent-id`, `body`, `verb`, `gravity`, `private`, GROUP_CONCAT(REPLACE(`author-name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-user-view` WHERE " . array_shift($condition) . " GROUP BY `parent-uri-id`, `thr-parent-id`, `verb`, `body`, `gravity`, `private`";
