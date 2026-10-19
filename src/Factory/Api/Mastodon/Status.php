@@ -18,6 +18,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Item;
+use Friendica\Model\Mail;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
 use Friendica\Network\HTTPException\InternalServerErrorException;
@@ -341,6 +342,14 @@ class Status extends BaseFactory
 		$item = ActivityPub\Transmitter::getItemArrayFromMail($id, true);
 		if (empty($item)) {
 			throw new NotFoundException('Mail record not found with id: ' . $id);
+		}
+
+		// Show the thread as a chain instead of replies to the first message
+		foreach (Mail::getThread($item['uid'], $item['parent-uri-id']) as $message) {
+			if ($message['uri-id'] == $item['uri-id'] && !empty($message['predecessor'])) {
+				$item['thr-parent-id']    = $message['predecessor'];
+				$item['parent-author-id'] = $message['predecessor-author-id'];
+			}
 		}
 
 		$account = $this->mstdnAccountFactory->createFromContactId($item['author-id']);
