@@ -79,7 +79,7 @@
 				 {{/if}}
 				{{if $profile.actions.unfollow}}
 					<a class="btn btn-labeled btn-primary btn-sm" href="{{$profile.actions.unfollow.1}}">
-						<i class="ri ri-user-unfollow-line" aria-hidden="true"></i>
+						<i class="ri ri-user-minus-fill" aria-hidden="true"></i>
 						<span class="action-label">{{$profile.actions.unfollow.0}}</span>
 					</a>
 				{{/if}}

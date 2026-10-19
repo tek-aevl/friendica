@@ -3078,6 +3078,10 @@ ul.viewcontact_wrapper > li {
 	opacity: 0.3;
 	transition: all 0.25s ease-in-out;
 }
+.contact-wrapper .contact-action-link .ri {
+	font-size: 18px;
+	line-height: 1;
+}
 ul li:hover .contact-wrapper .contact-action-link:hover {
 	opacity: 1;
 }
