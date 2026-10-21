@@ -32,9 +32,11 @@ class ImagesTest extends TestCase
 			// 210 megapixel JPEG seen in federation: ~840 MB as a GD truecolor bitmap
 			'oversized'       => [self::pngHeader(14000, 15000), 512 * 1024 * 1024, false],
 			'fits'            => [self::pngHeader(4000, 3000), 512 * 1024 * 1024, true],
-			'exactly at edge' => [self::pngHeader(1024, 1024), 4 * 1024 * 1024, true],
-			'one pixel over'  => [self::pngHeader(1024, 1025), 4 * 1024 * 1024, false],
-			'no budget left'  => [self::pngHeader(1, 1), 0, false],
+			'exactly at edge' => [self::pngHeader(1024, 1024), 8 * 1024 * 1024, true],
+			'one pixel over'  => [self::pngHeader(1024, 1025), 8 * 1024 * 1024, false],
+			// rotating or scaling after the decode needs a second bitmap
+			'no second bitmap' => [self::pngHeader(1024, 1024), 4 * 1024 * 1024, false],
+			'no budget left'   => [self::pngHeader(1, 1), 0, false],
 		];
 	}
 
