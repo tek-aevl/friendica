@@ -3075,7 +3075,7 @@ ul.viewcontact_wrapper > li {
 }
 .contact-wrapper .contact-action-link {
 	background-color: transparent;
-	opacity: 0.3;
+	opacity: 0.6;
 	transition: all 0.25s ease-in-out;
 }
 .contact-wrapper .contact-action-link .ri {
