@@ -29,11 +29,11 @@ steps:
           PR_HEAD="${CI_COMMIT_BRANCH}";
         fi
       - >-
-        PULLS="$(curl -sf -H "Authorization: token $${TOKEN}"
-        "$${API}/pulls?state=open&base=develop&head=$${PR_HEAD}")" || exit 1
+        PULLS="$(curl -sS --fail-with-body -H "Authorization: token $${TOKEN}"
+        "$${API}/pulls?state=open&base=develop&head=$${PR_HEAD}")" || { echo "$${PULLS}"; exit 1; }
       - OPEN="$(echo "$${PULLS}" | jq length)"
       - if [ "$${OPEN}" -gt 0 ]; then echo "Sync PR already open"; exit 0; fi
       - >-
-        curl -sf -X POST -H "Authorization: token $${TOKEN}" -H "Content-Type: application/json"
+        curl -sS --fail-with-body -X POST -H "Authorization: token $${TOKEN}" -H "Content-Type: application/json"
         -d "{\"base\":\"develop\",\"head\":\"${CI_COMMIT_BRANCH}\",\"title\":\"Merge ${CI_COMMIT_BRANCH} into develop\"}"
         "$${API}/pulls"
