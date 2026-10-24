@@ -966,6 +966,23 @@ final class PostTemplateBuilder
 	}
 
 	/**
+	 * Get the abstract that is added to a comment. It is only taken over from sensitive posts,
+	 * otherwise the summary is just a summary.
+	 *
+	 * @param string $contentWarning Content warning of the post that is commented on
+	 * @param bool   $sensitive      Is the post that is commented on marked as sensitive?
+	 * @return string
+	 */
+	public static function getAbstractText(string $contentWarning, bool $sensitive): string
+	{
+		if ($contentWarning === '' || !$sensitive) {
+			return '';
+		}
+
+		return '[abstract=' . Protocol::ACTIVITYPUB . ']' . $contentWarning . "[/abstract]\n";
+	}
+
+	/**
 	 * Get default text for comment box
 	 *
 	 * @param array<string, mixed> $item
@@ -980,8 +997,8 @@ final class PostTemplateBuilder
 		$owner = User::getOwnerDataById($this->uid);
 		$text  = '';
 
-		if (!empty($item['content-warning']) && Feature::isEnabled($this->uid, Feature::ADD_ABSTRACT)) {
-			$text = '[abstract=' . Protocol::ACTIVITYPUB . ']' . $item['content-warning'] . "[/abstract]\n";
+		if (Feature::isEnabled($this->uid, Feature::ADD_ABSTRACT)) {
+			$text = self::getAbstractText($item['content-warning'] ?? '', !empty($item['sensitive']));
 		}
 
 		if (!Feature::isEnabled($this->uid, Feature::EXPLICIT_MENTIONS)) {
