@@ -88,7 +88,7 @@ function item_drop(int $uid, string $dropitems): void
 
 function item_edit(int $uid, array $request, bool $preview, string $return_path): void
 {
-	$post = Post::selectFirst(Item::ITEM_FIELDLIST, ['id' => $request['post_id'], 'uid' => $uid]);
+	$post = Post::selectFirst(array_merge(Item::ITEM_FIELDLIST, ['sensitive']), ['id' => $request['post_id'], 'uid' => $uid]);
 	if (!DBA::isResult($post)) {
 		if ($return_path) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Unable to locate original post.'));
@@ -99,6 +99,7 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 
 	$post['edit'] = $post;
 	$old_body     = $post['body'];
+	$sensitive    = $post['sensitive'];
 	$post['file'] = Post\Category::getTextByURIId($post['uri-id'], $post['uid']);
 
 	Post\Media::deleteByURIId($post['uri-id'], [PostMedia::TYPE_AUDIO, PostMedia::TYPE_VIDEO, PostMedia::TYPE_IMAGE, PostMedia::TYPE_HTML, PostMedia::TYPE_HLS]);
@@ -107,7 +108,7 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 	$fields = [
 		'title'           => $post['title'],
 		'content-warning' => $post['content-warning'],
-		'sensitive'       => $post['sensitive'],
+		'sensitive'       => isset($request['sensitive']) ? $post['sensitive'] : $sensitive,
 		'body'            => $post['body'],
 		'attach'          => $post['attach'],
 		'file'            => $post['file'],
@@ -194,7 +195,7 @@ function item_insert(int $uid, array $request, bool $preview, string $return_pat
 
 	$post['pubmail'] = $post['pubmail'] && !$post['private'];
 
-	$post = item_process($post, $request, $preview, $return_path, $parent_item);
+	$post = item_process($post, $request, $preview, $return_path);
 
 	$post_id = Item::insert($post);
 	if (!$post_id) {
@@ -230,14 +231,14 @@ function item_insert(int $uid, array $request, bool $preview, string $return_pat
 	// NOTREACHED
 }
 
-function item_process(array $post, array $request, bool $preview, string $return_path, array $parent_item = []): array
+function item_process(array $post, array $request, bool $preview, string $return_path): array
 {
 	$post['self']            = true;
 	$post['api_source']      = false;
 	$post['attach']          = '';
 	$post['title']           = trim($request['title'] ?? '');
 	$post['content-warning'] = trim($request['summary'] ?? '');
-	$post['sensitive']       = !empty($request['sensitive'] ?? false) || !empty($parent_item['sensitive']);
+	$post['sensitive']       = !empty($request['sensitive'] ?? false);
 	$post['body']            = $request['body'] ?? '';
 	$post['location']        = trim($request['location'] ?? '');
 	$post['coord']           = trim($request['coord'] ?? '');

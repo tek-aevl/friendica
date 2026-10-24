@@ -1922,7 +1922,7 @@ msgid "Add an abstract from ActivityPub content warnings"
 msgstr ""
 
 #: src/Content/Feature.php:115
-msgid "Add an abstract when commenting on a sensitive ActivityPub post that has a content warning. Abstracts are displayed as content warning on systems like Mastodon or Pleroma. The \"sensitive\" flag itself is always taken over from the post that is being commented on, independent of this setting."
+msgid "Add an abstract when commenting on a sensitive ActivityPub post that has a content warning. Abstracts are displayed as content warning on systems like Mastodon or Pleroma."
 msgstr ""
 
 #: src/Content/Feature.php:120
