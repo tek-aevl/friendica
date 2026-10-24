@@ -11172,26 +11172,6 @@ msgstr ""
 msgid "Theme default"
 msgstr ""
 
-#: src/Module/Settings/Display.php:320
-msgid "OpenDyslexic"
-msgstr ""
-
-#: src/Module/Settings/Display.php:321
-msgid "Atkinson Hyperlegible"
-msgstr ""
-
-#: src/Module/Settings/Display.php:322
-msgid "Lexend"
-msgstr ""
-
-#: src/Module/Settings/Display.php:323
-msgid "Luciole"
-msgstr ""
-
-#: src/Module/Settings/Display.php:324
-msgid "Andika"
-msgstr ""
-
 #: src/Module/Settings/Display.php:330
 msgid "Increased"
 msgstr ""
@@ -11408,7 +11388,7 @@ msgid "Text spacing"
 msgstr ""
 
 #: src/Module/Settings/Display.php:516
-msgid "Increase the spacing between letters, words and lines to make texts easier to read."
+msgid "Increase the spacing between letters, words and lines to make texts easier to read. \"Large\" corresponds to the text spacing values of WCAG 2.1 success criterion 1.4.12."
 msgstr ""
 
 #: src/Module/Settings/Display.php:517

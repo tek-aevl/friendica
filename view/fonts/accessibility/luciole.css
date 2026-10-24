@@ -38,6 +38,6 @@
 }
 
 html body,
-html body :where(:not([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt)) {
+html body :where(:not([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt, .glyphicon)) {
   font-family: "Luciole", sans-serif !important;
 }

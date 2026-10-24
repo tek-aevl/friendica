@@ -10,6 +10,11 @@ html body :where(:not([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt)
   word-spacing: 0.1em !important;
 }
 
+html body :where([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt) {
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+}
+
 html body :where(p, li, dd, dt, td, th, blockquote, textarea, .wall-item-body) {
   line-height: 1.5 !important;
 }

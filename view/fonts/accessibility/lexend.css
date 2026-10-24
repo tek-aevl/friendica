@@ -14,6 +14,6 @@
 }
 
 html body,
-html body :where(:not([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt)) {
+html body :where(:not([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt, .glyphicon)) {
   font-family: "Lexend", sans-serif !important;
 }
