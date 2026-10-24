@@ -127,6 +127,16 @@ class Display extends BaseSettings
 		$widget_timeline_reset   = (bool) $request['widget_timeline_reset'];
 		$menu_timeline_reset     = (bool) $request['menu_timeline_reset'];
 
+		$font = is_string($request['font'] ?? null) ? trim($request['font']) : '';
+		if (!in_array($font, Page::ACCESSIBILITY_FONTS, true)) {
+			$font = '';
+		}
+
+		$text_spacing = is_string($request['text_spacing'] ?? null) ? trim($request['text_spacing']) : '';
+		if (!in_array($text_spacing, Page::ACCESSIBILITY_TEXT_SPACINGS, true)) {
+			$text_spacing = '';
+		}
+
 		$enabled_timelines = [];
 		foreach ($enable as $code => $enabled) {
 			if ($enabled) {
@@ -198,6 +208,13 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'accessibility', 'hide_empty_descriptions', $hide_empty_descriptions);
 		$this->pConfig->set($uid, 'accessibility', 'hide_custom_emojis', $hide_custom_emojis);
 		$this->pConfig->set($uid, 'accessibility', 'platform_icon_style', $platform_icon_style);
+		foreach (['font' => $font, 'text_spacing' => $text_spacing] as $key => $value) {
+			if ($value === '') {
+				$this->pConfig->delete($uid, 'accessibility', $key);
+			} else {
+				$this->pConfig->set($uid, 'accessibility', $key, $value);
+			}
+		}
 
 		$this->pConfig->set($uid, 'calendar', 'first_day_of_week', $first_day_of_week);
 		$this->pConfig->set($uid, 'calendar', 'default_view', $calendar_default_view);
@@ -302,6 +319,27 @@ class Display extends BaseSettings
 			ContactSelector::SVG_BLACK       => $this->t('Black'),
 			ContactSelector::SVG_COLOR_WHITE => $this->t('Color/White'),
 			ContactSelector::SVG_WHITE       => $this->t('White'),
+		];
+
+		$font_names = [
+			'opendyslexic'          => 'OpenDyslexic',
+			'atkinson-hyperlegible' => 'Atkinson Hyperlegible',
+			'lexend'                => 'Lexend',
+			'luciole'               => 'Luciole',
+			'andika'                => 'Andika',
+		];
+
+		$font  = $this->pConfig->get($uid, 'accessibility', 'font', '');
+		$fonts = ['' => $this->t('Theme default')];
+		foreach (Page::ACCESSIBILITY_FONTS as $font_key) {
+			$fonts[$font_key] = $font_names[$font_key];
+		}
+
+		$text_spacing  = $this->pConfig->get($uid, 'accessibility', 'text_spacing', '');
+		$text_spacings = [
+			''          => $this->t('Theme default'),
+			'increased' => $this->t('Increased'),
+			'large'     => $this->t('Large'),
 		];
 
 		$preview_mode  = $this->pConfig->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_AUTO);
@@ -485,6 +523,8 @@ class Display extends BaseSettings
 			'$hide_empty_descriptions'  => ['hide_empty_descriptions', $this->t('Hide pictures with empty alternative text'), $hide_empty_descriptions, $this->t("Don't display pictures that are missing the alternative text.")],
 			'$hide_custom_emojis'       => ['hide_custom_emojis', $this->t('Hide custom emojis'), $hide_custom_emojis, $this->t("Don't display custom emojis.")],
 			'$platform_icon_style'      => ['platform_icon_style', $this->t('Platform icons style'), $platform_icon_style, $this->t('Style of the platform icons'), $platform_icon_styles, false],
+			'$font'                     => ['font', $this->t('Font'), $font, $this->t('Replace the font of the theme with a font that is easier to read. OpenDyslexic is designed for people with dyslexia, Atkinson Hyperlegible and Luciole for people with low vision, Lexend for a smoother reading flow, Andika for beginning readers.'), $fonts, false],
+			'$text_spacing'             => ['text_spacing', $this->t('Text spacing'), $text_spacing, $this->t('Increase the spacing between letters, words and lines to make texts easier to read. "Large" corresponds to the text spacing values of WCAG 2.1 success criterion 1.4.12.'), $text_spacings, false],
 			'$embed_remote_media'       => ['embed_remote_media', $this->t('Embed remote media'), $embed_remote_media, $this->t('When enabled, remote media will be embedded in the post, like for example YouTube videos.')],
 			'$embed_media'              => ['embed_media', $this->t('Embed supported media'), $embed_media, $this->t('When enabled, remote media will be embedded in the post instead of using the local player if this is supported by the remote system. This is useful for media where the remote player is better than the local one, like for example Peertube videos.')],
 
