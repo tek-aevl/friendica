@@ -1054,109 +1054,109 @@ msgid_plural "<button type=\"button\" %2$s>%1$d people</button> reshared this"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:986
-#: src/Content/Conversation/ConversationDataProvider.php:989
-#: src/Content/Conversation/ConversationDataProvider.php:992
 #: src/Content/Conversation/ConversationDataProvider.php:995
 #: src/Content/Conversation/ConversationDataProvider.php:998
+#: src/Content/Conversation/ConversationDataProvider.php:1001
+#: src/Content/Conversation/ConversationDataProvider.php:1004
+#: src/Content/Conversation/ConversationDataProvider.php:1007
 #, php-format
 msgid "You had been addressed (%s)."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1001
+#: src/Content/Conversation/ConversationDataProvider.php:1010
 #, php-format
 msgid "You are following %s."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1005
+#: src/Content/Conversation/ConversationDataProvider.php:1014
 msgid "You subscribed to one or more tags in this post."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1005
+#: src/Content/Conversation/ConversationDataProvider.php:1014
 #, php-format
 msgid "You subscribed to %s."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1023
+#: src/Content/Conversation/ConversationDataProvider.php:1032
 #, php-format
 msgid "%s reshared this."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1025
+#: src/Content/Conversation/ConversationDataProvider.php:1034
 msgid "Reshared"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1025
+#: src/Content/Conversation/ConversationDataProvider.php:1034
 #, php-format
 msgid "Reshared by %s <%s>"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1028
+#: src/Content/Conversation/ConversationDataProvider.php:1037
 #, php-format
 msgid "%s is participating in this thread."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1031
+#: src/Content/Conversation/ConversationDataProvider.php:1040
 msgid "Stored for general reasons"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1034
+#: src/Content/Conversation/ConversationDataProvider.php:1043
 msgid "Global post"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1037
+#: src/Content/Conversation/ConversationDataProvider.php:1046
 msgid "Sent via an relay server"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1037
+#: src/Content/Conversation/ConversationDataProvider.php:1046
 #, php-format
 msgid "Sent via the relay server %s <%s>"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1040
+#: src/Content/Conversation/ConversationDataProvider.php:1049
 msgid "Fetched"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1040
+#: src/Content/Conversation/ConversationDataProvider.php:1049
 #, php-format
 msgid "Fetched because of %s <%s>"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1043
+#: src/Content/Conversation/ConversationDataProvider.php:1052
 msgid "Stored because of a child post to complete this thread."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1046
+#: src/Content/Conversation/ConversationDataProvider.php:1055
 msgid "Local delivery"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1049
+#: src/Content/Conversation/ConversationDataProvider.php:1058
 msgid "Stored because of your activity (like, comment, bookmark, ...)"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1052
+#: src/Content/Conversation/ConversationDataProvider.php:1061
 msgid "Distributed"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1055
+#: src/Content/Conversation/ConversationDataProvider.php:1064
 msgid "Pushed to us"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1060
+#: src/Content/Conversation/ConversationDataProvider.php:1069
 #, php-format
 msgid "Channel \"%s\": %s"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1060
+#: src/Content/Conversation/ConversationDataProvider.php:1069
 #, php-format
 msgid "Channel \"%s\""
 msgstr ""
 
-#: src/Content/Conversation/ConversationRenderer.php:502
+#: src/Content/Conversation/ConversationRenderer.php:522
 msgid "Delete Selected Items"
 msgstr ""
 
-#: src/Content/Conversation/ConversationRenderer.php:518
+#: src/Content/Conversation/ConversationRenderer.php:564
 msgid "remove"
 msgstr ""
 
