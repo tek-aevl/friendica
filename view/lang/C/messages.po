@@ -573,7 +573,7 @@ msgid "toggle mobile"
 msgstr ""
 
 #: src/App/Page.php:384 src/Module/Admin/Logs/View.php:124
-#: src/Module/Deck.php:105 src/Module/Item/Compose.php:336
+#: src/Module/Deck.php:104 src/Module/Item/Compose.php:336
 #: src/Module/Media/BaseBrowser.php:94 view/theme/frio/php/minimal.php:39
 msgid "Close"
 msgstr ""
@@ -1401,7 +1401,7 @@ msgstr ""
 #: src/Module/BaseProfile.php:141 src/Module/Contact.php:402
 #: src/Module/Contact.php:540 src/Module/Conversation/Channel.php:98
 #: src/Module/Conversation/Community.php:91
-#: src/Module/Conversation/Network.php:396
+#: src/Module/Conversation/Network.php:392
 #: src/Module/Moderation/BaseUsers.php:127
 msgid "More"
 msgstr ""
@@ -7230,12 +7230,12 @@ msgstr ""
 msgid "Circle: %s"
 msgstr ""
 
-#: src/Module/Conversation/Network.php:312
+#: src/Module/Conversation/Network.php:308
 #, php-format
 msgid "Error %d (%s) while fetching the timeline."
 msgstr ""
 
-#: src/Module/Conversation/Network.php:408
+#: src/Module/Conversation/Network.php:404
 msgid "Network feed not available."
 msgstr ""
 
@@ -7359,59 +7359,59 @@ msgstr ""
 msgid "Lookup address:"
 msgstr ""
 
-#: src/Module/Deck.php:66 src/Module/Item/Compose.php:65
+#: src/Module/Deck.php:65 src/Module/Item/Compose.php:65
 msgid "This feature is only available with the frio theme."
 msgstr ""
 
-#: src/Module/Deck.php:77
+#: src/Module/Deck.php:76
 msgid "System notifications"
 msgstr ""
 
-#: src/Module/Deck.php:78
+#: src/Module/Deck.php:77
 msgid "Personal notifications"
 msgstr ""
 
-#: src/Module/Deck.php:90
+#: src/Module/Deck.php:89
 msgid "Search term"
 msgstr ""
 
-#: src/Module/Deck.php:91
+#: src/Module/Deck.php:90
 msgid "Path of the page, e.g. network/circle/1"
 msgstr ""
 
-#: src/Module/Deck.php:91
+#: src/Module/Deck.php:90
 msgid "Custom page"
 msgstr ""
 
-#: src/Module/Deck.php:92
+#: src/Module/Deck.php:91
 msgid "Scroll to top"
 msgstr ""
 
-#: src/Module/Deck.php:93
+#: src/Module/Deck.php:92
 msgid "Reload"
 msgstr ""
 
-#: src/Module/Deck.php:94
+#: src/Module/Deck.php:93
 msgid "Move left"
 msgstr ""
 
-#: src/Module/Deck.php:95
+#: src/Module/Deck.php:94
 msgid "Move right"
 msgstr ""
 
-#: src/Module/Deck.php:96
+#: src/Module/Deck.php:95
 msgid "Close column"
 msgstr ""
 
-#: src/Module/Deck.php:97
+#: src/Module/Deck.php:96
 msgid "Change column type"
 msgstr ""
 
-#: src/Module/Deck.php:103
+#: src/Module/Deck.php:102
 msgid "Add column"
 msgstr ""
 
-#: src/Module/Deck.php:104
+#: src/Module/Deck.php:103
 msgid "New post"
 msgstr ""
 
@@ -9646,26 +9646,26 @@ msgstr ""
 msgid "{0} and %d others requested registration"
 msgstr ""
 
-#: src/Module/Notifications/Stream.php:93
+#: src/Module/Notifications/Stream.php:94
 msgid "No notifications."
 msgstr ""
 
-#: src/Module/Notifications/Stream.php:224
+#: src/Module/Notifications/Stream.php:244
 #, php-format
 msgid "%s started following you"
 msgstr ""
 
-#: src/Module/Notifications/Stream.php:228
+#: src/Module/Notifications/Stream.php:248
 #, php-format
 msgid "%s requested to follow you"
 msgstr ""
 
-#: src/Module/Notifications/Stream.php:232
+#: src/Module/Notifications/Stream.php:252
 #, php-format
 msgid "%s shared your post"
 msgstr ""
 
-#: src/Module/Notifications/Stream.php:236
+#: src/Module/Notifications/Stream.php:256
 #, php-format
 msgid "%s reacted to your post"
 msgstr ""
