@@ -22,6 +22,6 @@
 }
 
 html body,
-html body :where(:not([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt, .glyphicon)) {
+html body :where(:not([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt, .glyphicon, :is(code, pre, kbd, samp, tt) *)) {
   font-family: "OpenDyslexic 3", sans-serif !important;
 }
