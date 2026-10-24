@@ -70,10 +70,11 @@
 			toggleJotNav(this);
 		});
 
-		// Bookmarklet and share intent pages need a jot modal which appears automatically
+		// Bookmarklet and share intent pages need a jot modal which appears automatically.
+		// The exact path match doesn't work if Friendica is installed in a subdirectory.
 		if (
-			(window.location.pathname.indexOf("/bookmarklet") >= 0 ||
-				window.location.pathname.indexOf("/share") >= 0) &&
+			(window.location.pathname === "/bookmarklet" ||
+				window.location.pathname === "/share") &&
 			$("#jot-modal").length
 		) {
 			// jotShow is defined in jot-header.tpl

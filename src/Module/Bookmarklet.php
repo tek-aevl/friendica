@@ -37,14 +37,14 @@ class Bookmarklet extends BaseModule
 		}
 
 		$referer = Strings::normaliseLink($_SERVER['HTTP_REFERER'] ?? '');
-		$page    = Strings::normaliseLink(DI::baseUrl() . '/' . DI::args()->getQueryString());
+		$page    = Strings::normaliseLink(DI::baseUrl() . '/' . DI::args()->getCommand());
 
-		if ($referer !== $page) {
+		if (!str_starts_with($referer, $page)) {
 			if (empty($_REQUEST['url']) && empty($_REQUEST['text'])) {
 				throw new HTTPException\BadRequestException(DI::l10n()->t('This page is missing a url or text parameter.'));
 			}
 
-			$content = trim($_REQUEST['text'] ?? '');
+			$content = htmlspecialchars(trim($_REQUEST['text'] ?? ''));
 			if (!empty($_REQUEST['url'])) {
 				$content .= "\n" . PageInfo::getFooterFromUrl($_REQUEST['url']);
 			}
