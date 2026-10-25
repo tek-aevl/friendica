@@ -1255,6 +1255,42 @@ function showHideComments(id) {
 	}
 }
 
+// Opens a post's display page from a click on its text, unless the click hit
+// an interactive element or embedded media inside it, or the user is selecting
+// text - used when comments are hidden or compacted in the feed, so that the
+// whole conversation can be read and written on the display page. The target
+// url is taken from the data-display-url attribute of the clicked content.
+// Ctrl/Cmd/Shift/middle clicks open a new tab or window like a real link. A
+// plain element.click() on a synthesized link isn't picked up by Unpoly - it
+// only forwards clicks that either came from a real mouse hit or lack
+// coordinates entirely (keyboard activation), so up.visit() is used directly
+// when SPA mode is active.
+$(document).on('click', '.click-to-display[data-display-url]', function(event) {
+	if (event.target.closest('a, button, summary, details, label, input, select, textarea, img, video, audio, iframe')) {
+		return;
+	}
+	if (String(window.getSelection()).length) {
+		return;
+	}
+
+	var url = $(this).data('display-url');
+	if (event.ctrlKey || event.metaKey || event.shiftKey) {
+		window.open(url, '_blank');
+		return;
+	}
+	if (typeof window.up !== 'undefined' && typeof up.visit === 'function') {
+		up.error.muteUncriticalRejection(up.visit(url));
+		return;
+	}
+	window.location.href = url;
+});
+
+// The display page itself already shows the whole conversation, so rendered
+// items fetched there must not offer to open themselves
+function onDisplayPage() {
+	return /(^|\/)display\//.test(window.location.pathname);
+}
+
 // Load more comments for a specific post
 function loadMoreComments(uriId, itemId, existing) {
 	var button = $('#load-more-comments-' + itemId);
@@ -1277,7 +1313,8 @@ function loadMoreComments(uriId, itemId, existing) {
 		url: 'item/' + uriId + '/comments',
 		data: {
 			'mode': 'raw',
-			'existing': existingArray.join(',')
+			'existing': existingArray.join(','),
+			'display': onDisplayPage() ? 1 : 0
 		}
 	})
 	.done(function(data) {
@@ -1347,7 +1384,7 @@ function insertPostedComment(parentItemId, data) {
 		return false;
 	}
 
-	$.get('item/' + data['comment-uri-id'] + '/comment')
+	$.get('item/' + data['comment-uri-id'] + '/comment', {'display': onDisplayPage() ? 1 : 0})
 		.done(function(html) {
 			// keepScripts: the comment form carries an inline <script> that wires up its dropzone
 			var $new = $('<div>').append($.parseHTML(html, document, true)).find(parent).first();
@@ -1456,7 +1493,7 @@ function refreshItemActivity(itemId, data) {
 		return false;
 	}
 
-	$.get('item/' + data['uri-id'] + '/node')
+	$.get('item/' + data['uri-id'] + '/node', {'display': onDisplayPage() ? 1 : 0})
 		.done(function(html) {
 			var $newArticle = $('<div>').append($.parseHTML(html)).find(item + ' > article.media').first();
 			if (!$newArticle.length) {

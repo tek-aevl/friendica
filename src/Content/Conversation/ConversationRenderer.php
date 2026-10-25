@@ -45,6 +45,23 @@ final readonly class ConversationRenderer
 	public const ORDER_PINNED_RECEIVED  = 'pinned_received';
 	public const ORDER_PINNED_CREATED   = 'pinned_created';
 
+	public const COMMENTS_MODE_ALL     = 0;
+	public const COMMENTS_MODE_COMPACT = 1;
+	public const COMMENTS_MODE_HIDDEN  = 2;
+
+	/**
+	 * Map a stored comments mode to one of the COMMENTS_MODE_* constants.
+	 *
+	 * @param mixed $mode The stored value
+	 * @return int
+	 */
+	public static function normalizeCommentsMode(mixed $mode): int
+	{
+		$mode = (int) $mode;
+
+		return in_array($mode, [self::COMMENTS_MODE_COMPACT, self::COMMENTS_MODE_HIDDEN], true) ? $mode : self::COMMENTS_MODE_ALL;
+	}
+
 	public function __construct(
 		private L10n $l10n,
 		private IManagePersonalConfigValues $pConfig,
@@ -108,11 +125,12 @@ final readonly class ConversationRenderer
 	 * @param int $uriId The URI ID of the thread
 	 * @param int $uid The user ID of the viewer, or null for public view
 	 * @param array $existing Existing comment URI IDs to exclude
+	 * @param bool $displayPage Whether the request comes from a display page, where clicking a post must not open it again
 	 * @return string The rendered HTML of all comments
 	 * @throws ImagickException
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function renderCommentsByUriId(int $uriId, int $uid, array $existing = []): string
+	public function renderCommentsByUriId(int $uriId, int $uid, array $existing = [], bool $displayPage = false): string
 	{
 		$this->profiler->startRecording('rendering');
 		$this->statusEditor->registerAssets();
@@ -132,10 +150,12 @@ final readonly class ConversationRenderer
 			return '';
 		}
 
+		$clickToDisplay = !$displayPage && $this->isClickToDisplayEnabled($viewerUid);
+
 		$html = '';
 		foreach ($root['children'] as $child) {
 			// wall_thread.tpl contains a different treating for MODE_DISPLAY that we use here
-			$html .= $this->renderItemHtml($child, self::MODE_DISPLAY);
+			$html .= $this->renderItemHtml($child, self::MODE_DISPLAY, $clickToDisplay);
 		}
 
 		$this->profiler->stopRecording();
@@ -157,11 +177,12 @@ final readonly class ConversationRenderer
 	 *
 	 * @param int $commentUriId The URI ID of the freshly posted comment
 	 * @param int $uid The user ID of the viewer, or null for public view
+	 * @param bool $displayPage Whether the request comes from a display page, where clicking a post must not open it again
 	 * @return string The rendered HTML of the immediate parent's subtree, or of the thread root for a reply to the thread starter
 	 * @throws ImagickException
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function renderCommentByUriId(int $commentUriId, int $uid): string
+	public function renderCommentByUriId(int $commentUriId, int $uid, bool $displayPage = false): string
 	{
 		$this->profiler->startRecording('rendering');
 		$this->statusEditor->registerAssets();
@@ -174,16 +195,16 @@ final readonly class ConversationRenderer
 			return '';
 		}
 
-		// Match the surrounding conversation: the compact timeline never flattens,
+		// Match the surrounding conversation: compact/hidden timelines never flatten,
 		// so a flattened subtree would move the new reply out of its parent.
-		$smartThreading = !$this->pConfig->get($viewerUid, 'system', 'compact_timeline');
+		$smartThreading = self::normalizeCommentsMode($this->pConfig->get($viewerUid, 'system', 'compact_timeline')) === self::COMMENTS_MODE_ALL;
 
 		$page_dropping = $viewerUid && $this->pConfig->get($viewerUid, 'system', 'show_page_drop', true);
 		$root          = $this->dataProvider->getRootTemplateDataFromItem($comment, $viewerUid, self::MODE_DISPLAY, [], $page_dropping, $smartThreading);
 
 		$parent = $root ? $this->selectInsertNode($root, $comment) : null;
 
-		$html = $parent ? $this->renderItemHtml($parent, self::MODE_DISPLAY) : '';
+		$html = $parent ? $this->renderItemHtml($parent, self::MODE_DISPLAY, !$displayPage && $this->isClickToDisplayEnabled($viewerUid)) : '';
 
 		$this->profiler->stopRecording();
 
@@ -198,11 +219,12 @@ final readonly class ConversationRenderer
 	 *
 	 * @param int $uriId The URI ID of the item to render
 	 * @param int $uid The user ID of the viewer, or null for public view
+	 * @param bool $displayPage Whether the request comes from a display page, where clicking a post must not open it again
 	 * @return string The rendered HTML of the single item node
 	 * @throws ImagickException
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function renderItemByUriId(int $uriId, int $uid): string
+	public function renderItemByUriId(int $uriId, int $uid, bool $displayPage = false): string
 	{
 		$this->profiler->startRecording('rendering');
 		$this->statusEditor->registerAssets();
@@ -215,7 +237,7 @@ final readonly class ConversationRenderer
 			return '';
 		}
 
-		$smartThreading = !$this->pConfig->get($viewerUid, 'system', 'compact_timeline');
+		$smartThreading = self::normalizeCommentsMode($this->pConfig->get($viewerUid, 'system', 'compact_timeline')) === self::COMMENTS_MODE_ALL;
 
 		$page_dropping = $viewerUid && $this->pConfig->get($viewerUid, 'system', 'show_page_drop', true);
 		$root          = $this->dataProvider->getRootTemplateDataFromItem($item, $viewerUid, self::MODE_DISPLAY, [], $page_dropping, $smartThreading);
@@ -225,7 +247,7 @@ final readonly class ConversationRenderer
 			$node['children'] = [];
 		}
 
-		$html = $node !== null ? $this->renderItemHtml($node, self::MODE_DISPLAY) : '';
+		$html = $node !== null ? $this->renderItemHtml($node, self::MODE_DISPLAY, !$displayPage && $this->isClickToDisplayEnabled($viewerUid)) : '';
 
 		$this->profiler->stopRecording();
 
@@ -322,7 +344,7 @@ final readonly class ConversationRenderer
 			return '';
 		}
 
-		$html = $this->renderThreadedTemplate([$root], $mode, $update, $page_dropping);
+		$html = $this->renderThreadedTemplate([$root], $mode, $update, $page_dropping, $mode !== self::MODE_DISPLAY && $this->isClickToDisplayEnabled($viewerUid));
 		$this->profiler->stopRecording();
 		return $live_update_div . $html;
 	}
@@ -362,7 +384,7 @@ final readonly class ConversationRenderer
 		$items = $cb['items'];
 
 		$roots = $this->dataProvider->getFlatTemplateData($items, $viewerUid, $preview);
-		$html  = $live_update_div . $this->renderThreadedTemplate($roots, $mode, false, false);
+		$html  = $live_update_div . $this->renderThreadedTemplate($roots, $mode, false, false, !$preview && $this->isClickToDisplayEnabled($viewerUid, true));
 
 		$this->profiler->stopRecording();
 		return $html;
@@ -482,7 +504,7 @@ final readonly class ConversationRenderer
 			return '';
 		}
 
-		return $this->renderThreadedTemplate($roots, $mode, $update, $page_dropping);
+		return $this->renderThreadedTemplate($roots, $mode, $update, $page_dropping, $this->isClickToDisplayEnabled($uid));
 	}
 
 	/**
@@ -490,17 +512,43 @@ final readonly class ConversationRenderer
 	 *
 	 * @param array<int, array> $threads The thread data to render
 	 * @param string $mode The rendering mode (e.g., self::MODE_DISPLAY)
+	 * @param bool $clickToDisplay Whether clicking a post opens its own page instead of the normal in-feed behavior
 	 * @return string The rendered HTML of the conversation
 	 */
-	private function renderThreadedTemplate(array $threads, string $mode, bool $update, bool $pagedrop): string
+	private function renderThreadedTemplate(array $threads, string $mode, bool $update, bool $pagedrop, bool $clickToDisplay = false): string
 	{
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('threaded_conversation.tpl'), [
-			'$live_update' => '',
-			'$mode'        => $mode,
-			'$update'      => $update,
-			'$threads'     => $threads,
-			'$dropping'    => ($pagedrop ? $this->l10n->t('Delete Selected Items') : false),
+			'$live_update'      => '',
+			'$mode'             => $mode,
+			'$update'           => $update,
+			'$threads'          => $threads,
+			'$dropping'         => ($pagedrop ? $this->l10n->t('Delete Selected Items') : false),
+			'$click_to_display' => $clickToDisplay,
 		]);
+	}
+
+	/**
+	 * Whether clicking a post's body should open its own page instead of the
+	 * usual in-feed behavior. Only takes effect together with the compact or
+	 * hidden comments modes; with all comments shown, it has no purpose.
+	 * Lists without any comment context (search, contact posts) always qualify.
+	 *
+	 * @param int $uid The user ID of the viewer
+	 * @param bool $commentsAlwaysHidden Whether the list never shows any comments
+	 * @return bool
+	 */
+	private function isClickToDisplayEnabled(int $uid, bool $commentsAlwaysHidden = false): bool
+	{
+		if (!$uid) {
+			return false;
+		}
+
+		$commentsMode = self::normalizeCommentsMode($this->pConfig->get($uid, 'system', 'compact_timeline', self::COMMENTS_MODE_ALL));
+		if (!$commentsAlwaysHidden && $commentsMode === self::COMMENTS_MODE_ALL) {
+			return false;
+		}
+
+		return (bool) $this->pConfig->get($uid, 'system', 'click_to_display', false);
 	}
 
 	/**
@@ -508,14 +556,16 @@ final readonly class ConversationRenderer
 	 *
 	 * @param array<string, mixed> $item The item data to render
 	 * @param string $mode The rendering mode (e.g., self::MODE_DISPLAY)
+	 * @param bool $clickToDisplay Whether clicking the item opens its own page
 	 * @return string The rendered HTML of the item
 	 */
-	private function renderItemHtml(array $item, string $mode): string
+	private function renderItemHtml(array $item, string $mode, bool $clickToDisplay = false): string
 	{
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate($item['template']), [
-			'$item'   => $item,
-			'$mode'   => $mode,
-			'$remove' => $this->l10n->t('remove'),
+			'$item'             => $item,
+			'$mode'             => $mode,
+			'$remove'           => $this->l10n->t('remove'),
+			'$click_to_display' => $clickToDisplay,
 		]);
 	}
 
