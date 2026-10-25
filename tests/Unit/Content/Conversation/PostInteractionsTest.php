@@ -7,12 +7,13 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Test\src\Content\Conversation;
+namespace Friendica\Test\Unit\Content\Conversation;
 
 use Friendica\Content\Conversation\PostInteractions;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class PostInteractionsTest extends TestCase
 {
@@ -60,5 +61,20 @@ class PostInteractionsTest extends TestCase
 		self::assertSame('like', $interactions->getLabel(PostInteractions::LIKES, 1));
 		self::assertSame('likes', $interactions->getLabel(PostInteractions::LIKES, 2));
 		self::assertSame('', $interactions->getLabel('unknown', 2));
+	}
+
+	public function testAuthorConditionWithoutViewer(): void
+	{
+		$condition = (new ReflectionMethod(PostInteractions::class, 'getAuthorCondition'))->invoke($this->createInteractions(false), 0);
+
+		self::assertSame(['NOT `author-blocked`'], $condition);
+	}
+
+	public function testAuthorConditionLeavesOutBlockedAndIgnoredContactsOfTheViewer(): void
+	{
+		$condition = (new ReflectionMethod(PostInteractions::class, 'getAuthorCondition'))->invoke($this->createInteractions(false), 7);
+
+		self::assertStringContainsString('`user-contact`', $condition[0]);
+		self::assertSame(7, $condition[1]);
 	}
 }

@@ -65,9 +65,14 @@ final readonly class PostInteractions
 	 */
 	public function getSummary(int $uriId, string $guid, int $uid): array
 	{
+		$types = $this->getTypes($uid);
+
+		// Likes, dislikes and reactions share one query
+		$activities = array_intersect($types, [self::LIKES, self::DISLIKES, self::REACTIONS]) ? $this->getLikeActors($uriId, $uid) : [];
+
 		$summary = [];
-		foreach ($this->getTypes($uid) as $type) {
-			$total = $this->count($type, $uriId, $uid);
+		foreach ($types as $type) {
+			$total = isset($activities[$type]) ? count($activities[$type]) : $this->count($type, $uriId, $uid);
 			if ($total > 0) {
 				$summary[] = [
 					'type'  => $type,
@@ -143,33 +148,45 @@ final readonly class PostInteractions
 	/**
 	 * All actors of an interaction type, most recent first. Every actor is listed once.
 	 *
-	 * The decision whether a like or dislike is an emoji reaction can't be made in SQL, so the
-	 * paging is done on the result. This way the list and the count always show the same numbers.
-	 *
 	 * @return array<int, string> Public contact id => emoji of the reaction(s), empty for other types
 	 */
 	private function getActors(string $type, int $uriId, int $uid): array
 	{
-		$rows = Post::select(['author-id', 'vid', 'body'], $this->getActivityCondition($type, $uriId, $uid), ['order' => ['received' => true]]);
-
-		$emojiReact = Verb::getID(Activity::EMOJIREACT);
+		if ($type !== self::RESHARES) {
+			return $this->getLikeActors($uriId, $uid)[$type] ?? [];
+		}
 
 		$actors = [];
+		foreach (array_column(Post::selectToArray(['author-id'], $this->getActivityCondition($type, $uriId, $uid), ['order' => ['received' => true]]), 'author-id') as $authorId) {
+			$actors[$authorId] = '';
+		}
+
+		return $actors;
+	}
+
+	/**
+	 * Actors of the likes, dislikes and reactions, from a single query.
+	 *
+	 * The decision whether a like or dislike is an emoji reaction can't be made in SQL (see isEmojiReaction),
+	 * so the split is done on the result. This way the lists and the counts always show the same numbers.
+	 *
+	 * @return array<string, array<int, string>> Actors per interaction type (public contact id => emoji, empty for likes and dislikes)
+	 */
+	private function getLikeActors(int $uriId, int $uid): array
+	{
+		$rows = Post::select(['author-id', 'vid', 'body'], $this->getActivityCondition(self::REACTIONS, $uriId, $uid), ['order' => ['received' => true]]);
+
+		$emojiReact = Verb::getID(Activity::EMOJIREACT);
+		$dislike    = Verb::getID(Activity::DISLIKE);
+
+		$actors = [self::LIKES => [], self::DISLIKES => [], self::REACTIONS => []];
 		while ($row = Post::fetch($rows)) {
-			$emoji      = $row['vid'] === $emojiReact ? (string) $row['body'] : ($this->isEmojiReaction((string) $row['body']) ? $row['body'] : '');
-			$isReaction = $emoji !== '';
+			$emoji = $row['vid'] === $emojiReact ? (string) $row['body'] : ($this->isEmojiReaction((string) $row['body']) ? (string) $row['body'] : '');
 
-			if (in_array($type, [self::LIKES, self::DISLIKES], true) && $isReaction) {
-				continue;
-			}
-
-			if ($type === self::REACTIONS) {
-				if (!$isReaction) {
-					continue;
-				}
-				$actors[$row['author-id']] = ($actors[$row['author-id']] ?? '') . $emoji;
+			if ($emoji !== '') {
+				$actors[self::REACTIONS][$row['author-id']] = ($actors[self::REACTIONS][$row['author-id']] ?? '') . $emoji;
 			} else {
-				$actors[$row['author-id']] = '';
+				$actors[$row['vid'] === $dislike ? self::DISLIKES : self::LIKES][$row['author-id']] = '';
 			}
 		}
 		DBA::close($rows);

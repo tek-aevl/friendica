@@ -27,6 +27,7 @@ use Friendica\Module;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -40,6 +41,7 @@ class Interactions extends BaseModule
 		private readonly App\Page $page,
 		private readonly PostInteractions $postInteractions,
 		private readonly ConversationRenderer $conversationRenderer,
+		EventDispatcherInterface $eventDispatcher,
 		L10n $l10n,
 		App\BaseURL $baseUrl,
 		App\Arguments $args,
@@ -49,7 +51,7 @@ class Interactions extends BaseModule
 		array $server,
 		array $parameters = [],
 	) {
-		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters, $eventDispatcher);
 	}
 
 	protected function content(array $request = []): string
@@ -58,7 +60,7 @@ class Interactions extends BaseModule
 			throw new HTTPException\UnauthorizedException($this->t('Access denied.'));
 		}
 
-		$uid  = $this->session->getLocalUserId();
+		$uid  = (int) $this->session->getLocalUserId();
 		$type = $this->parameters['type'] ?? '';
 
 		if (!$this->postInteractions->isAvailable($type, $uid)) {

@@ -194,7 +194,7 @@ final readonly class ConversationDataProvider
 		if (!$preview) {
 			$parentUriIds = array_values(array_unique(array_column($items, 'parent-uri-id')));
 			$emojis       = $this->getEmojis($parentUriIds, $viewerUid, $uriIds);
-			$quoteshares  = $this->getQuoteShares($uriIds);
+			$quoteshares  = $this->getQuoteShares($uriIds, $viewerUid);
 			$counts       = $this->getCounts($parentUriIds);
 
 			if ($viewerUid) {
@@ -415,7 +415,7 @@ final readonly class ConversationDataProvider
 		}
 
 		$emojis      = $this->getEmojis($uriIds, $uid);
-		$quoteshares = $this->getQuoteShares($uriIds);
+		$quoteshares = $this->getQuoteShares($uriIds, $uid);
 		$counts      = $this->getCounts($uriIds);
 
 		$commentsMode = !in_array($mode, [ConversationRenderer::MODE_DISPLAY, ConversationRenderer::MODE_COMMENTS])
@@ -688,12 +688,18 @@ final readonly class ConversationDataProvider
 	/**
 	 * Get quote shares for the given URI IDs.
 	 *
+	 * Contacts the viewer blocked or ignored are left out, like in the interaction lists (see PostInteractions)
+	 *
 	 * @param array<int, int> $uriIds The URI IDs to get quote shares for
+	 * @param int $uid The user ID of the viewer
 	 * @return array<int, array> The quote shares data
 	 */
-	private function getQuoteShares(array $uriIds): array
+	private function getQuoteShares(array $uriIds, int $uid): array
 	{
 		$condition = DBA::mergeConditions(['quote-uri-id' => $uriIds], ["NOT `quote-uri-id` IS NULL AND NOT `post`.`deleted` AND `post`.`private` IN (?, ?) AND NOT `contact`.`blocked`", ItemModel::PUBLIC, ItemModel::UNLISTED]);
+		if ($uid) {
+			$condition = DBA::mergeConditions($condition, ["NOT `post`.`author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored`))", $uid]);
+		}
 		$separator = chr(255) . chr(255) . chr(255);
 		$sql       = "SELECT `quote-uri-id`, COUNT(*) AS `total`, GROUP_CONCAT(REPLACE(`name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-quote` INNER JOIN `post` ON `post`.`uri-id` = `post-quote`.`uri-id` INNER JOIN `contact` ON `post`.`author-id` = `contact`.`id` WHERE " . array_shift($condition) . " GROUP BY `quote-uri-id`";
 		$quotes    = [];
