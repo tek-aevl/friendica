@@ -1266,10 +1266,6 @@ function showHideComments(id) {
 // coordinates entirely (keyboard activation), so up.visit() is used directly
 // when SPA mode is active.
 $(document).on('click', '.click-to-display[data-display-url]', function(event) {
-	// The display page itself already shows the whole conversation
-	if (/(^|\/)display\//.test(window.location.pathname)) {
-		return;
-	}
 	if (event.target.closest('a, button, summary, details, label, input, select, textarea, img, video, audio, iframe')) {
 		return;
 	}
@@ -1278,7 +1274,7 @@ $(document).on('click', '.click-to-display[data-display-url]', function(event) {
 	}
 
 	var url = $(this).data('display-url');
-	if (event.ctrlKey || event.metaKey || event.shiftKey || event.which === 2) {
+	if (event.ctrlKey || event.metaKey || event.shiftKey) {
 		window.open(url, '_blank');
 		return;
 	}
@@ -1288,6 +1284,12 @@ $(document).on('click', '.click-to-display[data-display-url]', function(event) {
 	}
 	window.location.href = url;
 });
+
+// The display page itself already shows the whole conversation, so rendered
+// items fetched there must not offer to open themselves
+function onDisplayPage() {
+	return /(^|\/)display\//.test(window.location.pathname);
+}
 
 // Load more comments for a specific post
 function loadMoreComments(uriId, itemId, existing) {
@@ -1311,7 +1313,8 @@ function loadMoreComments(uriId, itemId, existing) {
 		url: 'item/' + uriId + '/comments',
 		data: {
 			'mode': 'raw',
-			'existing': existingArray.join(',')
+			'existing': existingArray.join(','),
+			'display': onDisplayPage() ? 1 : 0
 		}
 	})
 	.done(function(data) {
@@ -1381,7 +1384,7 @@ function insertPostedComment(parentItemId, data) {
 		return false;
 	}
 
-	$.get('item/' + data['comment-uri-id'] + '/comment')
+	$.get('item/' + data['comment-uri-id'] + '/comment', {'display': onDisplayPage() ? 1 : 0})
 		.done(function(html) {
 			// keepScripts: the comment form carries an inline <script> that wires up its dropzone
 			var $new = $('<div>').append($.parseHTML(html, document, true)).find(parent).first();
@@ -1490,7 +1493,7 @@ function refreshItemActivity(itemId, data) {
 		return false;
 	}
 
-	$.get('item/' + data['uri-id'] + '/node')
+	$.get('item/' + data['uri-id'] + '/node', {'display': onDisplayPage() ? 1 : 0})
 		.done(function(html) {
 			var $newArticle = $('<div>').append($.parseHTML(html)).find(item + ' > article.media').first();
 			if (!$newArticle.length) {

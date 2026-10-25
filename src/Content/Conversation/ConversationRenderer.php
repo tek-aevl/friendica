@@ -125,11 +125,12 @@ final readonly class ConversationRenderer
 	 * @param int $uriId The URI ID of the thread
 	 * @param int $uid The user ID of the viewer, or null for public view
 	 * @param array $existing Existing comment URI IDs to exclude
+	 * @param bool $displayPage Whether the request comes from a display page, where clicking a post must not open it again
 	 * @return string The rendered HTML of all comments
 	 * @throws ImagickException
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function renderCommentsByUriId(int $uriId, int $uid, array $existing = []): string
+	public function renderCommentsByUriId(int $uriId, int $uid, array $existing = [], bool $displayPage = false): string
 	{
 		$this->profiler->startRecording('rendering');
 		$this->statusEditor->registerAssets();
@@ -149,7 +150,7 @@ final readonly class ConversationRenderer
 			return '';
 		}
 
-		$clickToDisplay = $this->isClickToDisplayEnabled($viewerUid);
+		$clickToDisplay = !$displayPage && $this->isClickToDisplayEnabled($viewerUid);
 
 		$html = '';
 		foreach ($root['children'] as $child) {
@@ -176,11 +177,12 @@ final readonly class ConversationRenderer
 	 *
 	 * @param int $commentUriId The URI ID of the freshly posted comment
 	 * @param int $uid The user ID of the viewer, or null for public view
+	 * @param bool $displayPage Whether the request comes from a display page, where clicking a post must not open it again
 	 * @return string The rendered HTML of the immediate parent's subtree, or of the thread root for a reply to the thread starter
 	 * @throws ImagickException
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function renderCommentByUriId(int $commentUriId, int $uid): string
+	public function renderCommentByUriId(int $commentUriId, int $uid, bool $displayPage = false): string
 	{
 		$this->profiler->startRecording('rendering');
 		$this->statusEditor->registerAssets();
@@ -202,7 +204,7 @@ final readonly class ConversationRenderer
 
 		$parent = $root ? $this->selectInsertNode($root, $comment) : null;
 
-		$html = $parent ? $this->renderItemHtml($parent, self::MODE_DISPLAY, $this->isClickToDisplayEnabled($viewerUid)) : '';
+		$html = $parent ? $this->renderItemHtml($parent, self::MODE_DISPLAY, !$displayPage && $this->isClickToDisplayEnabled($viewerUid)) : '';
 
 		$this->profiler->stopRecording();
 
@@ -217,11 +219,12 @@ final readonly class ConversationRenderer
 	 *
 	 * @param int $uriId The URI ID of the item to render
 	 * @param int $uid The user ID of the viewer, or null for public view
+	 * @param bool $displayPage Whether the request comes from a display page, where clicking a post must not open it again
 	 * @return string The rendered HTML of the single item node
 	 * @throws ImagickException
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function renderItemByUriId(int $uriId, int $uid): string
+	public function renderItemByUriId(int $uriId, int $uid, bool $displayPage = false): string
 	{
 		$this->profiler->startRecording('rendering');
 		$this->statusEditor->registerAssets();
@@ -244,7 +247,7 @@ final readonly class ConversationRenderer
 			$node['children'] = [];
 		}
 
-		$html = $node !== null ? $this->renderItemHtml($node, self::MODE_DISPLAY, $this->isClickToDisplayEnabled($viewerUid)) : '';
+		$html = $node !== null ? $this->renderItemHtml($node, self::MODE_DISPLAY, !$displayPage && $this->isClickToDisplayEnabled($viewerUid)) : '';
 
 		$this->profiler->stopRecording();
 
