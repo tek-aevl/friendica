@@ -46,7 +46,7 @@ class Index extends BaseSettings
 
 		self::checkFormSecurityTokenRedirectOnError('/settings/trustedhosts', 'settings-trustedhosts');
 
-		$trusted = $this->pConfig->get($uid, 'system', 'trusted_iframe_hosts', []);
+		$trusted = (array) $this->pConfig->get($uid, 'system', 'trusted_iframe_hosts', []);
 
 		if (array_key_exists('delete', $request) && is_array($request['delete'])) {
 			foreach ($request['delete'] as $host => $delete) {
@@ -70,7 +70,7 @@ class Index extends BaseSettings
 
 		parent::content();
 
-		$trusted = $this->pConfig->get($uid, 'system', 'trusted_iframe_hosts', []);
+		$trusted = (array) $this->pConfig->get($uid, 'system', 'trusted_iframe_hosts', []);
 		sort($trusted);
 
 		$pager = new Pager($this->l10n, $this->args->getQueryString(), 30);

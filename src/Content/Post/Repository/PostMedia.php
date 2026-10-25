@@ -813,7 +813,7 @@ class PostMedia extends BaseRepository
 	 * Extracts the host of an URL, including protocol-relative ones.
 	 *
 	 * @param string $url URL to get the host from
-	 * @return string Lowercased host, empty if there is none
+	 * @return string Lowercased host in punycode, empty if there is none
 	 */
 	private function getUrlHost(string $url): string
 	{
@@ -822,7 +822,12 @@ class PostMedia extends BaseRepository
 			$url = 'https:' . $url;
 		}
 
-		return strtolower((string) parse_url($url, PHP_URL_HOST));
+		$host = mb_strtolower((string) parse_url($url, PHP_URL_HOST));
+		if ($host !== '' && function_exists('idn_to_ascii')) {
+			$host = (string) idn_to_ascii($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
+		}
+
+		return $host;
 	}
 
 	/**

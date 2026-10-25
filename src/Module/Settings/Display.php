@@ -311,11 +311,11 @@ class Display extends BaseSettings
 			ConversationRenderer::COMMENTS_MODE_COMPACT => $this->t('Compact conversation view: only comments from the thread author and yourself that form coherent conversation threads'),
 			ConversationRenderer::COMMENTS_MODE_HIDDEN  => $this->t('Hide comments in feeds'),
 		];
-		$click_to_display   = $this->pConfig->get($uid, 'system', 'click_to_display', false);
-		$compact_timeline       = $this->pConfig->get($uid, 'system', 'compact_timeline', false);
-		$show_page_drop         = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
-		$display_eventlist      = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
-		$embed_media            = $this->pConfig->get($uid, 'system', 'embed_media', false);
+		$click_to_display  = $this->pConfig->get($uid, 'system', 'click_to_display', false);
+		$compact_timeline  = $this->pConfig->get($uid, 'system', 'compact_timeline', false);
+		$show_page_drop    = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
+		$display_eventlist = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
+		$embed_media       = $this->pConfig->get($uid, 'system', 'embed_media', false);
 
 		$hide_empty_descriptions = $this->pConfig->get($uid, 'accessibility', 'hide_empty_descriptions', false);
 		$hide_custom_emojis      = $this->pConfig->get($uid, 'accessibility', 'hide_custom_emojis', false);
