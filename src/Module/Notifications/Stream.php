@@ -134,7 +134,8 @@ class Stream extends BaseModule
 	 */
 	protected function getCondition(int $uid, ?int $afterId = null): array
 	{
-		$condition = ["`uid` = ? AND NOT `dismissed` AND (`type` IN (?, ?, ?, ?, ?, ?) OR (`type` = ? AND `vid` = ?)) AND NOT EXISTS(SELECT `cid` FROM `user-contact` WHERE `user-contact`.`cid` = `notification`.`actor-id` AND `user-contact`.`uid` = `notification`.`uid` AND (`is-blocked` OR `blocked`))",
+		// Mentions and replies are shown as the post alone, so they are only counted when the post still exists
+		$condition = ["`uid` = ? AND NOT `dismissed` AND (`type` IN (?, ?, ?, ?, ?) AND EXISTS(SELECT `uri-id` FROM `post-user` WHERE `post-user`.`uri-id` = `notification`.`target-uri-id` AND `post-user`.`uid` = `notification`.`uid` AND NOT `post-user`.`deleted`) OR `type` = ? OR (`type` = ? AND `vid` = ?)) AND NOT EXISTS(SELECT `cid` FROM `user-contact` WHERE `user-contact`.`cid` = `notification`.`actor-id` AND `user-contact`.`uid` = `notification`.`uid` AND (`is-blocked` OR `blocked`))",
 			$uid,
 			Post\UserNotification::TYPE_EXPLICIT_TAGGED, Post\UserNotification::TYPE_IMPLICIT_TAGGED,
 			Post\UserNotification::TYPE_DIRECT_COMMENT, Post\UserNotification::TYPE_DIRECT_THREAD_COMMENT,

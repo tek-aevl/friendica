@@ -48,10 +48,8 @@ const friendicaGlobals = {
 	commentBusy: "writable",
 	commentClose: "readonly",
 	commentCloseUI: "readonly",
-	getUpdateUrl: "readonly", // view/js/main.js
 	hideLoading: "readonly",
 	htmlToText: "readonly",
-	in_progress: "writable", // view/js/main.js
 	initInfiniteScroll: "readonly", // view/js/main.js
 	insertBBCodeInTextarea: "readonly",
 	insertPostedComment: "readonly", // view/js/main.js
@@ -65,10 +63,8 @@ const friendicaGlobals = {
 	showPosting: "readonly",
 	showProcessing: "readonly",
 	showReceiving: "readonly",
-	stopped: "writable", // view/js/main.js
 	timer: "writable",
 	unpause: "readonly",
-	updateCounter: "readonly", // view/js/main.js
 	updateContent: "readonly",
 	updateItem: "readonly",
 };
