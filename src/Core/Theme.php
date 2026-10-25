@@ -104,7 +104,7 @@ class Theme
 						$result = explode(',', $value);
 						if ($result) {
 							foreach ($result as $key => $value) {
-								$info['features'][$ke] = trim($value);
+								$info['features'][$key] = trim($value);
 							}
 						}
 					} elseif (array_key_exists($key, $info)) {
