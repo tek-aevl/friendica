@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Post;
+namespace Friendica\Security;
 
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\DBA;
@@ -17,7 +17,7 @@ use Friendica\Security\PermissionSet\Repository\PermissionSet;
 /**
  * Creates the conditions that limit posts to those the current visitor is allowed to see
  */
-final readonly class PermissionFilter
+final readonly class PostPermissions
 {
 	public function __construct(
 		private IHandleUserSessions $userSession,

@@ -862,7 +862,7 @@ class Item
 		}
 
 		if (empty($item['quote-uri-id'])) {
-			$quote_id = DI::postLinkResolver()->getQuoteUriId($item['body']);
+			$quote_id = DI::postFetcher()->getQuoteUriId($item['body']);
 			if (!empty($quote_id)) {
 				// This is one of these "should not happen" situations.
 				// The protocol implementations should already have done this job.
@@ -2781,29 +2781,29 @@ class Item
 
 	/**
 	 * Fetch the SQL condition for the given user id
-	 * Will be deprecated: new code should call \Friendica\Post\PermissionFilter::getConditionArray() directly.
+	 * Will be deprecated: new code should call \Friendica\Security\PostPermissions::getConditionArray() directly.
 	 *
 	 * @param integer $owner_id User ID for which the permissions should be fetched
 	 * @return array condition
-	 * @see \Friendica\Post\PermissionFilter::getConditionArray()
+	 * @see \Friendica\Security\PostPermissions::getConditionArray()
 	 */
 	public static function getPermissionsConditionArrayByUserId(int $owner_id): array
 	{
-		return DI::postPermissionFilter()->getConditionArray($owner_id);
+		return DI::postPermissions()->getConditionArray($owner_id);
 	}
 
 	/**
 	 * Get a permission SQL string for the given user
-	 * Will be deprecated: new code should call \Friendica\Post\PermissionFilter::getSQL() directly.
+	 * Will be deprecated: new code should call \Friendica\Security\PostPermissions::getSQL() directly.
 	 *
 	 * @param int $owner_id
 	 * @param string $table
 	 * @return string
-	 * @see \Friendica\Post\PermissionFilter::getSQL()
+	 * @see \Friendica\Security\PostPermissions::getSQL()
 	 */
 	public static function getPermissionsSQLByUserId(int $owner_id, string $table = ''): string
 	{
-		return DI::postPermissionFilter()->getSQL($owner_id, $table);
+		return DI::postPermissions()->getSQL($owner_id, $table);
 	}
 
 	/**
@@ -3781,7 +3781,7 @@ class Item
 
 	/**
 	 * Fetches item for given URI or plink
-	 * Will be deprecated: new code should call \Friendica\Post\LinkResolver::fetchByLink() directly.
+	 * Will be deprecated: new code should call \Friendica\Protocol\PostFetcher::fetchByLink() directly.
 	 *
 	 * @param string $uri
 	 * @param int    $uid
@@ -3789,25 +3789,25 @@ class Item
 	 * @param string $mimetype
 	 *
 	 * @return integer item id
-	 * @see \Friendica\Post\LinkResolver::fetchByLink()
+	 * @see \Friendica\Protocol\PostFetcher::fetchByLink()
 	 */
 	public static function fetchByLink(string $uri, int $uid = 0, int $completion = ActivityPub\Receiver::COMPLETION_MANUAL, string $mimetype = ''): int
 	{
-		return DI::postLinkResolver()->fetchByLink($uri, $uid, $completion, $mimetype);
+		return DI::postFetcher()->fetchByLink($uri, $uid, $completion, $mimetype);
 	}
 
 	/**
 	 * Fetch the uri-id of a quoted post by searching for data in the body or attached media
-	 * Will be deprecated: new code should call \Friendica\Post\LinkResolver::getQuoteUriId() directly.
+	 * Will be deprecated: new code should call \Friendica\Protocol\PostFetcher::getQuoteUriId() directly.
 	 *
 	 * @param string $body   The body of the
 	 * @param int    $uid    The id of the user
 	 * @return integer
-	 * @see \Friendica\Post\LinkResolver::getQuoteUriId()
+	 * @see \Friendica\Protocol\PostFetcher::getQuoteUriId()
 	 */
 	public static function getQuoteUriId(string $body, int $uid = 0): int
 	{
-		return DI::postLinkResolver()->getQuoteUriId($body, $uid);
+		return DI::postFetcher()->getQuoteUriId($body, $uid);
 	}
 
 	public static function incrementInbound(string $network)
