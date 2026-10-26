@@ -17,11 +17,13 @@ when:
 steps:
   open_sync_pr:
     image: alpine
+    # A sync needing manual work must not mark the rc push as failed
+    failure: ignore
     environment:
       TOKEN:
         from_secret: sync_token
     commands:
-      - apk add --no-cache curl git jq
+      - apk add --no-cache curl gettext git jq
       - SCRIPT="$(pwd)/bin/dev/sync-rc-into-develop.sh"
       - SYNC_BRANCH="merge-${CI_COMMIT_BRANCH}-into-develop"
       - if [ "${CI_FORGE_TYPE}" = "github" ]; then

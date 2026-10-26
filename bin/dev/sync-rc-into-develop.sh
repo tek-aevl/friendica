@@ -8,6 +8,7 @@
 # Usage: bin/dev/sync-rc-into-develop.sh <rc-branch> [<remote>]
 #
 # Expects <remote>/develop and <remote>/<rc-branch> to be fetched.
+# Needs xgettext when view/lang/C/messages.po conflicts.
 # Exit codes: 0 = branch prepared, 3 = develop already contains <rc-branch>, 1 = error
 
 set -eu
@@ -15,7 +16,9 @@ set -eu
 RC_BRANCH="${1:?Usage: $0 <rc-branch> [<remote>]}"
 REMOTE="${2:-origin}"
 SYNC_BRANCH="merge-${RC_BRANCH}-into-develop"
-VERSION_FILES="VERSION database.sql src/App.php view/lang/C/messages.po"
+MESSAGES_PO="view/lang/C/messages.po"
+VERSION_FILES="VERSION database.sql src/App.php ${MESSAGES_PO}"
+REBUILD_MESSAGES=0
 
 # Rewrites the version in a copy of one of the VERSION_FILES
 # $1 = path the content belongs to, $2 = file to rewrite
@@ -52,6 +55,11 @@ if ! git merge -q --no-ff --no-commit "${REMOTE}/${RC_BRANCH}"; then
 	# Rewrite base and rc side to the develop version, so only real changes are merged.
 	TMP="$(mktemp -d)"
 	for FILE in $(git diff --name-only --diff-filter=U); do
+		# Generated file, line references conflict on every change; rebuilt after the loop
+		if [ "${FILE}" = "${MESSAGES_PO}" ]; then
+			REBUILD_MESSAGES=1
+			continue
+		fi
 		if ! is_version_file "${FILE}"; then
 			echo "Merge conflict in ${FILE}, resolve the sync manually"
 			git merge --abort
@@ -70,6 +78,10 @@ if ! git merge -q --no-ff --no-commit "${REMOTE}/${RC_BRANCH}"; then
 		cp "${TMP}/ours" "${FILE}"
 	done
 	rm -rf "${TMP}"
+fi
+
+if [ "${REBUILD_MESSAGES}" -eq 1 ]; then
+	bin/run_xgettext.sh > /dev/null
 fi
 
 for FILE in ${VERSION_FILES}; do
