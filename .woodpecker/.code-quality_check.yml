@@ -55,6 +55,11 @@ steps:
     commands:
       - bin/composer.phar run phpstan;
 
+  deptrac:
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
+    commands:
+      - bin/composer.phar run deptrac
+
   # Non-blocking: friendica-addons lives on git.friendi.ca and has no CI of its own,
   # so faulty addon code only surfaces here, after it was merged - turning this
   # repository's pipeline red for changes that aren't ours.
