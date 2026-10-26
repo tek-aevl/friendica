@@ -160,7 +160,7 @@ msgstr ""
 msgid "Insert web link"
 msgstr ""
 
-#: mod/message.php:192 mod/message.php:348 src/App/Page.php:289
+#: mod/message.php:192 mod/message.php:348 src/App/Page.php:303
 #: src/Content/Conversation/PostTemplateBuilder.php:394
 #: src/Content/Conversation/StatusEditor.php:188
 #: src/Module/Item/Compose.php:181 src/Module/Media/BaseBrowser.php:91
@@ -547,35 +547,86 @@ msgstr ""
 msgid "You can't upload any more files."
 msgstr ""
 
+#: src/App/Page.php:275 src/Content/Nav.php:240 src/Content/Text/HTML.php:887
+#: src/Module/Deck.php:89 src/Module/Moderation/Blocklist/Contact.php:112
+#: src/Module/Moderation/Blocklist/Server/Index.php:103
+#: src/Module/Search/Index.php:99
+msgid "Search"
+msgstr ""
+
+#: src/App/Page.php:276
+msgid "Skin tone"
+msgstr ""
+
+#: src/App/Page.php:277
+msgid "Frequently used"
+msgstr ""
+
+#: src/App/Page.php:278
+msgid "Smileys & Emotion"
+msgstr ""
+
 #: src/App/Page.php:279
-msgid "Fetching..."
+msgid "People & Body"
 msgstr ""
 
 #: src/App/Page.php:280
-msgid "Receiving data..."
+msgid "Animals & Nature"
 msgstr ""
 
 #: src/App/Page.php:281
-msgid "Processing..."
+msgid "Food & Drink"
 msgstr ""
 
 #: src/App/Page.php:282
+msgid "Activities"
+msgstr ""
+
+#: src/App/Page.php:283
+msgid "Travel & Places"
+msgstr ""
+
+#: src/App/Page.php:284
+msgid "Objects"
+msgstr ""
+
+#: src/App/Page.php:285
+msgid "Symbols"
+msgstr ""
+
+#: src/App/Page.php:286
+msgid "Flags"
+msgstr ""
+
+#: src/App/Page.php:293
+msgid "Fetching..."
+msgstr ""
+
+#: src/App/Page.php:294
+msgid "Receiving data..."
+msgstr ""
+
+#: src/App/Page.php:295
+msgid "Processing..."
+msgstr ""
+
+#: src/App/Page.php:296
 msgid "Posting..."
 msgstr ""
 
-#: src/App/Page.php:287
+#: src/App/Page.php:301
 msgid "Timeout"
 msgstr ""
 
-#: src/App/Page.php:288
+#: src/App/Page.php:302
 msgid "The request took too long. Please try again."
 msgstr ""
 
-#: src/App/Page.php:373
+#: src/App/Page.php:387
 msgid "toggle mobile"
 msgstr ""
 
-#: src/App/Page.php:384 src/Module/Admin/Logs/View.php:124
+#: src/App/Page.php:398 src/Module/Admin/Logs/View.php:124
 #: src/Module/Deck.php:104 src/Module/Item/Compose.php:336
 #: src/Module/Media/BaseBrowser.php:94 view/theme/frio/php/minimal.php:39
 msgid "Close"
@@ -2277,13 +2328,6 @@ msgstr ""
 
 #: src/Content/Nav.php:236
 msgid "Addon applications, utilities, games"
-msgstr ""
-
-#: src/Content/Nav.php:240 src/Content/Text/HTML.php:887 src/Module/Deck.php:89
-#: src/Module/Moderation/Blocklist/Contact.php:112
-#: src/Module/Moderation/Blocklist/Server/Index.php:103
-#: src/Module/Search/Index.php:99
-msgid "Search"
 msgstr ""
 
 #: src/Content/Nav.php:240
