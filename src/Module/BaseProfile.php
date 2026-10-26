@@ -137,12 +137,11 @@ class BaseProfile extends BaseModule
 
 		$o = Renderer::replaceMacros($tpl, ['$tabs' => $hook_data['tabs'], '$more' => DI::l10n()->t('More')]);
 
-		// The filter pages are contact pages, which are only available for logged in users
-		if (in_array($current, self::POSTS_TABS) && DI::userSession()->getLocalUserId()) {
+		if (in_array($current, self::POSTS_TABS)) {
 			$pcid     = $is_owner ? DI::userSession()->getPublicContactId() : Contact::getPublicIdByUserId($owner['uid'] ?? 0);
 			$pcontact = $pcid ? Contact::getById($pcid, ['contact-type', 'network']) : [];
 
-			$o .= self::getPostsFilterHTML($baseProfileUrl . '/conversations', DI::baseUrl() . '/contact/' . $pcid, $current, $pcontact ?: []);
+			$o .= self::getPostsFilterHTML($baseProfileUrl . '/conversations', $baseProfileUrl, $current, $pcontact ?: []);
 		}
 
 		return $o;

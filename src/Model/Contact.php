@@ -1807,7 +1807,12 @@ class Contact
 			$condition = DBA::mergeConditions($condition, ['author-id' => $cid, 'gravity' => Item::GRAVITY_ACTIVITY, 'vid' => $vids]);
 		}
 
-		if (!empty($request['last_created'])) {
+		if (!empty($request['last_uriid']) && !is_null($vids)) {
+			$last = Post::selectFirst(['created'], DBA::mergeConditions($condition, ['thr-parent-id' => $request['last_uriid']]), ['order' => ['created']]);
+			if (!empty($last['created'])) {
+				$condition = DBA::mergeConditions($condition, ["`created` < ?", $last['created']]);
+			}
+		} elseif (!empty($request['last_created'])) {
 			$condition = DBA::mergeConditions($condition, ["`created` < ?", $request['last_created']]);
 		}
 
@@ -1884,7 +1889,7 @@ class Contact
 
 			$sql   = "SELECT `uri-id`, `created` FROM `post-thread-user-view` WHERE " . array_shift($condition1);
 			$union = $condition1;
-		} elseif ($contact['contact-type'] == self::TYPE_COMMUNITY) {
+		} else {
 			$condition2 = DBA::mergeConditions($condition, [
 				"`author-id` = ? AND `gravity` = ? AND `vid` = ? AND `protocol` != ? AND `thr-parent-id` = `parent-uri-id`",
 				$cid, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA,
@@ -1895,15 +1900,6 @@ class Contact
 
 			$union = array_merge($condition1, $condition2);
 			$sql   = $sql1 . " UNION " . $sql2;
-		} else {
-			// Reshares are displayed in their own tab. Diaspora style reshares are posts without own content that quote another post.
-			$condition1 = DBA::mergeConditions($condition1, [
-				"NOT (`protocol` = ? AND IFNULL(`body`, '') = '' AND `quote-uri-id` IS NOT NULL)",
-				Conversation::PARCEL_DIASPORA,
-			]);
-
-			$sql   = "SELECT `uri-id`, `created` FROM `post-thread-user-view` WHERE " . array_shift($condition1);
-			$union = $condition1;
 		}
 
 		$sql .= " ORDER BY `created` DESC LIMIT ?, ?";

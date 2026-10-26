@@ -5,10 +5,8 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 
-<div class="panel posts-filter">
-<ul class="nav nav-tabs">
+<ul role="menubar" class="tabs posts-filter">
 	{{foreach $filters as $filter}}
-		<li id="{{$filter.id}}" class="{{$filter.sel}}"><a href="{{$filter.url}}"{{if $filter.title}} title="{{$filter.title}}"{{/if}}>{{$filter.label}}</a></li>
+		<li role="menuitem" id="{{$filter.id}}"><a href="{{$filter.url}}" class="tab button {{$filter.sel}}"{{if $filter.title}} title="{{$filter.title}}"{{/if}}>{{$filter.label}}</a></li>
 	{{/foreach}}
 </ul>
-</div>
