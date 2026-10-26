@@ -22,9 +22,6 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Post\Category;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
-use Friendica\Network\HTTPClient\Client\HttpClientOptions;
-use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\ServiceUnavailableException;
 use Friendica\Protocol\Activity;
@@ -33,7 +30,6 @@ use Friendica\Protocol\ActivityPub\Processor;
 use Friendica\Protocol\Delivery;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\HTTPSignature;
 use Friendica\Util\Map;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy;
@@ -866,7 +862,7 @@ class Item
 		}
 
 		if (empty($item['quote-uri-id'])) {
-			$quote_id = self::getQuoteUriId($item['body']);
+			$quote_id = DI::postLinkResolver()->getQuoteUriId($item['body']);
 			if (!empty($quote_id)) {
 				// This is one of these "should not happen" situations.
 				// The protocol implementations should already have done this job.
@@ -2785,83 +2781,29 @@ class Item
 
 	/**
 	 * Fetch the SQL condition for the given user id
+	 * Will be deprecated: new code should call \Friendica\Post\PermissionFilter::getConditionArray() directly.
 	 *
 	 * @param integer $owner_id User ID for which the permissions should be fetched
 	 * @return array condition
+	 * @see \Friendica\Post\PermissionFilter::getConditionArray()
 	 */
 	public static function getPermissionsConditionArrayByUserId(int $owner_id): array
 	{
-		$local_user  = DI::userSession()->getLocalUserId();
-		$remote_user = DI::userSession()->getRemoteContactID($owner_id);
-
-		// default permissions - anonymous user
-		$condition = ["`private` != ?", self::PRIVATE];
-
-		if ($local_user && ($local_user == $owner_id)) {
-			// Profile owner - everything is visible
-			$condition = [];
-		} elseif ($remote_user) {
-			// Authenticated visitor - fetch the matching permissionsets
-			$permissionSets = DI::permissionSet()->selectByContactId($remote_user, $owner_id);
-			if (count($permissionSets) > 0) {
-				$condition = [
-					"(`private` != ? OR (`private` = ? AND `wall`
-					AND `psid` IN (" . implode(', ', array_fill(0, count($permissionSets), '?')) . ")))",
-					self::PRIVATE, self::PRIVATE,
-				];
-				$condition = array_merge($condition, $permissionSets->column('id'));
-			}
-		}
-
-		return $condition;
+		return DI::postPermissionFilter()->getConditionArray($owner_id);
 	}
 
 	/**
 	 * Get a permission SQL string for the given user
+	 * Will be deprecated: new code should call \Friendica\Post\PermissionFilter::getSQL() directly.
 	 *
 	 * @param int $owner_id
 	 * @param string $table
 	 * @return string
+	 * @see \Friendica\Post\PermissionFilter::getSQL()
 	 */
 	public static function getPermissionsSQLByUserId(int $owner_id, string $table = ''): string
 	{
-		$local_user  = DI::userSession()->getLocalUserId();
-		$remote_user = DI::userSession()->getRemoteContactID($owner_id);
-
-		if (!empty($table)) {
-			$table = DBA::quoteIdentifier($table) . '.';
-		}
-
-		// Profile owner - everything is visible
-		if ($local_user && ($local_user == $owner_id)) {
-			return '';
-		}
-
-		if ($remote_user) {
-			/*
-			 * Authenticated visitor. Unless pre-verified,
-			 * check that the contact belongs to this $owner_id
-			 * and load the circles the visitor belongs to.
-			 * If pre-verified, the caller is expected to have already
-			 * done this and passed the circles into this function.
-			 */
-			$permissionSets = DI::permissionSet()->selectByContactId($remote_user, $owner_id);
-
-			$sql_set = '';
-
-			if (count($permissionSets) > 0) {
-				$sql_set = sprintf(" OR (" . $table . "`private` = %d AND " . $table . "`wall` AND " . $table . "`psid` IN (", self::PRIVATE) . implode(',', $permissionSets->column('id')) . "))";
-			}
-
-			return sprintf(" AND (" . $table . "`private` != %d", self::PRIVATE) . $sql_set . ")";
-		}
-
-		/*
-		 * Construct permissions
-		 *
-		 * default permissions - anonymous user
-		 */
-		return sprintf(" AND " . $table . "`private` != %d", self::PRIVATE);
+		return DI::postPermissionFilter()->getSQL($owner_id, $table);
 	}
 
 	/**
@@ -3810,57 +3752,36 @@ class Item
 
 	/**
 	 * Search item id for given URI or plink
+	 * Will be deprecated: new code should call \Friendica\Post\LinkResolver::searchByLink() directly.
 	 *
 	 * @param string $uri
 	 * @param integer $uid
 	 *
 	 * @return integer item id
+	 * @see \Friendica\Post\LinkResolver::searchByLink()
 	 */
 	public static function searchByLink(string $uri, int $uid = 0): int
 	{
-		$ssl_uri = str_replace('http://', 'https://', $uri);
-		$uris    = [$uri, $ssl_uri, Strings::normaliseLink($uri)];
-
-		$item = Post::selectFirst(['id'], ['uri' => $uris, 'uid' => $uid]);
-		if (DBA::isResult($item)) {
-			return $item['id'];
-		}
-
-		$item = Post::selectFirst(['id'], ['plink' => $uris, 'uid' => $uid]);
-		if (DBA::isResult($item)) {
-			return $item['id'];
-		}
-
-		return 0;
+		return DI::postLinkResolver()->searchByLink($uri, $uid);
 	}
 
 	/**
 	 * Return the URI for a link to the post
+	 * Will be deprecated: new code should call \Friendica\Post\LinkResolver::getURIByLink() directly.
 	 *
 	 * @param string $uri URI or link to post
 	 *
 	 * @return string URI
+	 * @see \Friendica\Post\LinkResolver::getURIByLink()
 	 */
 	public static function getURIByLink(string $uri): string
 	{
-		$ssl_uri = str_replace('http://', 'https://', $uri);
-		$uris    = [$uri, $ssl_uri, Strings::normaliseLink($uri)];
-
-		$item = Post::selectFirst(['uri'], ['uri' => $uris]);
-		if (DBA::isResult($item)) {
-			return $item['uri'];
-		}
-
-		$item = Post::selectFirst(['uri'], ['plink' => $uris]);
-		if (DBA::isResult($item)) {
-			return $item['uri'];
-		}
-
-		return '';
+		return DI::postLinkResolver()->getURIByLink($uri);
 	}
 
 	/**
 	 * Fetches item for given URI or plink
+	 * Will be deprecated: new code should call \Friendica\Post\LinkResolver::fetchByLink() directly.
 	 *
 	 * @param string $uri
 	 * @param int    $uid
@@ -3868,140 +3789,25 @@ class Item
 	 * @param string $mimetype
 	 *
 	 * @return integer item id
+	 * @see \Friendica\Post\LinkResolver::fetchByLink()
 	 */
 	public static function fetchByLink(string $uri, int $uid = 0, int $completion = ActivityPub\Receiver::COMPLETION_MANUAL, string $mimetype = ''): int
 	{
-		DI::logger()->info('Trying to fetch link', ['uid' => $uid, 'uri' => $uri]);
-		$item_id = self::searchByLink($uri, $uid);
-		if (!empty($item_id)) {
-			DI::logger()->info('Link found', ['uid' => $uid, 'uri' => $uri, 'id' => $item_id]);
-			return $item_id;
-		}
-
-		if (ActivityPub\Processor::alreadyKnown($uri, '')) {
-			return 0;
-		}
-
-		$eventDispatcher = DI::eventDispatcher();
-
-		$hook_data = [
-			'uri'     => $uri,
-			'uid'     => $uid,
-			'item_id' => null,
-		];
-
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::FETCH_ITEM_BY_LINK, $hook_data),
-		)->getArray();
-
-		if (isset($hook_data['item_id'])) {
-			DI::logger()->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $hook_data['item_id']]);
-			return is_numeric($hook_data['item_id']) ? $hook_data['item_id'] : 0;
-		}
-
-		$head_not_found = false;
-		if (!$mimetype) {
-			try {
-				$curlResult     = DI::httpClient()->head($uri, [HttpClientOptions::ACCEPT_CONTENT => HttpClientAccept::JSON_AS, HttpClientOptions::REQUEST => HttpClientRequest::ACTIVITYPUB]);
-				$mimetype       = $curlResult->getContentType();
-				$head_not_found = ($curlResult->getReturnCode() == 404);
-			} catch (\Throwable $th) {
-				DI::logger()->info('Error while fetching HTTP link via HEAD', ['uid' => $uid, 'uri' => $uri, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
-				return 0;
-			}
-		}
-
-		if (!HTTPSignature::isValidContentType($mimetype, $uri) && ($head_not_found || (current(explode(';', $mimetype)) == 'application/json'))) {
-			try {
-				// Issue 14126: Workaround for Mastodon servers that return "application/json" on a "head" request.
-				// Issue 14536: Lemmy answers a "head" request with an error (404), so we retry with a signed "get" request.
-				$curlResult = HTTPSignature::fetchRaw($uri, $uid);
-				$mimetype   = $curlResult->getContentType();
-			} catch (\Throwable $th) {
-				DI::logger()->info('Error while fetching HTTP link via signed GET', ['uid' => $uid, 'uri' => $uri, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
-				return 0;
-			}
-		}
-
-		if (HTTPSignature::isValidContentType($mimetype, $uri)) {
-			$fetched_uri = ActivityPub\Processor::fetchMissingActivity($uri, [], '', $completion, $uid);
-			if (!empty($fetched_uri)) {
-				$item_id = self::searchByLink($fetched_uri, $uid);
-				if ($item_id) {
-					DI::logger()->info('ActivityPub link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $item_id]);
-					return $item_id;
-				}
-			}
-		}
-
-		$item_id = Diaspora::fetchByURL($uri);
-		if ($item_id) {
-			DI::logger()->info('Diaspora link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $item_id]);
-			return $item_id;
-		}
-
-		DI::logger()->info('This is not an item link', ['uid' => $uid, 'uri' => $uri]);
-		return 0;
+		return DI::postLinkResolver()->fetchByLink($uri, $uid, $completion, $mimetype);
 	}
 
 	/**
 	 * Fetch the uri-id of a quoted post by searching for data in the body or attached media
+	 * Will be deprecated: new code should call \Friendica\Post\LinkResolver::getQuoteUriId() directly.
 	 *
 	 * @param string $body   The body of the
 	 * @param int    $uid    The id of the user
 	 * @return integer
+	 * @see \Friendica\Post\LinkResolver::getQuoteUriId()
 	 */
 	public static function getQuoteUriId(string $body, int $uid = 0): int
 	{
-		$shared = BBCode::fetchShareAttributes($body);
-		if (empty($shared['guid']) && empty($shared['message_id'])) {
-			return 0;
-		}
-
-		if (empty($shared['link']) && empty($shared['message_id'])) {
-			DI::logger()->notice('Invalid share block.', ['share' => $shared]);
-			return 0;
-		}
-
-		if (!empty($shared['guid'])) {
-			$shared_item = Post::selectFirst(['uri-id'], ['guid' => $shared['guid'], 'uid' => [0, $uid]]);
-			if (!empty($shared_item['uri-id'])) {
-				DI::logger()->debug('Found post by guid', ['guid' => $shared['guid'], 'uid' => $uid]);
-				return $shared_item['uri-id'];
-			}
-		}
-
-		if (!empty($shared['message_id'])) {
-			$shared_item = Post::selectFirst(['uri-id'], ['uri' => $shared['message_id'], 'uid' => [0, $uid]]);
-			if (!empty($shared_item['uri-id'])) {
-				DI::logger()->debug('Found post by message_id', ['message_id' => $shared['message_id'], 'uid' => $uid]);
-				return $shared_item['uri-id'];
-			}
-		}
-
-		if (!empty($shared['link'])) {
-			$shared_item = Post::selectFirst(['uri-id'], ['plink' => $shared['link'], 'uid' => [0, $uid]]);
-			if (!empty($shared_item['uri-id'])) {
-				DI::logger()->debug('Found post by link', ['link' => $shared['link'], 'uid' => $uid]);
-				return $shared_item['uri-id'];
-			}
-		}
-
-		$url = $shared['message_id'] ?: $shared['link'];
-		$id  = self::fetchByLink($url, 0, ActivityPub\Receiver::COMPLETION_ASYNC);
-		if (!$id) {
-			DI::logger()->notice('Post could not be fetched.', ['url' => $url, 'uid' => $uid]);
-			return 0;
-		}
-
-		$shared_item = Post::selectFirst(['uri-id'], ['id' => $id]);
-		if (!empty($shared_item['uri-id'])) {
-			DI::logger()->debug('Fetched shared post', ['id' => $id, 'url' => $url, 'uid' => $uid]);
-			return $shared_item['uri-id'];
-		}
-
-		DI::logger()->warning('Post does not exist although it was supposed to had been fetched.', ['id' => $id, 'url' => $url, 'uid' => $uid]);
-		return 0;
+		return DI::postLinkResolver()->getQuoteUriId($body, $uid);
 	}
 
 	public static function incrementInbound(string $network)

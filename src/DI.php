@@ -570,6 +570,16 @@ abstract class DI
 	// "Post" namespace instances
 	//
 
+	public static function postLinkResolver(): Post\LinkResolver
+	{
+		return self::$dice->create(Post\LinkResolver::class);
+	}
+
+	public static function postPermissionFilter(): Post\PermissionFilter
+	{
+		return self::$dice->create(Post\PermissionFilter::class);
+	}
+
 	public static function postUriGenerator(): Post\UriGenerator
 	{
 		return self::$dice->create(Post\UriGenerator::class);
