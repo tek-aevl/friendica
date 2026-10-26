@@ -222,6 +222,18 @@ Those mixed folders are what we untangle over time.
 
 These tiers are boundaries for **new** code; existing violations are unwound by baseline-backed follow-up work — how much exists today, and the order to get there, is tracked in [issue #15981](https://github.com/friendica/friendica/issues/15981), not here.
 
+**Checked in CI:** `composer run deptrac` maps every class in `src/` to a tier (`deptrac.yaml`) and fails on an upward import, or a sideways one between two feature packages.
+Today's violations are frozen in `deptrac-baseline.yaml`, so only new ones fail.
+If you remove one, deptrac reports the stale entry; run `composer run deptrac:generate-baseline` and commit the result.
+Never add a baseline entry by hand.
+A new top-level folder in `src/` needs a layer in `deptrac.yaml`, otherwise the check fails.
+
+**Frozen folders:** `src/Object/`, `src/Factory/` and `src/Collection/` may shrink, never grow.
+New factories, collections and typed objects go next to their feature (`src/<Feature>/Factory/`, …), enforced by `tests/Unit/Architecture/FrozenNamespaceTest.php`.
+
+**Still called "DDD":** the building blocks keep their [Domain-Driven Design](domain-driven-design) names, because that vocabulary is already in the codebase and in every review.
+Aggregates and bounded contexts are not part of the target, the tiers are.
+
 ---
 
 ## 1. Dependency Injection
@@ -700,6 +712,9 @@ For the test suites and the `MYSQL_*` database variables the harness needs, see 
 
 **PHPStan level:** Level 4 with partial strict rules.
 PHPStan does not enforce architectural boundaries such as `DI::` or `DBA::` in the wrong layer — those are reviewed manually.
+
+**Deptrac:** `composer run deptrac` checks the [tier direction rule](#target-architecture) against `deptrac.yaml`, with today's violations frozen in `deptrac-baseline.yaml`.
+It runs in the `Code Quality` workflow and in `composer run qa`.
 
 **PHPStan ignores:** Fix the type instead of ignoring the error.
 If that is not possible, use `// @phpstan-ignore <identifier> (<reason>)` on the line, or list the affected files with `paths` in `.phpstan.neon`.
