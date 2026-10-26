@@ -21,6 +21,14 @@ deptrac:
         - ./src
 
     layers:
+        # --- Composition root -------------------------------------------------
+        # Wires every tier together, so it may use all of them.
+        # Nothing may use it: new classes take constructor injection instead of DI::.
+        - name: Bootstrap
+          collectors:
+              - type: classLike
+                value: ^Friendica\\(App|DI|Core\\Console)$
+
         # --- Tier 0: Base -----------------------------------------------------
         # Plumbing and framework primitives. Uses nothing above.
         - name: Base
@@ -29,8 +37,13 @@ deptrac:
                 value: src/App/.*
               - type: directory
                 value: src/Capabilities/.*
-              - type: directory
-                value: src/Core/.*
+              - type: bool
+                must:
+                    - type: directory
+                      value: src/Core/.*
+                must_not:
+                    - type: layer
+                      value: Bootstrap
               - type: directory
                 value: src/Database/.*
               - type: directory
@@ -44,7 +57,7 @@ deptrac:
               - type: directory
                 value: src/Util/.*
               - type: classLike
-                value: ^Friendica\\(App|AppHelper|AppLegacy|DI|Base(Collection|DataTransferObject|Entity|Factory|Repository))$
+                value: ^Friendica\\(AppHelper|AppLegacy|Base(Collection|DataTransferObject|Entity|Factory|Repository))$
 
         # --- Tier 1: Domain ---------------------------------------------------
         # The core nouns everything else points at. Uses Base only.
@@ -126,6 +139,19 @@ deptrac:
                 value: ^Friendica\\(BaseModule|LegacyModule)$
 
     ruleset:
+        Bootstrap:
+            - Delivery
+            - Feature/Channel
+            - Feature/Contact
+            - Feature/Moderation
+            - Feature/Navigation
+            - Feature/Privacy
+            - Feature/Profile
+            - Feature/Security
+            - Feature/User
+            - Domain
+            - Base
+
         Base: ~
 
         Domain:

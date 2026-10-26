@@ -1,27 +1,30 @@
 deptrac:
   skip_violations:
-    Friendica\App:
-      - Friendica\BaseModule
-      - Friendica\Content\Nav
-      - Friendica\Module\Maintenance
-      - Friendica\Module\Response
-      - Friendica\Module\Special\HTTPException
-      - Friendica\Protocol\ATProtocol\DID
-      - Friendica\Security\Authentication
-      - Friendica\Security\ExAuth
-      - Friendica\Security\OpenWebAuth
     Friendica\App\Page:
+      - Friendica\App
       - Friendica\Content\Nav
       - Friendica\Content\Text\HTML
+      - Friendica\DI
     Friendica\App\Router:
       - Friendica\LegacyModule
       - Friendica\Module\HTTPException\MethodNotAllowed
       - Friendica\Module\HTTPException\PageNotFound
       - Friendica\Module\Special\Options
+    Friendica\BaseModule:
+      - Friendica\DI
     Friendica\Capabilities\ICanHandleRequests:
       - Friendica\Module\Special\HTTPException
+    Friendica\Console\ArchiveContact:
+      - Friendica\DI
+    Friendica\Console\Contact:
+      - Friendica\DI
+    Friendica\Console\PostUpdate:
+      - Friendica\DI
     Friendica\Contact\Avatar:
+      - Friendica\DI
       - Friendica\Object\Image
+    Friendica\Content\ContactSelector:
+      - Friendica\DI
     Friendica\Content\Conversation\Factory\ChannelPost:
       - Friendica\Protocol\Activity
     Friendica\Content\Conversation\Factory\Community:
@@ -30,51 +33,56 @@ deptrac:
       - Friendica\Content\Conversation\ConversationRenderer
     Friendica\Content\Conversation\Factory\SystemChannelPost:
       - Friendica\Protocol\Activity
+    Friendica\Content\Feature:
+      - Friendica\DI
+    Friendica\Content\PageInfo:
+      - Friendica\DI
     Friendica\Content\Post\Repository\PostMedia:
       - Friendica\BaseModule
       - Friendica\Content\Text\HTML
+    Friendica\Content\Smilies:
+      - Friendica\DI
+    Friendica\Content\Text\BBCode:
+      - Friendica\DI
+    Friendica\Content\Text\HTML:
+      - Friendica\DI
+    Friendica\Content\Text\Markdown:
+      - Friendica\DI
+    Friendica\Content\Text\Plaintext:
+      - Friendica\DI
+    Friendica\Content\Widget:
+      - Friendica\DI
+    Friendica\Content\Widget\CalendarExport:
+      - Friendica\DI
+    Friendica\Content\Widget\ContactBlock:
+      - Friendica\DI
+    Friendica\Content\Widget\SavedSearches:
+      - Friendica\DI
+    Friendica\Content\Widget\TagCloud:
+      - Friendica\DI
+    Friendica\Content\Widget\TrendingTags:
+      - Friendica\DI
+    Friendica\Content\Widget\VCard:
+      - Friendica\DI
     Friendica\Core\ACL:
+      - Friendica\DI
       - Friendica\Model\Circle
       - Friendica\Model\Contact
       - Friendica\Model\User
-    Friendica\Core\Console:
-      - Friendica\Console\Addon
-      - Friendica\Console\ArchiveContact
-      - Friendica\Console\AutomaticInstallation
-      - Friendica\Console\Cache
-      - Friendica\Console\ClearAvatarCache
-      - Friendica\Console\Config
-      - Friendica\Console\Contact
-      - Friendica\Console\CreateDoxygen
-      - Friendica\Console\Daemon
-      - Friendica\Console\DatabaseStructure
-      - Friendica\Console\DocBloxErrorChecker
-      - Friendica\Console\Extract
-      - Friendica\Console\FediBuzzRelay
-      - Friendica\Console\FixAPDeliveryWorkerTaskParameters
-      - Friendica\Console\GlobalCommunityBlock
-      - Friendica\Console\GlobalCommunitySilence
-      - Friendica\Console\JetstreamDaemon
-      - Friendica\Console\Lock
-      - Friendica\Console\Maintenance
-      - Friendica\Console\MergeContacts
-      - Friendica\Console\MoveToAvatarCache
-      - Friendica\Console\PhpToPo
-      - Friendica\Console\PoToPhp
-      - Friendica\Console\PostUpdate
-      - Friendica\Console\Relay
-      - Friendica\Console\Relocate
-      - Friendica\Console\ServerBlock
-      - Friendica\Console\Storage
-      - Friendica\Console\Test
-      - Friendica\Console\Typo
-      - Friendica\Console\User
-      - Friendica\Console\Worker
+    Friendica\Core\Hook:
+      - Friendica\DI
+    Friendica\Core\Installer:
+      - Friendica\DI
     Friendica\Core\Protocol:
+      - Friendica\DI
       - Friendica\Model\User
       - Friendica\Protocol\ActivityPub\Transmitter
       - Friendica\Protocol\Diaspora
+    Friendica\Core\Renderer:
+      - Friendica\App
+      - Friendica\DI
     Friendica\Core\Search:
+      - Friendica\DI
       - Friendica\Model\Contact
       - Friendica\Object\Search\ContactResult
       - Friendica\Object\Search\ResultList
@@ -83,88 +91,41 @@ deptrac:
       - Friendica\Model\User
     Friendica\Core\Session\Type\Native:
       - Friendica\Model\User\Cookie
+    Friendica\Core\Storage\Repository\StorageManager:
+      - Friendica\DI
     Friendica\Core\System:
       - Friendica\Content\Text\BBCode
+      - Friendica\DI
       - Friendica\Module\Response
     Friendica\Core\Theme:
+      - Friendica\DI
       - Friendica\Model\Profile
     Friendica\Core\Update:
+      - Friendica\App
+      - Friendica\DI
       - Friendica\Model\User
+    Friendica\Core\Worker:
+      - Friendica\DI
     Friendica\Core\Worker\Cron:
+      - Friendica\DI
       - Friendica\Model\GServer
       - Friendica\Model\Post\Delivery
       - Friendica\Model\User
       - Friendica\Protocol\ActivityPub\Delivery
-    Friendica\DI:
-      - Friendica\Contact\FriendSuggest\Factory\FriendSuggest
-      - Friendica\Contact\FriendSuggest\Repository\FriendSuggest
-      - Friendica\Contact\Introduction\Factory\Introduction
-      - Friendica\Contact\Introduction\Repository\Introduction
-      - Friendica\Contact\LocalRelationship\Repository\LocalRelationship
-      - Friendica\Content\Conversation\ConversationDataProvider
-      - Friendica\Content\Conversation\ConversationRenderer
-      - Friendica\Content\Conversation\Factory\Activity
-      - Friendica\Content\Conversation\Factory\Channel
-      - Friendica\Content\Conversation\Factory\ChannelPost
-      - Friendica\Content\Conversation\Factory\Community
-      - Friendica\Content\Conversation\Factory\Network
-      - Friendica\Content\Conversation\Factory\SystemChannelPost
-      - Friendica\Content\Conversation\Factory\Timeline
-      - Friendica\Content\Conversation\PostTemplateBuilder
-      - Friendica\Content\Conversation\Repository\UserDefinedChannel
-      - Friendica\Content\Conversation\StatusEditor
-      - Friendica\Content\Item
-      - Friendica\Content\Post\Factory\PostMedia
-      - Friendica\Content\Post\Repository\PostMedia
-      - Friendica\Content\Text\BBCode\Video
-      - Friendica\Factory\Api\Mastodon\Account
-      - Friendica\Factory\Api\Mastodon\Application
-      - Friendica\Factory\Api\Mastodon\Attachment
-      - Friendica\Factory\Api\Mastodon\Card
-      - Friendica\Factory\Api\Mastodon\Conversation
-      - Friendica\Factory\Api\Mastodon\Emoji
-      - Friendica\Factory\Api\Mastodon\Error
-      - Friendica\Factory\Api\Mastodon\ListEntity
-      - Friendica\Factory\Api\Mastodon\Notification
-      - Friendica\Factory\Api\Mastodon\Poll
-      - Friendica\Factory\Api\Mastodon\Relationship
-      - Friendica\Factory\Api\Mastodon\ScheduledStatus
-      - Friendica\Factory\Api\Mastodon\Status
-      - Friendica\Factory\Api\Mastodon\StatusSource
-      - Friendica\Factory\Api\Mastodon\Subscription
-      - Friendica\Factory\Api\Twitter\Status
-      - Friendica\Factory\Api\Twitter\User
-      - Friendica\Federation\Factory\DeliveryQueueItem
-      - Friendica\Federation\Repository\DeliveryQueueItem
-      - Friendica\Model\Log\ParsedLogIterator
-      - Friendica\Model\User\Cookie
-      - Friendica\Moderation\Factory\Report
-      - Friendica\Moderation\Repository\Report
-      - Friendica\Module\Api\ApiResponse
-      - Friendica\Navigation\Notifications\Factory\FormattedNavNotification
-      - Friendica\Navigation\Notifications\Factory\FormattedNotify
-      - Friendica\Navigation\Notifications\Factory\Introduction
-      - Friendica\Navigation\Notifications\Factory\Notification
-      - Friendica\Navigation\Notifications\Factory\Notify
-      - Friendica\Navigation\Notifications\Repository\Notification
-      - Friendica\Navigation\Notifications\Repository\Notify
-      - Friendica\Navigation\SystemMessages
-      - Friendica\Post\UriGenerator
-      - Friendica\Profile\ProfileField\Factory\ProfileField
-      - Friendica\Profile\ProfileField\Repository\ProfileField
-      - Friendica\Protocol\ATProtocol
-      - Friendica\Protocol\ATProtocol\Actor
-      - Friendica\Protocol\ATProtocol\Processor
-      - Friendica\Protocol\Activity
-      - Friendica\Protocol\Diaspora\Repository\DiasporaContact
-      - Friendica\Security\Authentication
-      - Friendica\Security\PermissionSet\Factory\PermissionSet
-      - Friendica\Security\PermissionSet\Repository\PermissionSet
-      - Friendica\User\Settings\Repository\UserGServer
+    Friendica\Core\Worker\Daemon:
+      - Friendica\DI
+    Friendica\Database\DBA:
+      - Friendica\DI
     Friendica\Database\DBStructure:
+      - Friendica\DI
       - Friendica\Model\Item
       - Friendica\Model\User
+    Friendica\Database\Definition\DbaDefinition:
+      - Friendica\DI
+    Friendica\Database\Definition\ViewDefinition:
+      - Friendica\DI
     Friendica\Database\PostUpdate:
+      - Friendica\DI
       - Friendica\Model\Contact
       - Friendica\Model\Conversation
       - Friendica\Model\GServer
@@ -181,6 +142,8 @@ deptrac:
       - Friendica\Model\Verb
       - Friendica\Protocol\ActivityPub\Processor
       - Friendica\Protocol\ActivityPub\Receiver
+    Friendica\Database\View:
+      - Friendica\DI
     Friendica\Event\ModuleContentEvent:
       - Friendica\BaseModule
     Friendica\Event\ModuleInitEvent:
@@ -189,17 +152,26 @@ deptrac:
       - Friendica\BaseModule
     Friendica\Event\ModulePostRecipientEvent:
       - Friendica\BaseModule
+    Friendica\Factory\Api\Mastodon\ScheduledStatus:
+      - Friendica\DI
+    Friendica\Factory\Api\Mastodon\Status:
+      - Friendica\DI
+    Friendica\LegacyModule:
+      - Friendica\DI
     Friendica\Model\APContact:
       - Friendica\Content\Text\HTML
+      - Friendica\DI
       - Friendica\Protocol\ActivityNamespace
       - Friendica\Protocol\ActivityPub
       - Friendica\Protocol\ActivityPub\Transmitter
     Friendica\Model\Attach:
+      - Friendica\DI
       - Friendica\Object\Image
       - Friendica\Security\Security
     Friendica\Model\Circle:
       - Friendica\BaseModule
       - Friendica\Content\Widget
+      - Friendica\DI
       - Friendica\Protocol\ActivityPub
     Friendica\Model\Contact:
       - Friendica\Contact\Avatar
@@ -208,6 +180,7 @@ deptrac:
       - Friendica\Content\Conversation\ConversationRenderer
       - Friendica\Content\Pager
       - Friendica\Content\Text\HTML
+      - Friendica\DI
       - Friendica\Object\Image
       - Friendica\Protocol\Activity
       - Friendica\Protocol\ActivityPub\Transmitter
@@ -217,21 +190,28 @@ deptrac:
       - Friendica\Worker\UpdateContact
     Friendica\Model\Contact\Circle:
       - Friendica\Content\Widget
+      - Friendica\DI
     Friendica\Model\Contact\Introduction:
       - Friendica\Contact\Introduction\Entity\Introduction
+      - Friendica\DI
       - Friendica\Protocol\ActivityPub\Transmitter
       - Friendica\Protocol\Diaspora
     Friendica\Model\Contact\Relation:
       - Friendica\Content\Widget
+      - Friendica\DI
       - Friendica\Protocol\Activity
       - Friendica\Protocol\ActivityPub
       - Friendica\Worker\AddContact
+    Friendica\Model\Contact\User:
+      - Friendica\DI
     Friendica\Model\Event:
       - Friendica\Content\Feature
       - Friendica\Content\Text\BBCode
+      - Friendica\DI
       - Friendica\Protocol\Activity
       - Friendica\Protocol\Activity\ObjectType
     Friendica\Model\GServer:
+      - Friendica\DI
       - Friendica\Module\Register
       - Friendica\Protocol\ActivityPub\Receiver
       - Friendica\Protocol\Relay
@@ -242,6 +222,7 @@ deptrac:
       - Friendica\Content\Image
       - Friendica\Content\Text\BBCode
       - Friendica\Content\Text\HTML
+      - Friendica\DI
       - Friendica\Protocol\Activity
       - Friendica\Protocol\ActivityPub\Processor
       - Friendica\Protocol\ActivityPub\Receiver
@@ -252,59 +233,935 @@ deptrac:
     Friendica\Model\ItemHelper:
       - Friendica\Content\Item
       - Friendica\Protocol\Activity
+    Friendica\Model\ItemURI:
+      - Friendica\DI
     Friendica\Model\Log\ParsedLogIterator:
       - Friendica\Object\Log\ParsedLogLine
     Friendica\Model\Mail:
+      - Friendica\DI
       - Friendica\Protocol\Activity
       - Friendica\Protocol\Delivery
+    Friendica\Model\Nodeinfo:
+      - Friendica\DI
     Friendica\Model\Photo:
+      - Friendica\DI
       - Friendica\Object\Image
       - Friendica\Security\Security
     Friendica\Model\Post:
+      - Friendica\DI
       - Friendica\Protocol\Activity
       - Friendica\Protocol\Activity\ObjectType
     Friendica\Model\Post\Collection:
+      - Friendica\DI
       - Friendica\Protocol\ActivityPub\Transmitter
+    Friendica\Model\Post\Content:
+      - Friendica\DI
     Friendica\Model\Post\Counts:
       - Friendica\Content\Smilies
       - Friendica\Protocol\Activity
+    Friendica\Model\Post\Delayed:
+      - Friendica\DI
+    Friendica\Model\Post\Delivery:
+      - Friendica\DI
     Friendica\Model\Post\Engagement:
       - Friendica\Content\Text\BBCode
+      - Friendica\DI
       - Friendica\Protocol\Activity
       - Friendica\Protocol\ActivityPub\Receiver
       - Friendica\Protocol\Relay
+    Friendica\Model\Post\History:
+      - Friendica\DI
     Friendica\Model\Post\Link:
+      - Friendica\DI
       - Friendica\Object\Image
     Friendica\Model\Post\Media:
       - Friendica\Content\PageInfo
       - Friendica\Content\Text\BBCode
+      - Friendica\DI
       - Friendica\Object\Image
       - Friendica\Protocol\ActivityPub\Receiver
+    Friendica\Model\Post\MediaExif:
+      - Friendica\DI
+    Friendica\Model\Post\Origin:
+      - Friendica\DI
+    Friendica\Model\Post\Question:
+      - Friendica\DI
+    Friendica\Model\Post\QuestionOption:
+      - Friendica\DI
+    Friendica\Model\Post\Quote:
+      - Friendica\DI
+    Friendica\Model\Post\SearchIndex:
+      - Friendica\DI
+    Friendica\Model\Post\Thread:
+      - Friendica\DI
+    Friendica\Model\Post\ThreadUser:
+      - Friendica\DI
     Friendica\Model\Post\User:
+      - Friendica\DI
       - Friendica\Protocol\Activity
     Friendica\Model\Post\UserNotification:
+      - Friendica\DI
       - Friendica\Protocol\Activity
     Friendica\Model\Profile:
       - Friendica\Content\Feature
       - Friendica\Content\Text\BBCode
       - Friendica\Content\Widget\ContactBlock
+      - Friendica\DI
       - Friendica\Protocol\Activity
       - Friendica\Protocol\Diaspora
       - Friendica\Security\PermissionSet\Entity\PermissionSet
     Friendica\Model\Register:
       - Friendica\Content\Pager
+    Friendica\Model\Search:
+      - Friendica\DI
     Friendica\Model\Subscription:
+      - Friendica\DI
       - Friendica\Factory\Api\Mastodon\Notification
       - Friendica\Navigation\Notifications\Entity\Notification
     Friendica\Model\Tag:
       - Friendica\Content\Text\BBCode
+      - Friendica\DI
       - Friendica\Protocol\ActivityPub
     Friendica\Model\User:
+      - Friendica\App
       - Friendica\Content\Pager
+      - Friendica\DI
       - Friendica\Module\Register
       - Friendica\Object\Image
       - Friendica\Protocol\Delivery
       - Friendica\Security\TwoFactor\Model\AppSpecificPassword
+    Friendica\Module\About:
+      - Friendica\DI
+    Friendica\Module\AccountManagementControlDocument:
+      - Friendica\DI
+    Friendica\Module\Acctlink:
+      - Friendica\DI
+    Friendica\Module\ActivityPub\Featured:
+      - Friendica\DI
+    Friendica\Module\ActivityPub\Followers:
+      - Friendica\DI
+    Friendica\Module\ActivityPub\Following:
+      - Friendica\DI
+    Friendica\Module\ActivityPub\Inbox:
+      - Friendica\DI
+    Friendica\Module\ActivityPub\Objects:
+      - Friendica\DI
+    Friendica\Module\ActivityPub\Outbox:
+      - Friendica\DI
+    Friendica\Module\ActivityPub\QuoteAuthorization:
+      - Friendica\DI
+    Friendica\Module\ActivityPub\Whoami:
+      - Friendica\DI
+    Friendica\Module\Admin\Addons\Details:
+      - Friendica\DI
+    Friendica\Module\Admin\Addons\Index:
+      - Friendica\DI
+    Friendica\Module\Admin\DBSync:
+      - Friendica\DI
+    Friendica\Module\Admin\Features:
+      - Friendica\DI
+    Friendica\Module\Admin\Federation:
+      - Friendica\DI
+    Friendica\Module\Admin\Logs\Settings:
+      - Friendica\DI
+    Friendica\Module\Admin\Logs\View:
+      - Friendica\DI
+    Friendica\Module\Admin\PhpInfo:
+      - Friendica\DI
+    Friendica\Module\Admin\Queue:
+      - Friendica\DI
+    Friendica\Module\Admin\Roles:
+      - Friendica\DI
+    Friendica\Module\Admin\Site:
+      - Friendica\DI
+    Friendica\Module\Admin\Storage:
+      - Friendica\DI
+    Friendica\Module\Admin\Summary:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Module\Admin\Themes\Details:
+      - Friendica\DI
+    Friendica\Module\Admin\Themes\Embed:
+      - Friendica\DI
+    Friendica\Module\Admin\Themes\Index:
+      - Friendica\DI
+    Friendica\Module\Admin\Tos:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Activity:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Attach\Delete:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Circle\Create:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Circle\Delete:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Circle\Show:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Circle\Update:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\DirectMessages\Search:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\DirectMessages\Setseen:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Events\Create:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Events\Delete:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Events\Index:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Notification:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Notification\Seen:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Photo:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Photo\Create:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Photo\Delete:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Photo\Lists:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Photo\Update:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Photoalbum\Delete:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Photoalbum\Index:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Photoalbum\Show:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Photoalbum\Update:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Profile\Show:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Statuses\Dislike:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Statuses\DislikedBy:
+      - Friendica\DI
+    Friendica\Module\Api\Friendica\Statuses\Undislike:
+      - Friendica\DI
+    Friendica\Module\Api\GNUSocial\GNUSocial\Config:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Module\Api\GNUSocial\GNUSocial\Version:
+      - Friendica\DI
+    Friendica\Module\Api\GNUSocial\Help\Test:
+      - Friendica\DI
+    Friendica\Module\Api\GNUSocial\Statusnet\Conversation:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Block:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\FeaturedTags:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Follow:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Followers:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Following:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\IdentityProofs:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Lists:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Lookup:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Mute:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Note:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Relationships:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Search:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Statuses:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Unblock:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Unfollow:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\Unmute:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\UpdateCredentials:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Accounts\VerifyCredentials:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Admin\Accounts:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Admin\Reports:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Announcements:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Apps:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Apps\VerifyCredentials:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Blocks:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Bookmarks:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Conversations:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Conversations\Read:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\CustomEmojis:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Directory:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Endorsements:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Favourited:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Filters:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\FollowRequests:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\FollowedTags:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Instance:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\InstanceV2:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Instance\ExtendedDescription:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Instance\Peers:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Instance\Rules:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Lists:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Lists\Accounts:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Markers:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Media:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Mutes:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Notifications:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Notifications\Clear:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Notifications\Dismiss:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Polls:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Preferences:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Proofs:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\PushSubscription:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Reports:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\ScheduledStatuses:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Search:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Bookmark:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Card:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Context:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Favourite:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\FavouritedBy:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Mute:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Pin:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Reblog:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\RebloggedBy:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Source:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Unbookmark:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Unfavourite:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Unmute:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Unpin:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Unreblog:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Suggestions:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Tags:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Tags\Follow:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Tags\Unfollow:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Timelines\Direct:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Timelines\Home:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Timelines\ListTimeline:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Timelines\PublicTimeline:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Timelines\Tag:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Trends\Links:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Trends\Statuses:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Trends\Tags:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Unimplemented:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Account\RateLimitStatus:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Account\UpdateProfile:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Account\UpdateProfileImage:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Account\VerifyCredentials:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Blocks\Ids:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Blocks\Lists:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\ContactEndpoint:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\DirectMessagesEndpoint:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\DirectMessages\All:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\DirectMessages\Conversation:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\DirectMessages\Destroy:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\DirectMessages\Inbox:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\DirectMessages\NewDM:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\DirectMessages\Sent:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Favorites:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Favorites\Create:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Favorites\Destroy:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Followers\Ids:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Followers\Lists:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Friends\Ids:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Friends\Lists:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Friendships\Destroy:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Friendships\Incoming:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Friendships\Show:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Lists\Create:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Lists\Destroy:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Lists\Lists:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Lists\Ownership:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Lists\Statuses:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Lists\Update:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Media\Metadata\Create:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Media\Upload:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\SavedSearches:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Search\Tweets:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Statuses\Destroy:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Statuses\HomeTimeline:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Statuses\Mentions:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Statuses\NetworkPublicTimeline:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Statuses\PublicTimeline:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Statuses\Retweet:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Statuses\Show:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Statuses\Update:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Statuses\UserTimeline:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Users\Lookup:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Users\Search:
+      - Friendica\DI
+    Friendica\Module\Api\Twitter\Users\Show:
+      - Friendica\DI
+    Friendica\Module\Apps:
+      - Friendica\DI
+    Friendica\Module\Attach:
+      - Friendica\DI
+    Friendica\Module\BaseAdmin:
+      - Friendica\DI
+    Friendica\Module\BaseApi:
+      - Friendica\DI
+    Friendica\Module\BaseModeration:
+      - Friendica\DI
+    Friendica\Module\BaseNotifications:
+      - Friendica\DI
+    Friendica\Module\BaseProfile:
+      - Friendica\DI
+    Friendica\Module\BaseSearch:
+      - Friendica\DI
+    Friendica\Module\BaseSettings:
+      - Friendica\DI
+    Friendica\Module\Blocklist\Domain\Download:
+      - Friendica\DI
+    Friendica\Module\Bookmarklet:
+      - Friendica\DI
+    Friendica\Module\Calendar\Event\API:
+      - Friendica\DI
+    Friendica\Module\Calendar\Event\Form:
+      - Friendica\DI
+    Friendica\Module\Calendar\Event\Get:
+      - Friendica\DI
+    Friendica\Module\Calendar\Event\Show:
+      - Friendica\DI
+    Friendica\Module\Calendar\Export:
+      - Friendica\DI
+    Friendica\Module\Calendar\Show:
+      - Friendica\DI
+    Friendica\Module\Circle:
+      - Friendica\DI
+    Friendica\Module\Contact:
+      - Friendica\DI
+    Friendica\Module\Contact\Activities:
+      - Friendica\DI
+    Friendica\Module\Contact\Advanced:
+      - Friendica\DI
+    Friendica\Module\Contact\BasePosts:
+      - Friendica\DI
+    Friendica\Module\Contact\Contacts:
+      - Friendica\DI
+    Friendica\Module\Contact\Conversations:
+      - Friendica\DI
+    Friendica\Module\Contact\Follow:
+      - Friendica\DI
+    Friendica\Module\Contact\Hovercard:
+      - Friendica\DI
+    Friendica\Module\Contact\MatchInterests:
+      - Friendica\DI
+    Friendica\Module\Contact\Media:
+      - Friendica\DI
+    Friendica\Module\Contact\Original:
+      - Friendica\DI
+    Friendica\Module\Contact\Posts:
+      - Friendica\DI
+    Friendica\Module\Contact\Profile:
+      - Friendica\DI
+    Friendica\Module\Contact\Quotes:
+      - Friendica\DI
+    Friendica\Module\Contact\Redir:
+      - Friendica\DI
+    Friendica\Module\Contact\Reshares:
+      - Friendica\DI
+    Friendica\Module\Contact\Revoke:
+      - Friendica\DI
+    Friendica\Module\Contact\Suggestions:
+      - Friendica\DI
+    Friendica\Module\Contact\Unfollow:
+      - Friendica\DI
+    Friendica\Module\Conversation\Channel:
+      - Friendica\DI
+    Friendica\Module\Conversation\Community:
+      - Friendica\DI
+    Friendica\Module\Conversation\Network:
+      - Friendica\DI
+    Friendica\Module\Conversation\Timeline:
+      - Friendica\DI
+    Friendica\Module\Credits:
+      - Friendica\DI
+    Friendica\Module\DFRN\Notify:
+      - Friendica\DI
+    Friendica\Module\Debug\ActivityPubConversion:
+      - Friendica\DI
+    Friendica\Module\Debug\Babel:
+      - Friendica\DI
+    Friendica\Module\Debug\Feed:
+      - Friendica\DI
+    Friendica\Module\Debug\ItemBody:
+      - Friendica\DI
+    Friendica\Module\Debug\Localtime:
+      - Friendica\DI
+    Friendica\Module\Debug\Probe:
+      - Friendica\DI
+    Friendica\Module\Debug\WebFinger:
+      - Friendica\DI
+    Friendica\Module\Deck:
+      - Friendica\DI
+    Friendica\Module\Diaspora\Fetch:
+      - Friendica\DI
+    Friendica\Module\Diaspora\Receive:
+      - Friendica\DI
+    Friendica\Module\Directory:
+      - Friendica\DI
+    Friendica\Module\Feed:
+      - Friendica\DI
+    Friendica\Module\Filer\RemoveTag:
+      - Friendica\DI
+    Friendica\Module\Filer\SaveTag:
+      - Friendica\DI
+    Friendica\Module\FollowConfirm:
+      - Friendica\DI
+    Friendica\Module\FriendSuggest:
+      - Friendica\DI
+    Friendica\Module\Friendica:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Module\Group:
+      - Friendica\DI
+    Friendica\Module\Groups:
+      - Friendica\DI
+    Friendica\Module\Groups\Discover:
+      - Friendica\DI
+    Friendica\Module\HCard:
+      - Friendica\DI
+    Friendica\Module\HTTPException\MethodNotAllowed:
+      - Friendica\DI
+    Friendica\Module\HTTPException\PageNotFound:
+      - Friendica\DI
+    Friendica\Module\Hashtag:
+      - Friendica\DI
+    Friendica\Module\Help:
+      - Friendica\DI
+    Friendica\Module\Home:
+      - Friendica\DI
+    Friendica\Module\Install:
+      - Friendica\DI
+    Friendica\Module\Invite:
+      - Friendica\DI
+    Friendica\Module\Item\Activity:
+      - Friendica\DI
+    Friendica\Module\Item\Comment:
+      - Friendica\DI
+    Friendica\Module\Item\Comments:
+      - Friendica\DI
+    Friendica\Module\Item\Complete:
+      - Friendica\DI
+    Friendica\Module\Item\Compose:
+      - Friendica\DI
+    Friendica\Module\Item\Display:
+      - Friendica\DI
+    Friendica\Module\Item\Feed:
+      - Friendica\DI
+    Friendica\Module\Item\Follow:
+      - Friendica\DI
+    Friendica\Module\Item\Ignore:
+      - Friendica\DI
+    Friendica\Module\Item\Interactions:
+      - Friendica\DI
+    Friendica\Module\Item\Language:
+      - Friendica\DI
+    Friendica\Module\Item\Node:
+      - Friendica\DI
+    Friendica\Module\Item\Pin:
+      - Friendica\DI
+    Friendica\Module\Item\Searchtext:
+      - Friendica\DI
+    Friendica\Module\Item\Star:
+      - Friendica\DI
+    Friendica\Module\LostPass:
+      - Friendica\DI
+    Friendica\Module\Magic:
+      - Friendica\DI
+    Friendica\Module\Maintenance:
+      - Friendica\DI
+    Friendica\Module\Manifest:
+      - Friendica\DI
+    Friendica\Module\Media\Attachment\Browser:
+      - Friendica\DI
+    Friendica\Module\Media\Attachment\Upload:
+      - Friendica\DI
+    Friendica\Module\Media\BaseBrowser:
+      - Friendica\DI
+    Friendica\Module\Media\Photo\Browser:
+      - Friendica\DI
+    Friendica\Module\Media\Photo\Upload:
+      - Friendica\DI
+    Friendica\Module\Moderation\BaseUsers:
+      - Friendica\DI
+    Friendica\Module\Moderation\Blocklist\Contact:
+      - Friendica\DI
+    Friendica\Module\Moderation\Blocklist\Contact\Export:
+      - Friendica\DI
+    Friendica\Module\Moderation\Blocklist\Contact\Import:
+      - Friendica\DI
+    Friendica\Module\Moderation\Blocklist\Server\Add:
+      - Friendica\DI
+    Friendica\Module\Moderation\Blocklist\Server\Import:
+      - Friendica\DI
+    Friendica\Module\Moderation\Blocklist\Server\Index:
+      - Friendica\DI
+    Friendica\Module\Moderation\Item\Delete:
+      - Friendica\DI
+    Friendica\Module\Moderation\Item\Source:
+      - Friendica\DI
+    Friendica\Module\Moderation\Report\Create:
+      - Friendica\DI
+    Friendica\Module\Moderation\Reports:
+      - Friendica\DI
+    Friendica\Module\Moderation\Summary:
+      - Friendica\DI
+    Friendica\Module\Moderation\Users\Active:
+      - Friendica\DI
+    Friendica\Module\Moderation\Users\Blocked:
+      - Friendica\DI
+    Friendica\Module\Moderation\Users\Create:
+      - Friendica\DI
+    Friendica\Module\Moderation\Users\Deleted:
+      - Friendica\DI
+    Friendica\Module\Moderation\Users\Index:
+      - Friendica\DI
+    Friendica\Module\Moderation\Users\Pending:
+      - Friendica\DI
+    Friendica\Module\NoScrape:
+      - Friendica\DI
+    Friendica\Module\NodeInfo110:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Module\NodeInfo120:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Module\NodeInfo121:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Module\NodeInfo122:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Module\NodeInfo210:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Module\Notifications\Introductions:
+      - Friendica\DI
+    Friendica\Module\Notifications\Notification:
+      - Friendica\DI
+    Friendica\Module\Notifications\Notifications:
+      - Friendica\DI
+    Friendica\Module\Notifications\Ping:
+      - Friendica\DI
+    Friendica\Module\Notifications\Stream:
+      - Friendica\DI
+    Friendica\Module\OAuth\Acknowledge:
+      - Friendica\DI
+    Friendica\Module\OAuth\Authorize:
+      - Friendica\DI
+    Friendica\Module\OAuth\Revoke:
+      - Friendica\DI
+    Friendica\Module\OAuth\Token:
+      - Friendica\DI
+    Friendica\Module\OpenSearch:
+      - Friendica\DI
+    Friendica\Module\Owa:
+      - Friendica\DI
+    Friendica\Module\ParseUrl:
+      - Friendica\DI
+    Friendica\Module\Photo:
+      - Friendica\DI
+    Friendica\Module\Ping\Contact:
+      - Friendica\DI
+    Friendica\Module\Ping\Network:
+      - Friendica\DI
+    Friendica\Module\Ping\Notifications:
+      - Friendica\DI
+    Friendica\Module\Ping\Search:
+      - Friendica\DI
+    Friendica\Module\Post\Edit:
+      - Friendica\DI
+    Friendica\Module\Post\Share:
+      - Friendica\DI
+    Friendica\Module\Post\Tag\Add:
+      - Friendica\DI
+    Friendica\Module\Post\Tag\Remove:
+      - Friendica\DI
+    Friendica\Module\Privacy\PermissionTooltip:
+      - Friendica\DI
+    Friendica\Module\Profile\CircleExport:
+      - Friendica\DI
+    Friendica\Module\Profile\Common:
+      - Friendica\DI
+    Friendica\Module\Profile\Contacts:
+      - Friendica\DI
+    Friendica\Module\Profile\Conversations:
+      - Friendica\DI
+    Friendica\Module\Profile\Index:
+      - Friendica\DI
+    Friendica\Module\Profile\Notes:
+      - Friendica\DI
+    Friendica\Module\Profile\Photos:
+      - Friendica\DI
+    Friendica\Module\Profile\Posts:
+      - Friendica\DI
+    Friendica\Module\Profile\Profile:
+      - Friendica\DI
+    Friendica\Module\Profile\RemoteFollow:
+      - Friendica\DI
+    Friendica\Module\Profile\Restricted:
+      - Friendica\DI
+    Friendica\Module\Profile\Schedule:
+      - Friendica\DI
+    Friendica\Module\RandomProfile:
+      - Friendica\DI
+    Friendica\Module\ReallySimpleDiscovery:
+      - Friendica\DI
+    Friendica\Module\Register:
+      - Friendica\DI
+    Friendica\Module\RobotsTxt:
+      - Friendica\DI
+    Friendica\Module\Search\Acl:
+      - Friendica\DI
+    Friendica\Module\Search\Directory:
+      - Friendica\DI
+    Friendica\Module\Search\Filed:
+      - Friendica\DI
+    Friendica\Module\Search\Index:
+      - Friendica\DI
+    Friendica\Module\Search\Saved:
+      - Friendica\DI
+    Friendica\Module\Search\Tags:
+      - Friendica\DI
+    Friendica\Module\Security\Login:
+      - Friendica\DI
+    Friendica\Module\Security\Logout:
+      - Friendica\DI
+    Friendica\Module\Security\OpenID:
+      - Friendica\DI
+    Friendica\Module\Security\PasswordTooLong:
+      - Friendica\DI
+    Friendica\Module\Security\TwoFactor\Recovery:
+      - Friendica\DI
+    Friendica\Module\Security\TwoFactor\SignOut:
+      - Friendica\DI
+    Friendica\Module\Security\TwoFactor\Trust:
+      - Friendica\DI
+    Friendica\Module\Security\TwoFactor\Verify:
+      - Friendica\DI
+    Friendica\Module\Settings\Account:
+      - Friendica\DI
+    Friendica\Module\Settings\Addons:
+      - Friendica\DI
+    Friendica\Module\Settings\Attachments:
+      - Friendica\DI
+    Friendica\Module\Settings\Channels:
+      - Friendica\DI
+    Friendica\Module\Settings\Connectors:
+      - Friendica\DI
+    Friendica\Module\Settings\ContactImport:
+      - Friendica\DI
+    Friendica\Module\Settings\Delegation:
+      - Friendica\DI
+    Friendica\Module\Settings\Display:
+      - Friendica\DI
+    Friendica\Module\Settings\Features:
+      - Friendica\DI
+    Friendica\Module\Settings\OAuth:
+      - Friendica\DI
+    Friendica\Module\Settings\Profile\Index:
+      - Friendica\DI
+    Friendica\Module\Settings\Profile\Photo\Crop:
+      - Friendica\DI
+    Friendica\Module\Settings\Profile\Photo\Index:
+      - Friendica\DI
+    Friendica\Module\Settings\RemoveMe:
+      - Friendica\DI
+    Friendica\Module\Settings\Server\Action:
+      - Friendica\DI
+    Friendica\Module\Settings\Server\Index:
+      - Friendica\DI
+    Friendica\Module\Settings\TrustedHosts\Add:
+      - Friendica\DI
+    Friendica\Module\Settings\TrustedHosts\Index:
+      - Friendica\DI
+    Friendica\Module\Settings\TwoFactor\AppSpecific:
+      - Friendica\DI
+    Friendica\Module\Settings\TwoFactor\Index:
+      - Friendica\DI
+    Friendica\Module\Settings\TwoFactor\Recovery:
+      - Friendica\DI
+    Friendica\Module\Settings\TwoFactor\Trusted:
+      - Friendica\DI
+    Friendica\Module\Settings\TwoFactor\Verify:
+      - Friendica\DI
+    Friendica\Module\Settings\UserExport:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Module\Smilies:
+      - Friendica\DI
+    Friendica\Module\Special\DisplayNotFound:
+      - Friendica\DI
+    Friendica\Module\Special\Options:
+      - Friendica\DI
+    Friendica\Module\Statistics:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Module\Stats:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Module\StatsCaching:
+      - Friendica\DI
+    Friendica\Module\Theme:
+      - Friendica\DI
+    Friendica\Module\ThemeDetails:
+      - Friendica\DI
+    Friendica\Module\ToggleMobile:
+      - Friendica\DI
+    Friendica\Module\Tos:
+      - Friendica\DI
+    Friendica\Module\Update\Channel:
+      - Friendica\DI
+    Friendica\Module\Update\Community:
+      - Friendica\DI
+    Friendica\Module\Update\Contact:
+      - Friendica\DI
+    Friendica\Module\Update\Display:
+      - Friendica\DI
+    Friendica\Module\Update\Network:
+      - Friendica\DI
+    Friendica\Module\Update\Notes:
+      - Friendica\DI
+    Friendica\Module\Update\Notifications:
+      - Friendica\DI
+    Friendica\Module\Update\Profile:
+      - Friendica\DI
+    Friendica\Module\Update\Search:
+      - Friendica\DI
+    Friendica\Module\User\Delegation:
+      - Friendica\DI
+    Friendica\Module\User\Import:
+      - Friendica\DI
+    Friendica\Module\User\PortableContacts:
+      - Friendica\DI
+    Friendica\Module\Welcome:
+      - Friendica\DI
+    Friendica\Module\WellKnown\NodeInfo:
+      - Friendica\DI
+    Friendica\Module\WellKnown\SecurityTxt:
+      - Friendica\DI
+    Friendica\Module\WellKnown\XSocialRelay:
+      - Friendica\DI
+    Friendica\Module\Xrd:
+      - Friendica\DI
     Friendica\Navigation\Notifications\Entity\Notify:
       - Friendica\Content\Text\BBCode
     Friendica\Navigation\Notifications\Factory\FormattedNavNotification:
@@ -330,8 +1187,13 @@ deptrac:
       - Friendica\Factory\Api\Mastodon\Notification
       - Friendica\Object\Api\Mastodon\Notification
       - Friendica\Protocol\Activity
+    Friendica\Network\HTTPClient\Client\HttpClient:
+      - Friendica\App
+    Friendica\Network\HTTPClient\Response\GuzzleResponse:
+      - Friendica\DI
     Friendica\Network\Probe:
       - Friendica\Content\Text\HTML
+      - Friendica\DI
       - Friendica\Model\Contact
       - Friendica\Model\GServer
       - Friendica\Model\Profile
@@ -342,6 +1204,12 @@ deptrac:
       - Friendica\Protocol\Diaspora
       - Friendica\Protocol\Email
       - Friendica\Protocol\Feed
+    Friendica\Object\Api\Mastodon\Instance:
+      - Friendica\App
+    Friendica\Object\Api\Mastodon\Stats:
+      - Friendica\DI
+    Friendica\Object\Image:
+      - Friendica\DI
     Friendica\Profile\ProfileField\Entity\ProfileField:
       - Friendica\Security\PermissionSet\Entity\PermissionSet
     Friendica\Profile\ProfileField\Factory\ProfileField:
@@ -349,22 +1217,78 @@ deptrac:
       - Friendica\Security\PermissionSet\Factory\PermissionSet
     Friendica\Profile\ProfileField\Repository\ProfileField:
       - Friendica\Security\PermissionSet\Repository\PermissionSet
+    Friendica\Protocol\ATProtocol\DID:
+      - Friendica\DI
+    Friendica\Protocol\ActivityPub:
+      - Friendica\DI
+    Friendica\Protocol\ActivityPub\ClientToServer:
+      - Friendica\DI
+    Friendica\Protocol\ActivityPub\Delivery:
+      - Friendica\DI
+    Friendica\Protocol\ActivityPub\Fetch:
+      - Friendica\DI
+    Friendica\Protocol\ActivityPub\Processor:
+      - Friendica\DI
+    Friendica\Protocol\ActivityPub\Queue:
+      - Friendica\DI
+    Friendica\Protocol\ActivityPub\Receiver:
+      - Friendica\DI
+    Friendica\Protocol\ActivityPub\Transmitter:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Protocol\DFRN:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Protocol\Delivery:
+      - Friendica\DI
+    Friendica\Protocol\Diaspora:
+      - Friendica\DI
+    Friendica\Protocol\Email:
+      - Friendica\DI
+    Friendica\Protocol\Feed:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Protocol\Relay:
+      - Friendica\DI
+    Friendica\Protocol\ZOT:
+      - Friendica\App
+      - Friendica\DI
+    Friendica\Render\FriendicaSmartyEngine:
+      - Friendica\DI
+    Friendica\Security\Authentication:
+      - Friendica\DI
+    Friendica\Security\BasicAuth:
+      - Friendica\DI
+    Friendica\Security\ExAuth:
+      - Friendica\DI
     Friendica\Security\OAuth:
+      - Friendica\DI
       - Friendica\Module\BaseApi
+    Friendica\Security\OpenWebAuth:
+      - Friendica\DI
+    Friendica\Security\Security:
+      - Friendica\DI
     Friendica\User\Settings\Repository\UserGServer:
       - Friendica\Content\Pager
     Friendica\Util\ACLFormatter:
       - Friendica\Model\Circle
+    Friendica\Util\Crypto:
+      - Friendica\DI
+    Friendica\Util\DateTimeFormat:
+      - Friendica\DI
     Friendica\Util\EMailer\MailBuilder:
+      - Friendica\App
       - Friendica\Model\User
       - Friendica\Object\EMail\IEmail
       - Friendica\Object\Email
     Friendica\Util\EMailer\NotifyMailBuilder:
+      - Friendica\App
       - Friendica\Content\Text\BBCode
       - Friendica\Model\User
       - Friendica\Object\EMail\IEmail
       - Friendica\Object\Email
     Friendica\Util\EMailer\SystemMailBuilder:
+      - Friendica\App
       - Friendica\Content\Text\BBCode
       - Friendica\Model\User
       - Friendica\Object\EMail\IEmail
@@ -373,6 +1297,7 @@ deptrac:
       - Friendica\Object\EMail\IEmail
       - Friendica\Protocol\Email
     Friendica\Util\HTTPSignature:
+      - Friendica\DI
       - Friendica\Model\APContact
       - Friendica\Model\Contact
       - Friendica\Model\GServer
@@ -381,20 +1306,141 @@ deptrac:
       - Friendica\Model\User
       - Friendica\Protocol\ActivityPub\Receiver
     Friendica\Util\Images:
+      - Friendica\DI
       - Friendica\Model\Photo
       - Friendica\Object\Image
     Friendica\Util\JsonLD:
+      - Friendica\DI
       - Friendica\Protocol\ActivityPub
     Friendica\Util\LDSignature:
+      - Friendica\DI
       - Friendica\Model\APContact
+    Friendica\Util\Map:
+      - Friendica\DI
     Friendica\Util\Network:
+      - Friendica\DI
       - Friendica\Model\Contact
     Friendica\Util\ParseUrl:
       - Friendica\Content\Text\BBCode
       - Friendica\Content\Text\HTML
+      - Friendica\DI
       - Friendica\Model\Post\Media
       - Friendica\Protocol\HTTP\MediaType
     Friendica\Util\Proxy:
       - Friendica\Content\Text\BBCode
+      - Friendica\DI
     Friendica\Util\Strings:
       - Friendica\Content\ContactSelector
+      - Friendica\DI
+    Friendica\Util\Temporal:
+      - Friendica\DI
+    Friendica\Util\Writer\DbaDefinitionSqlWriter:
+      - Friendica\App
+    Friendica\Util\XML:
+      - Friendica\DI
+    Friendica\Worker\APDelivery:
+      - Friendica\DI
+    Friendica\Worker\AddContact:
+      - Friendica\DI
+    Friendica\Worker\BulkDelivery:
+      - Friendica\DI
+    Friendica\Worker\CheckRelMeProfileLink:
+      - Friendica\DI
+    Friendica\Worker\CheckVersion:
+      - Friendica\DI
+    Friendica\Worker\ClearCache:
+      - Friendica\DI
+    Friendica\Worker\ContactDiscovery:
+      - Friendica\DI
+    Friendica\Worker\ContactDiscoveryForUser:
+      - Friendica\DI
+    Friendica\Worker\Contact\BlockByUrl:
+      - Friendica\DI
+    Friendica\Worker\Contact\Remove:
+      - Friendica\DI
+    Friendica\Worker\Contact\RemoveContent:
+      - Friendica\DI
+    Friendica\Worker\Cron:
+      - Friendica\DI
+    Friendica\Worker\DBUpdate:
+      - Friendica\DI
+    Friendica\Worker\DelayedPublish:
+      - Friendica\DI
+    Friendica\Worker\Directory:
+      - Friendica\DI
+    Friendica\Worker\DiscoverGroup:
+      - Friendica\DI
+    Friendica\Worker\Expire:
+      - Friendica\DI
+    Friendica\Worker\ExpireAndRemoveUsers:
+      - Friendica\DI
+    Friendica\Worker\ExpirePosts:
+      - Friendica\DI
+    Friendica\Worker\ExpireReports:
+      - Friendica\DI
+    Friendica\Worker\FetchFeaturedPosts:
+      - Friendica\DI
+    Friendica\Worker\FetchMissingActivity:
+      - Friendica\DI
+    Friendica\Worker\FetchMissingReplies:
+      - Friendica\DI
+    Friendica\Worker\FetchOutbox:
+      - Friendica\DI
+    Friendica\Worker\FixContacts:
+      - Friendica\DI
+    Friendica\Worker\MergeContact:
+      - Friendica\DI
+    Friendica\Worker\MoveStorage:
+      - Friendica\DI
+    Friendica\Worker\NodeInfo:
+      - Friendica\DI
+    Friendica\Worker\Notifier:
+      - Friendica\DI
+    Friendica\Worker\OnePoll:
+      - Friendica\DI
+    Friendica\Worker\OptimizeTables:
+      - Friendica\DI
+    Friendica\Worker\PollContacts:
+      - Friendica\DI
+    Friendica\Worker\ProcessQueue:
+      - Friendica\DI
+    Friendica\Worker\ProcessReplyByUri:
+      - Friendica\DI
+    Friendica\Worker\ProcessUnprocessedEntries:
+      - Friendica\DI
+    Friendica\Worker\ProfileUpdate:
+      - Friendica\DI
+    Friendica\Worker\PullDirectory:
+      - Friendica\DI
+    Friendica\Worker\PushSubscription:
+      - Friendica\DI
+    Friendica\Worker\RemoveUnusedAvatars:
+      - Friendica\DI
+    Friendica\Worker\RemoveUnusedContacts:
+      - Friendica\DI
+    Friendica\Worker\SearchDirectory:
+      - Friendica\DI
+    Friendica\Worker\SetSeen:
+      - Friendica\DI
+    Friendica\Worker\SpoolPost:
+      - Friendica\DI
+    Friendica\Worker\UpdateBlockedServers:
+      - Friendica\DI
+    Friendica\Worker\UpdateChannelPosts:
+      - Friendica\DI
+    Friendica\Worker\UpdateContact:
+      - Friendica\DI
+    Friendica\Worker\UpdateContacts:
+      - Friendica\DI
+    Friendica\Worker\UpdateGServer:
+      - Friendica\DI
+    Friendica\Worker\UpdateGServers:
+      - Friendica\DI
+    Friendica\Worker\UpdateScores:
+      - Friendica\DI
+    Friendica\Worker\UpdateServerDirectories:
+      - Friendica\DI
+    Friendica\Worker\UpdateServerDirectory:
+      - Friendica\DI
+    Friendica\Worker\UpdateServerPeers:
+      - Friendica\DI

@@ -227,6 +227,7 @@ Today's violations are frozen in `deptrac-baseline.yaml`, so only new ones fail.
 If you remove one, deptrac reports the stale entry; run `composer run deptrac:generate-baseline` and commit the result.
 Never add a baseline entry by hand.
 A new top-level folder in `src/` needs a layer in `deptrac.yaml`, otherwise the check fails.
+The composition root (`DI`, `App`, `Core\Console`) may use every tier, but nothing may use it, so a new class calling `DI::` fails as well.
 
 **Frozen folders:** `src/Object/`, `src/Factory/` and `src/Collection/` may shrink, never grow.
 New factories, collections and typed objects go next to their feature (`src/<Feature>/Factory/`, …), enforced by `tests/Unit/Architecture/FrozenNamespaceTest.php`.
