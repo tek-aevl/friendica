@@ -55,7 +55,7 @@
 		"npm-asset/chart.js": "^2.8",
 		"npm-asset/cropperjs": "1.2.2",
 		"npm-asset/unpoly": "^3.14.0",
-		"npm-asset/dompurify": "^1.0",
+		"npm-asset/dompurify": "^3.4.17",
 		"npm-asset/es-jquery-sortable": "^0.9.13",
 		"npm-asset/fullcalendar": "^3.10",
 		"npm-asset/imagesloaded": "4.1.4",
