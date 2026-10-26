@@ -70,7 +70,7 @@ class DatabaseCache extends AbstractCache implements ICanCache
 
 			if ($this->dba->isResult($cache)) {
 				$cached = $cache['v'];
-				$value  = @unserialize($cached, ['allowed_classes' => false]);
+				$value  = @unserialize($cached, ['allowed_classes' => [\stdClass::class]]);
 
 				// Only return a value if the serialized value is valid.
 				// We also check if the db entry is a serialized
