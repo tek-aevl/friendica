@@ -193,6 +193,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🫫",
+                "v": 18,
                 "title": "cracking face"
             },
             {
@@ -493,6 +494,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🫪",
+                "v": 17,
                 "title": "distorted face"
             },
             {
@@ -789,6 +791,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🫯",
+                "v": 17,
                 "title": "fight cloud"
             },
             {
@@ -984,11 +987,13 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🫹",
+                "v": 18,
                 "title": "leftwards thumb sign",
                 "tone": true
             },
             {
                 "emoji": "🫺",
+                "v": 18,
                 "title": "rightwards thumb sign",
                 "tone": true
             },
@@ -1995,6 +2000,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🫈",
+                "v": 17,
                 "title": "hairy creature"
             },
             {
@@ -2224,6 +2230,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🧑‍🩰",
+                "v": 17,
                 "title": "ballet dancer",
                 "tone": true
             },
@@ -3133,6 +3140,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🫍",
+                "v": 17,
                 "title": "orca"
             },
             {
@@ -3201,6 +3209,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🫌",
+                "v": 18,
                 "title": "monarch butterfly"
             },
             {
@@ -3491,6 +3500,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🫝",
+                "v": 18,
                 "title": "pickle"
             },
             {
@@ -4287,6 +4297,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🛘",
+                "v": 17,
                 "title": "landslide"
             },
             {
@@ -4719,6 +4730,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🛙",
+                "v": 18,
                 "title": "lighthouse"
             },
             {
@@ -5119,6 +5131,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🪋",
+                "v": 18,
                 "title": "meteor"
             },
             {
@@ -5405,6 +5418,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🪊",
+                "v": 17,
                 "title": "trombone"
             },
             {
@@ -5669,6 +5683,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🪎",
+                "v": 17,
                 "title": "treasure chest"
             },
             {
@@ -5785,6 +5800,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🪌",
+                "v": 18,
                 "title": "eraser"
             },
             {
@@ -5905,6 +5921,7 @@ const EmojiPicker = function(options) {
             },
             {
                 "emoji": "🪍",
+                "v": 18,
                 "title": "net with handle"
             },
             {
@@ -8226,6 +8243,52 @@ const EmojiPicker = function(options) {
 
     const functions = {
 
+        // Emojis of recent Unicode versions ("v" in the data) are only shown if the system can draw them.
+        // An unsupported emoji is drawn as an empty box (gray) or as its parts (wider), a supported one is a single coloured glyph.
+        supportCache: {},
+
+        isSupported: (emoji, version) => {
+            if (!version) {
+                return true;
+            }
+
+            if (functions.supportCache[emoji] !== undefined) {
+                return functions.supportCache[emoji];
+            }
+
+            let supported = true;
+            try {
+                const size = 32;
+                const canvas = document.createElement('canvas');
+                canvas.width = size * 3;
+                canvas.height = size * 2;
+                const context = canvas.getContext('2d', {willReadFrequently: true});
+                context.textBaseline = 'top';
+                context.font = size + 'px sans-serif';
+
+                // Sequences like the ballet dancer fall apart into several glyphs when unsupported
+                const parts = Array.from(emoji).filter(part => part !== '\u200D' && part !== '\uFE0F');
+                const singleWidth = context.measureText(parts[0]).width;
+                let coloured = false;
+                if (context.measureText(emoji).width < singleWidth * 1.5) {
+                    context.fillText(emoji, 0, 0);
+                    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+                    for (let i = 0; i < pixels.length; i += 4) {
+                        if (pixels[i + 3] > 0 && (pixels[i] !== pixels[i + 1] || pixels[i + 1] !== pixels[i + 2])) {
+                            coloured = true;
+                            break;
+                        }
+                    }
+                }
+                supported = coloured;
+            } catch (e) {
+                // Canvas not available, show the emoji and hope for the best
+            }
+
+            functions.supportCache[emoji] = supported;
+            return supported;
+        },
+
         loadUsage: () => {
             try {
                 const usage = JSON.parse(window.localStorage.getItem(frequentStorageKey));
@@ -8238,10 +8301,10 @@ const EmojiPicker = function(options) {
         recordUsage: (emoji) => {
             try {
                 const usage = functions.loadUsage();
-                usage[emoji] = {c: ((usage[emoji] && usage[emoji].c) || 0) + 1, t: Date.now()};
 
-                // Let old favourites fade out by halving all counters once the total gets too high
-                let total = 0;
+                // Let old favourites fade out by halving all counters once the total gets too high.
+                // This happens before counting the new use, so the emoji just picked can't fade out itself.
+                let total = 1;
                 Object.keys(usage).forEach(key => total += usage[key].c);
                 if (total > frequentMaxTotal) {
                     Object.keys(usage).forEach(key => {
@@ -8251,6 +8314,8 @@ const EmojiPicker = function(options) {
                         }
                     });
                 }
+
+                usage[emoji] = {c: ((usage[emoji] && usage[emoji].c) || 0) + 1, t: Date.now()};
 
                 window.localStorage.setItem(frequentStorageKey, JSON.stringify(usage));
             } catch (e) {
@@ -8317,7 +8382,7 @@ const EmojiPicker = function(options) {
 
             const usage = functions.loadUsage();
             return Object.keys(usage)
-                .filter(emoji => titles[emoji] && usage[emoji].c > 0)
+                .filter(emoji => titles[emoji] && usage[emoji].c > 0 && functions.isSupported(emoji, titles[emoji].v))
                 .sort((a, b) => (usage[b].c - usage[a].c) || (usage[b].t - usage[a].t))
                 .slice(0, frequentMaxItems)
                 .map(emoji => ({emoji: emoji, title: titles[emoji].title, tone: titles[emoji].tone}));
@@ -8474,7 +8539,8 @@ const EmojiPicker = function(options) {
                         border: none;
                         box-shadow: 0 0 0 0;
                         outline: none;
-                        width: calc(100% - 115px);
+                        box-sizing: border-box;
+                        width: 100%;
                         display: block;
                         padding: 10px 100px 10px 15px;
                         background-color: #f3f3f3;
@@ -8579,7 +8645,7 @@ const EmojiPicker = function(options) {
 
                         emojiesHTML += `<div class="fg-emoji-picker-category-wrapper" id="${key}">`;
                             emojiesHTML += `<p class="fg-emoji-picker-category-title">${categoryTitle(key)}</p>`;
-                            categoryObj.forEach(ej => {
+                            categoryObj.filter(ej => functions.isSupported(ej.emoji, ej.v)).forEach(ej => {
                                 emojiesHTML += `<li data-title="${ej.title.toLowerCase()}">
                                     <a title="${ej.title}" href="#"${ej.tone ? ` data-base="${ej.emoji}"` : ''}>${ej.emoji}</a>
                                 </li>`;
