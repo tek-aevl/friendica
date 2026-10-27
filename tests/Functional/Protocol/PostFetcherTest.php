@@ -10,6 +10,13 @@ declare(strict_types=1);
 namespace Friendica\Test\Functional\Protocol;
 
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
+use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
+use Friendica\Post\LinkResolver;
+use Friendica\Protocol\PostFetcher;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\NullLogger;
 use Friendica\Test\FixtureTestCase;
 
 class PostFetcherTest extends FixtureTestCase
@@ -38,5 +45,31 @@ class PostFetcherTest extends FixtureTestCase
 	public function testGetQuoteUriIdFindsSharedPostByMessageId(): void
 	{
 		self::assertSame(1, DI::postFetcher()->getQuoteUriId('[share]1[/share]', self::UID));
+	}
+
+	public static function hookItemIdProvider(): array
+	{
+		return [
+			'int'            => [7, 7],
+			'numeric string' => ['7', 7],
+			'garbage'        => ['abc', 0],
+		];
+	}
+
+	#[DataProvider('hookItemIdProvider')]
+	public function testFetchByLinkUsesAddonResultWithoutNetwork(mixed $hookItemId, int $expected): void
+	{
+		$dispatcher = $this->createStub(EventDispatcherInterface::class);
+		$dispatcher->method('dispatch')->willReturnCallback(function (ArrayFilterEvent $event) use ($hookItemId): ArrayFilterEvent {
+			$event->setArray(['item_id' => $hookItemId] + $event->getArray());
+			return $event;
+		});
+
+		$httpClient = $this->createMock(ICanSendHttpRequests::class);
+		$httpClient->expects(self::never())->method('head');
+
+		$fetcher = new PostFetcher(new LinkResolver(), new NullLogger(), $dispatcher, $httpClient);
+
+		self::assertSame($expected, $fetcher->fetchByLink('https://remote.example/unknown/1', self::UID));
 	}
 }
