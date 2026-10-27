@@ -123,6 +123,10 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 	// The language is only changed when it had been chosen manually
 	if (($post['language'] ?? '') !== $old_language) {
 		$fields['language'] = $post['language'];
+	} elseif (($request['language'] ?? '') === L10n::UNDETERMINED_LANGUAGE) {
+		// "Auto" has been chosen: Detect the language of the edited text again
+		$content            = trim($post['title'] . ' ' . $post['content-warning'] . ' ' . $fields['body']);
+		$fields['language'] = json_encode(DI::contentItem()->getLanguageArray($content, 3, $post['uri-id'], $post['author-id']));
 	}
 
 	$fields['body'] = Item::setHashtags($fields['body']);

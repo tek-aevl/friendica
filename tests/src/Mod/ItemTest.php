@@ -215,6 +215,26 @@ class ItemTest extends ApiTestCase
 		}
 	}
 
+	public function testItemEditWithAutoLanguageDetectsLanguageAgain(): void
+	{
+		Post::update(['language' => json_encode(['de' => 1])], ['id' => 1]);
+
+		$header = $this->mockRedirectHeader();
+		$header->expects(self::once())->with('Location: https://friendica.local/network');
+
+		$body = 'This is a completely English text that was edited, so the language detection should no longer report German for it.';
+
+		try {
+			item_edit(42, ['post_id' => 1, 'body' => $body, 'language' => 'un', 'return' => 'network'], false, 'network');
+		} catch (HTTPException\FoundException) {
+			// expected
+		}
+
+		$languages = json_decode((string) Post::selectFirst(['language'], ['id' => 1])['language'], true);
+
+		self::assertSame('en', array_key_first($languages));
+	}
+
 	public function testItemPostDropitemsDelegationIsNotAutomaticallyTestable(): void
 	{
 		self::markTestIncomplete(

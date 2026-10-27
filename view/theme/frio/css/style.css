@@ -1710,8 +1710,6 @@ section #jotOpen {
 	flex: auto;
 	flex-direction: column;
 }
-#jot-modal .modal-header a,
-#jot-modal .modal-header .btn-link,
 /* Keep the jot toolbar, including the language selector, in one row */
 #profile-jot-submit-wrapper > li > .btn-link {
 	padding: 10px 13px;
@@ -1737,6 +1735,8 @@ section #jotOpen {
 	margin-right: auto;
 }
 
+#jot-modal .modal-header a,
+#jot-modal .modal-header .btn-link,
 #profile-jot-submit-wrapper a,
 #profile-jot-submit-wrapper .btn-link {
 	color: $font_color_darker;
