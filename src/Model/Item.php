@@ -2974,19 +2974,19 @@ class Item
 
 		$item = $hook_data['item'] ?? $item;
 
-		// In order to provide theme developers more possibilities, event items
-		// are treated differently.
-		if ($item['object-type'] === Activity\ObjectType::EVENT && isset($item['event-id'])) {
-			$ev = Event::getItemHTML($item);
-			return $ev;
-		}
-
 		$tags = Tag::populateFromItem($item);
 
 		$item['tags']              = $tags['tags'];
 		$item['hashtags']          = $tags['hashtags'];
 		$item['mentions']          = $tags['mentions'];
 		$item['implicit_mentions'] = $tags['implicit_mentions'];
+
+		// In order to provide theme developers more possibilities, event items
+		// are treated differently.
+		if ($item['object-type'] === Activity\ObjectType::EVENT && isset($item['event-id'])) {
+			$ev = Event::getItemHTML($item);
+			return $ev;
+		}
 
 		if (!$is_preview) {
 			$item['body'] = preg_replace("#\s*\[attachment .*?].*?\[/attachment]\s*#ism", "\n", (string) $item['body']);
