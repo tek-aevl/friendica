@@ -30,6 +30,7 @@ parameters:
 
     excludePaths:
         - vendor/rector/
+        - vendor/deptrac/
 
     dynamicConstantNames:
         - DB_UPDATE_VERSION
