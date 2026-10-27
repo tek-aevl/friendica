@@ -153,6 +153,68 @@ class ItemTest extends ApiTestCase
 		self::assertSame('Edited via item_post() dispatch', $post['body']);
 	}
 
+	private function postWithLanguage(string $body, ?string $language): array
+	{
+		$header = $this->mockRedirectHeader();
+		$header->expects(self::once())->with(self::stringStartsWith('Location: https://friendica.local/network'));
+
+		$_REQUEST = ['body' => $body, 'return' => 'network'];
+		if ($language !== null) {
+			$_REQUEST['language'] = $language;
+		}
+
+		try {
+			item_post();
+			self::fail('Expected a redirect (FoundException)');
+		} catch (HTTPException\FoundException) {
+			// expected
+		} finally {
+			$_REQUEST = [];
+		}
+
+		return Post::selectFirst(['language'], ['uid' => 42, 'body' => $body]);
+	}
+
+	public function testItemInsertStoresManuallyChosenLanguage(): void
+	{
+		$stored = $this->postWithLanguage('Posted with a manually chosen language', 'fr');
+
+		self::assertSame(['fr' => 1], json_decode((string) $stored['language'], true));
+	}
+
+	public function testItemInsertIgnoresUnknownLanguage(): void
+	{
+		$stored = $this->postWithLanguage('Posted with an invalid language', '<b>xx</b>');
+
+		self::assertStringNotContainsString('xx', (string) $stored['language']);
+	}
+
+	public function testItemInsertIgnoresUndeterminedLanguage(): void
+	{
+		$stored = $this->postWithLanguage('Posted with an undetermined language', 'un');
+
+		self::assertNotSame(['un' => 1], json_decode((string) $stored['language'], true));
+	}
+
+	public function testItemEditChangesLanguageOnlyWhenChosenManually(): void
+	{
+		Post::update(['language' => json_encode(['de' => 1])], ['id' => 1]);
+
+		$header = $this->mockRedirectHeader();
+		$header->expects(self::exactly(2))->with('Location: https://friendica.local/network');
+
+		foreach ([[], ['language' => 'fr']] as $extra) {
+			try {
+				item_edit(42, ['post_id' => 1, 'body' => 'Edited with language', 'return' => 'network'] + $extra, false, 'network');
+			} catch (HTTPException\FoundException) {
+				// expected
+			}
+
+			$expected = $extra === [] ? ['de' => 1] : ['fr' => 1];
+			self::assertSame($expected, json_decode((string) Post::selectFirst(['language'], ['id' => 1])['language'], true));
+		}
+	}
+
 	public function testItemPostDropitemsDelegationIsNotAutomaticallyTestable(): void
 	{
 		self::markTestIncomplete(

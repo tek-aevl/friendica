@@ -1050,9 +1050,6 @@ final class PostTemplateBuilder
 		$default  = $this->getDefaultText($item);
 		$template = \Friendica\Core\Renderer::getMarkupTemplate('comment_item.tpl');
 
-		$languageCodes = array_keys($this->l10n->getLanguageCodes());
-		$languages     = array_combine($languageCodes, array_map(mb_strtoupper(...), $languageCodes));
-
 		return \Friendica\Core\Renderer::replaceMacros($template, [
 			'$default'        => $default,
 			'$return_path'    => $this->arguments->getQueryString(),
@@ -1082,8 +1079,8 @@ final class PostTemplateBuilder
 			'$preview'        => $this->l10n->t('Preview'),
 			'$rand_num'       => \Friendica\Util\Crypto::randomDigits(12),
 			'$language_label' => $this->l10n->t('Language'),
-			'$language'       => $this->l10n->getCurrentLangIso6391(),
-			'$languages'      => $languages,
+			'$language'       => L10n::UNDETERMINED_LANGUAGE,
+			'$languages'      => $this->l10n->getLanguageSelection(),
 		]);
 	}
 

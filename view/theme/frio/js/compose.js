@@ -29,8 +29,7 @@
 	let locationButton = null;
 	let locationInput = null;
 	let $languageSelect = null;
-	let languageDetectTimer = null;
-	let languageManuallySet = false;
+	let languageDetection = null;
 
 	/**
 	 * Initialize the compose page functionality.
@@ -78,10 +77,9 @@
 				}
 
 				// Reset the language selector back to automatic detection
-				if ($languageSelect && $languageSelect.length) {
-					$languageSelect.val("un");
+				if (languageDetection) {
+					languageDetection.reset();
 				}
-				languageManuallySet = false;
 
 				// Clear any link preview
 				if (typeof window.linkPreview === "object" && window.linkPreview !== null) {
@@ -143,8 +141,7 @@
 			body: $textarea.val(),
 			location: locationInput ? locationInput.value : "",
 			scheduled_at: $('[name="scheduled_at"]').val(),
-			language: $languageSelect && $languageSelect.length ? $languageSelect.val() : "",
-			languageManuallySet: languageManuallySet,
+			language: languageDetection && languageDetection.isManual() ? $languageSelect.val() : "",
 		};
 
 		try {
@@ -198,12 +195,10 @@
 					$scheduledAt.trigger("change");
 				}
 
-				// Restore language selection and whether it was picked by hand
-				if (typeof draft.languageManuallySet !== "undefined") {
-					languageManuallySet = draft.languageManuallySet;
-				}
-				if (draft.language && $languageSelect && $languageSelect.length) {
+				// Restore a language that was picked by hand
+				if (draft.language && languageDetection) {
 					$languageSelect.val(draft.language);
+					languageDetection.setManual(true);
 				}
 			}, 100);
 		} catch (e) {
@@ -402,52 +397,17 @@
 	 */
 	function initLanguageSelector() {
 		$languageSelect = $("#jot-language");
+		languageDetection = initLanguageDetection($textarea, $languageSelect, "input");
 
-		if (!$languageSelect.length || !$textarea || !$textarea.length) {
-			return;
+		// A language that was preselected by the server counts as picked by hand
+		if (languageDetection && $languageSelect.val() !== "un") {
+			languageDetection.setManual(true);
 		}
-
-		languageManuallySet = false;
-
-		// Once the user picks a language by hand, stop overwriting it with detection results
-		$languageSelect.off("change.compose").on("change.compose", function () {
-			languageManuallySet = true;
-		});
 
 		// Run detection once for text that's already there (e.g. a quoted reply)
-		if ($languageSelect.val() === "un" && $.trim($textarea.val()).length >= 10) {
-			detectLanguage($textarea.val());
+		if (languageDetection && !languageDetection.isManual()) {
+			languageDetection.detect();
 		}
-
-		$textarea.off("input.compose-language").on("input.compose-language", function () {
-			if (languageManuallySet) {
-				return;
-			}
-
-			clearTimeout(languageDetectTimer);
-			const body = $(this).val();
-			if ($.trim(body).length < 10) {
-				return;
-			}
-
-			languageDetectTimer = setTimeout(function () {
-				detectLanguage(body);
-			}, 800);
-		});
-	}
-
-	/**
-	 * Ask the server to detect the language of the given text and update the
-	 * selector, unless the user has since picked a language themselves.
-	 *
-	 * @param {string} body - The current textarea content
-	 */
-	function detectLanguage(body) {
-		$.post(baseurl + "/item/language", { body: body }, function (data) {
-			if (!languageManuallySet && data && data.lang && $languageSelect && $languageSelect.length) {
-				$languageSelect.val(data.lang);
-			}
-		}, "json");
 	}
 
 	window.onDocumentReady("body.mod-compose", init);

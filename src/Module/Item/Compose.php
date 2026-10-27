@@ -120,7 +120,7 @@ class Compose extends BaseModule
 		$body      = $request['body']      ?? '';
 		$location  = $request['location']  ?? $user['default-location'];
 		$wall      = $request['wall']      ?? $type == 'post';
-		$language  = $request['language']  ?? $this->l10n->getCurrentLangIso6391();
+		$language  = $request['language']  ?? L10n::UNDETERMINED_LANGUAGE;
 
 		$jotplugins = $this->eventDispatcher->dispatch(
 			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
@@ -219,7 +219,7 @@ class Compose extends BaseModule
 			'$body'       => $body,
 			'$location'   => $location,
 			'$language'   => $language,
-			'$languages'  => $this->l10n->getLanguageCodes(true, true),
+			'$languages'  => $this->l10n->getLanguageSelection(),
 
 			'$contact_allow' => implode(',', $contact_allow_list),
 			'$circle_allow'  => implode(',', $circle_allow_list),

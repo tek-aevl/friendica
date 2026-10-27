@@ -94,8 +94,8 @@
                         </button>
                     </div>
                 {{/if}}
-                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
-                    <select name="language" id="jot-language" class="form-control" title="{{$l10n.language_label}}" aria-label="{{$l10n.language_label}}" style="display: inline-block; width: auto; height: 36px; margin-right: auto;">
+                <div class="compose-actions">
+                    <select{{if $language != 'un'}} name="language"{{/if}} id="jot-language" class="form-control jot-language" title="{{$l10n.language_label}}" aria-label="{{$l10n.language_label}}">
                         {{foreach $languages as $code => $name}}
                             <option value="{{$code}}"{{if $code == $language}} selected{{/if}}>{{$name}}</option>
                         {{/foreach}}

@@ -39,9 +39,6 @@ class Language extends BaseModule
 		if (empty($this->parameters['id'])) {
 			$languages = $this->item->getLanguageArray((string) ($request['body'] ?? ''), 1);
 			$lang      = array_key_first($languages);
-			if ($lang === L10n::UNDETERMINED_LANGUAGE) {
-				$lang = $this->l10n->getCurrentLangIso6391();
-			}
 			$this->earlyJsonExit(['lang' => $lang]);
 		}
 

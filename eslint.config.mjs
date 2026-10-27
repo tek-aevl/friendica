@@ -51,6 +51,7 @@ const friendicaGlobals = {
 	hideLoading: "readonly",
 	htmlToText: "readonly",
 	initInfiniteScroll: "readonly", // view/js/main.js
+	initLanguageDetection: "readonly", // view/js/main.js
 	insertBBCodeInTextarea: "readonly",
 	insertPostedComment: "readonly", // view/js/main.js
 	jotShow: "readonly",

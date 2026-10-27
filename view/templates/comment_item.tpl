@@ -43,7 +43,7 @@
 					<a title="{{$edquote}}" data-role="insert-formatting" data-bbcode="quote" data-id="{{$id}}"><i class="icon-quote-left"></i></a>
 					<a title="{{$edemojis}}" class="emojis"><i class="icon-smile"></i></a>
 				</div>
-				<select name="language" id="jot-language-{{$id}}" title="{{$language_label}}">
+				<select id="jot-language-{{$id}}" title="{{$language_label}}">
 					{{foreach $languages as $code => $name}}
 						<option value="{{$code}}"{{if $code == $language}} selected{{/if}}>{{$name}}</option>
 					{{/foreach}}
@@ -58,38 +58,9 @@
 				<div class="comment-edit-end"></div>
 			</form>
 			<script>
-				(function () {
-					var $textarea = $('#comment-edit-text-{{$id}}');
-					var $counter = $('#character-counter-{{$id}}');
-					var $language = $('#jot-language-{{$id}}');
-					var languageManuallySet = false;
-					var languageDetectTimer = null;
-
-					$language.off('change.jot-language').on('change.jot-language', function () {
-						languageManuallySet = true;
-					});
-
-					$textarea.off('keyup.comment-counter').on('keyup.comment-counter', function () {
-						$counter.text($textarea.val().length);
-
-						if (languageManuallySet) {
-							return;
-						}
-
-						var body = $textarea.val();
-						clearTimeout(languageDetectTimer);
-						if ($.trim(body).length < 10) {
-							return;
-						}
-
-						languageDetectTimer = setTimeout(function () {
-							$.post(baseurl + '/item/language', {body: body}, function (data) {
-								if (!languageManuallySet && data && data.lang) {
-									$language.val(data.lang);
-								}
-							}, 'json');
-						}, 800);
-					});
-				})();
+				$('#comment-edit-text-{{$id}}').off('keyup.comment-counter').on('keyup.comment-counter', function () {
+					$('#character-counter-{{$id}}').text($(this).val().length);
+				});
+				initLanguageDetection($('#comment-edit-text-{{$id}}'), $('#jot-language-{{$id}}'), 'keyup');
 			</script>
 		</div>

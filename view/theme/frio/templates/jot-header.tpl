@@ -12,8 +12,7 @@
 	var editor = false;
 	var textlen = 0;
 	var formModified = false;
-	var languageManuallySet = false;
-	var languageDetectTimer = null;
+	var languageDetection = null;
 
 	function initEditor(callback) {
 		if (editor == false) {
@@ -30,20 +29,11 @@
 				'transition' : 'elastic'
 			});
 			$(".jothidden").show();
-			$("#jot-language").off('change.jot-language').on('change.jot-language', function(){
-				languageManuallySet = true;
-			});
+			languageDetection = initLanguageDetection($("#profile-jot-text"), $("#jot-language"), 'keyup');
 			$("#profile-jot-text").keyup(function(){
 				textlen = $(this).val().length;
 				$('#character-counter').text(textlen);
 				formModified = true; // Mark the form as modified when the user types
-
-				if (!languageManuallySet && $.trim($(this).val()).length >= 10) {
-					clearTimeout(languageDetectTimer);
-					languageDetectTimer = setTimeout(function() {
-						detectJotLanguage($('#profile-jot-text').val());
-					}, 800);
-				}
 			});
 
 			editor = true;
@@ -69,14 +59,6 @@
 	// Reset formModified flag after successful submission
 	function resetFormModifiedFlag() {
 		formModified = false;
-	}
-
-	function detectJotLanguage(body) {
-		$.post(baseurl + '/item/language', {body: body}, function (data) {
-			if (!languageManuallySet && data && data.lang) {
-				$('#jot-language').val(data.lang);
-			}
-		}, 'json');
 	}
 
 </script>
@@ -177,7 +159,9 @@
 					}
 				}
 
-				languageManuallySet = false;
+				if (languageDetection) {
+					languageDetection.reset();
+				}
 			})
 			.always(function() {
 				hideLoading();

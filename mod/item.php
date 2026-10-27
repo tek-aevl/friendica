@@ -100,6 +100,7 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 
 	$post['edit'] = $post;
 	$old_body     = $post['body'];
+	$old_language = $post['language'] ?? '';
 	$sensitive    = $post['sensitive'];
 	$post['file'] = Post\Category::getTextByURIId($post['uri-id'], $post['uid']);
 
@@ -118,6 +119,11 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 		'edited'          => DateTimeFormat::utcNow(),
 		'changed'         => DateTimeFormat::utcNow(),
 	];
+
+	// The language is only changed when it had been chosen manually
+	if (($post['language'] ?? '') !== $old_language) {
+		$fields['language'] = $post['language'];
+	}
 
 	$fields['body'] = Item::setHashtags($fields['body']);
 
@@ -244,7 +250,7 @@ function item_process(array $post, array $request, bool $preview, string $return
 	$post['location']        = trim($request['location'] ?? '');
 	$post['coord']           = trim($request['coord'] ?? '');
 
-	if (!empty($request['language']) && $request['language'] != L10n::UNDETERMINED_LANGUAGE) {
+	if (!empty($request['language']) && $request['language'] != L10n::UNDETERMINED_LANGUAGE && array_key_exists($request['language'], DI::l10n()->getLanguageCodes())) {
 		$post['language'] = json_encode([$request['language'] => 1]);
 	}
 

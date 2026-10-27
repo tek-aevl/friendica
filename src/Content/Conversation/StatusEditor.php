@@ -139,9 +139,6 @@ final class StatusEditor
 			$created_at = '';
 		}
 
-		$languageCodes = array_keys($this->l10n->getLanguageCodes());
-		$languages     = array_combine($languageCodes, array_map(mb_strtoupper(...), $languageCodes));
-
 		$tpl = Renderer::getMarkupTemplate('jot.tpl');
 
 		if (isset($formData['contact_account_type']) && $formData['contact_account_type'] === User::ACCOUNT_TYPE_COMMUNITY) {
@@ -170,8 +167,8 @@ final class StatusEditor
 			'$setloc'              => $this->l10n->t('Set your location'),
 			'$noloc'               => $this->l10n->t('Clear browser location'),
 			'$language_label'      => $this->l10n->t('Language'),
-			'$language'            => $this->l10n->getCurrentLangIso6391(),
-			'$languages'           => $languages,
+			'$language'            => L10n::UNDETERMINED_LANGUAGE,
+			'$languages'           => $this->l10n->getLanguageSelection(),
 			'$weblink'             => $this->l10n->t('Link'),
 			'$video'               => $this->l10n->t('Video'),
 			'$audio'               => $this->l10n->t('Audio'),

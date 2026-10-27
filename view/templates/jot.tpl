@@ -68,7 +68,7 @@
 		<a id="profile-emojis" class="icon icon-smile emojis-post" title="{{$edemojis}}"></a>
 	</div>
 	<div id="jot-language-wrapper">
-		<select name="language" id="jot-language" title="{{$language_label}}">
+		<select id="jot-language"{{if $is_edit}} data-no-detect="1"{{/if}} title="{{$language_label}}">
 			{{foreach $languages as $code => $label}}
 				<option value="{{$code}}"{{if $code == $language}} selected{{/if}}>{{$label}}</option>
 			{{/foreach}}

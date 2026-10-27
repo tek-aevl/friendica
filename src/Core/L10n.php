@@ -101,14 +101,15 @@ class L10n
 	}
 
 	/**
-	 * Returns the current language as an ISO 639-1 code, for use as a fallback
-	 * when automatic language detection of a text doesn't come up with a result.
+	 * Returns the languages offered in the language selector of the post editors.
+	 * The undetermined language is labelled "Auto", since choosing it leaves the
+	 * language detection to the server.
 	 *
-	 * @return string ISO 639-1 language code
+	 * @return array Language names, indexed by their ISO 639-1 code
 	 */
-	public function getCurrentLangIso6391(): string
+	public function getLanguageSelection(): array
 	{
-		return $this->toISO6391($this->lang);
+		return [self::UNDETERMINED_LANGUAGE => $this->t('Auto')] + $this->getLanguageCodes(true, true);
 	}
 
 	/**

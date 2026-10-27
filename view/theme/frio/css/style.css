@@ -1236,7 +1236,7 @@ ul li .intro-wrapper button.intro-action-link {
 .nav > li > .btn-link {
 	position: relative;
 	display: block;
-	padding: 10px 13px;
+	padding: 10px 15px;
 }
 .nav .open > .btn-link {
 	background-color: #eee;
@@ -1712,6 +1712,31 @@ section #jotOpen {
 }
 #jot-modal .modal-header a,
 #jot-modal .modal-header .btn-link,
+/* Keep the jot toolbar, including the language selector, in one row */
+#profile-jot-submit-wrapper > li > .btn-link {
+	padding: 10px 13px;
+}
+.jot-language {
+	display: inline-block;
+	width: auto;
+	max-width: 9em;
+	height: 36px;
+	padding-left: 4px;
+	padding-right: 4px;
+}
+.comment-edit-submit-wrapper .jot-language {
+	margin-right: auto;
+}
+.compose-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+.compose-actions .jot-language {
+	margin-right: auto;
+}
+
 #profile-jot-submit-wrapper a,
 #profile-jot-submit-wrapper .btn-link {
 	color: $font_color_darker;
