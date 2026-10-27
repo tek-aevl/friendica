@@ -165,7 +165,7 @@ final class PostTemplateBuilder
 		$sparkle = str_starts_with((string) $profileUrl, 'contact/redir/') ? ' sparkle' : '';
 		$this->item->localize($item);
 		$bodyHtml = ItemModel::prepareBody($item, true, $preview);
-		$tags     = Tag::populateFromItem($item);
+		$tags     = ['tags' => $item['tags'], 'hashtags' => $item['hashtags'], 'mentions' => $item['mentions'], 'implicit_mentions' => $item['implicit_mentions']];
 
 		$categories = [];
 		$folders    = [];
