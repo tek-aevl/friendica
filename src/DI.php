@@ -502,6 +502,11 @@ abstract class DI
 		return self::$dice->create(Contact\LocalRelationship\Repository\LocalRelationship::class);
 	}
 
+	public static function postPermissions(): Security\PostPermissions
+	{
+		return self::$dice->create(Security\PostPermissions::class);
+	}
+
 	public static function permissionSet(): Security\PermissionSet\Repository\PermissionSet
 	{
 		return self::$dice->create(Security\PermissionSet\Repository\PermissionSet::class);
@@ -569,6 +574,16 @@ abstract class DI
 	//
 	// "Post" namespace instances
 	//
+
+	public static function postLinkResolver(): Post\LinkResolver
+	{
+		return self::$dice->create(Post\LinkResolver::class);
+	}
+
+	public static function postFetcher(): Protocol\PostFetcher
+	{
+		return self::$dice->create(Protocol\PostFetcher::class);
+	}
 
 	public static function postUriGenerator(): Post\UriGenerator
 	{
