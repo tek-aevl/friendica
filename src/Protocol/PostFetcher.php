@@ -68,7 +68,7 @@ final readonly class PostFetcher
 
 		if (isset($hook_data['item_id'])) {
 			$this->logger->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $hook_data['item_id']]);
-			return is_numeric($hook_data['item_id']) ? $hook_data['item_id'] : 0;
+			return is_numeric($hook_data['item_id']) ? (int) $hook_data['item_id'] : 0;
 		}
 
 		$head_not_found = false;

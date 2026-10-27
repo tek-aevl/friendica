@@ -2781,10 +2781,10 @@ class Item
 
 	/**
 	 * Fetch the SQL condition for the given user id
-	 * Will be deprecated: new code should call \Friendica\Security\PostPermissions::getConditionArray() directly.
 	 *
 	 * @param integer $owner_id User ID for which the permissions should be fetched
 	 * @return array condition
+	 * @deprecated 2026.11 - Use \Friendica\Security\PostPermissions::getConditionArray() instead
 	 * @see \Friendica\Security\PostPermissions::getConditionArray()
 	 */
 	public static function getPermissionsConditionArrayByUserId(int $owner_id): array
@@ -2794,11 +2794,11 @@ class Item
 
 	/**
 	 * Get a permission SQL string for the given user
-	 * Will be deprecated: new code should call \Friendica\Security\PostPermissions::getSQL() directly.
 	 *
 	 * @param int $owner_id
 	 * @param string $table
 	 * @return string
+	 * @deprecated 2026.11 - Use \Friendica\Security\PostPermissions::getSQL() instead
 	 * @see \Friendica\Security\PostPermissions::getSQL()
 	 */
 	public static function getPermissionsSQLByUserId(int $owner_id, string $table = ''): string
@@ -3752,12 +3752,12 @@ class Item
 
 	/**
 	 * Search item id for given URI or plink
-	 * Will be deprecated: new code should call \Friendica\Post\LinkResolver::searchByLink() directly.
 	 *
 	 * @param string $uri
 	 * @param integer $uid
 	 *
 	 * @return integer item id
+	 * @deprecated 2026.11 - Use \Friendica\Post\LinkResolver::searchByLink() instead
 	 * @see \Friendica\Post\LinkResolver::searchByLink()
 	 */
 	public static function searchByLink(string $uri, int $uid = 0): int
@@ -3767,11 +3767,11 @@ class Item
 
 	/**
 	 * Return the URI for a link to the post
-	 * Will be deprecated: new code should call \Friendica\Post\LinkResolver::getURIByLink() directly.
 	 *
 	 * @param string $uri URI or link to post
 	 *
 	 * @return string URI
+	 * @deprecated 2026.11 - Use \Friendica\Post\LinkResolver::getURIByLink() instead
 	 * @see \Friendica\Post\LinkResolver::getURIByLink()
 	 */
 	public static function getURIByLink(string $uri): string
@@ -3781,7 +3781,6 @@ class Item
 
 	/**
 	 * Fetches item for given URI or plink
-	 * Will be deprecated: new code should call \Friendica\Protocol\PostFetcher::fetchByLink() directly.
 	 *
 	 * @param string $uri
 	 * @param int    $uid
@@ -3789,6 +3788,7 @@ class Item
 	 * @param string $mimetype
 	 *
 	 * @return integer item id
+	 * @deprecated 2026.11 - Use \Friendica\Protocol\PostFetcher::fetchByLink() instead
 	 * @see \Friendica\Protocol\PostFetcher::fetchByLink()
 	 */
 	public static function fetchByLink(string $uri, int $uid = 0, int $completion = ActivityPub\Receiver::COMPLETION_MANUAL, string $mimetype = ''): int
@@ -3798,11 +3798,11 @@ class Item
 
 	/**
 	 * Fetch the uri-id of a quoted post by searching for data in the body or attached media
-	 * Will be deprecated: new code should call \Friendica\Protocol\PostFetcher::getQuoteUriId() directly.
 	 *
 	 * @param string $body   The body of the
 	 * @param int    $uid    The id of the user
 	 * @return integer
+	 * @deprecated 2026.11 - Use \Friendica\Protocol\PostFetcher::getQuoteUriId() instead
 	 * @see \Friendica\Protocol\PostFetcher::getQuoteUriId()
 	 */
 	public static function getQuoteUriId(string $body, int $uid = 0): int
