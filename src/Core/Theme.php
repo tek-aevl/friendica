@@ -80,27 +80,27 @@ class Theme
 		$result = preg_match("|/\*.*\*/|msU", $theme_file, $matches);
 
 		if ($result) {
-			$comment_lines = explode("\n", $matches[0]);
+			$comment_lines = explode('\n', $matches[0]);
 			foreach ($comment_lines as $comment_line) {
 				$comment_line = trim($comment_line, "\t\n\r */");
 				if (str_contains($comment_line, ':')) {
 					[$key, $value] = array_map(trim(...), explode(":", $comment_line, 2));
 					$key           = strtolower($key);
-					if ($key == "author") {
+					if ($key === 'author') {
 						$result = preg_match("|([^<]+)<([^>]+)>|", $value, $matches);
 						if ($result) {
 							$info['author'][] = ['name' => $matches[1], 'link' => $matches[2]];
 						} else {
 							$info['author'][] = ['name' => $value];
 						}
-					} elseif ($key == "maintainer") {
+					} elseif ($key === 'maintainer') {
 						$result = preg_match("|([^<]+)<([^>]+)>|", $value, $matches);
 						if ($result) {
 							$info['maintainer'][] = ['name' => $matches[1], 'link' => $matches[2]];
 						} else {
 							$info['maintainer'][] = ['name' => $value];
 						}
-					} elseif ($key == "features") {
+					} elseif ($key === 'features') {
 						$result = explode(',', $value);
 						if ($result) {
 							foreach ($result as $key => $value) {
