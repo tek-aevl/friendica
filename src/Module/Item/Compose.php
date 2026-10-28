@@ -65,7 +65,7 @@ class Compose extends BaseModule
 		$theme_info    = Theme::getInfo($current_theme);
 
 		if (!in_array('compose_page', $theme_info['features'])) {
-			throw new NotImplementedException($this->l10n->t('This feature is only available with the frio theme.'));
+			throw new NotImplementedException($this->l10n->t('This feature is not available with the current theme.'));
 		}
 
 		$posttype = $this->parameters['type'] ?? Item::PT_ARTICLE;
