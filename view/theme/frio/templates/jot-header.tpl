@@ -12,6 +12,7 @@
 	var editor = false;
 	var textlen = 0;
 	var formModified = false;
+	var languageDetection = null;
 
 	function initEditor(callback) {
 		if (editor == false) {
@@ -28,6 +29,7 @@
 				'transition' : 'elastic'
 			});
 			$(".jothidden").show();
+			languageDetection = initLanguageDetection($("#profile-jot-text"), $("#jot-language"), 'keyup');
 			$("#profile-jot-text").keyup(function(){
 				textlen = $(this).val().length;
 				$('#character-counter').text(textlen);
@@ -155,6 +157,10 @@
 					} else {
 						window.location.reload();
 					}
+				}
+
+				if (languageDetection) {
+					languageDetection.reset();
 				}
 			})
 			.always(function() {

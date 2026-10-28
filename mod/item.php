@@ -19,6 +19,7 @@
 
 use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Content\Text\BBCode;
+use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
@@ -99,6 +100,7 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 
 	$post['edit'] = $post;
 	$old_body     = $post['body'];
+	$old_language = $post['language'] ?? '';
 	$sensitive    = $post['sensitive'];
 	$post['file'] = Post\Category::getTextByURIId($post['uri-id'], $post['uid']);
 
@@ -117,6 +119,15 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 		'edited'          => DateTimeFormat::utcNow(),
 		'changed'         => DateTimeFormat::utcNow(),
 	];
+
+	// The language is only changed when it had been chosen manually
+	if (($post['language'] ?? '') !== $old_language) {
+		$fields['language'] = $post['language'];
+	} elseif (($request['language'] ?? '') === L10n::UNDETERMINED_LANGUAGE) {
+		// "Auto" has been chosen: Detect the language of the edited text again
+		$content            = trim($post['title'] . ' ' . $post['content-warning'] . ' ' . $fields['body']);
+		$fields['language'] = json_encode(DI::contentItem()->getLanguageArray($content, 3, $post['uri-id'], $post['author-id']));
+	}
 
 	$fields['body'] = Item::setHashtags($fields['body']);
 
@@ -242,6 +253,10 @@ function item_process(array $post, array $request, bool $preview, string $return
 	$post['body']            = $request['body'] ?? '';
 	$post['location']        = trim($request['location'] ?? '');
 	$post['coord']           = trim($request['coord'] ?? '');
+
+	if (!empty($request['language']) && $request['language'] != L10n::UNDETERMINED_LANGUAGE && array_key_exists($request['language'], DI::l10n()->getLanguageCodes())) {
+		$post['language'] = json_encode([$request['language'] => 1]);
+	}
 
 	$post = DI::contentItem()->addCategories($post, $request['category'] ?? '');
 

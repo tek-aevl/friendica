@@ -576,6 +576,74 @@ if (window.addEventListener) {
 }
 
 /**
+ * Connects a post textarea with a language selector.
+ *
+ * While the user hasn't picked a language, the server is asked to detect the
+ * language of the text and the result is shown in the selector.
+ * The selector only gets a name, and with that is only submitted, once the
+ * user has picked a language by hand. Otherwise the server detects the
+ * language when the post is stored.
+ *
+ * @param {jQuery} $textarea
+ * @param {jQuery} $select
+ * @param {string} [inputEvent] Event on the textarea that triggers the detection
+ * @returns {{isManual: function(): boolean, setManual: function(boolean), reset: function(), detect: function()}|null}
+ */
+function initLanguageDetection($textarea, $select, inputEvent) {
+	if (!$textarea.length || !$select.length) {
+		return null;
+	}
+
+	let manuallySet = false;
+	let timer = null;
+
+	function setManual(value) {
+		manuallySet = value;
+		if (value) {
+			$select.attr('name', 'language');
+		} else {
+			$select.removeAttr('name');
+		}
+	}
+
+	function detect() {
+		const body = $textarea.val();
+		// When editing, the stored language stays unless it is changed by hand
+		if (manuallySet || $select.data('no-detect') || $.trim(body).length < 10) {
+			return;
+		}
+
+		$.post(baseurl + '/item/language', {body: body}, function (data) {
+			if (!manuallySet && data && data.lang) {
+				$select.val(data.lang);
+			}
+		}, 'json');
+	}
+
+	setManual(false);
+
+	$select.off('change.language-detection').on('change.language-detection', function () {
+		setManual(true);
+	});
+
+	$textarea.off(inputEvent + '.language-detection').on(inputEvent + '.language-detection', function () {
+		clearTimeout(timer);
+		timer = setTimeout(detect, 800);
+	});
+
+	return {
+		isManual: function () { return manuallySet; },
+		setManual: setManual,
+		reset: function () {
+			clearTimeout(timer);
+			setManual(false);
+			$select.val('un');
+		},
+		detect: detect
+	};
+}
+
+/**
  * Inserts a BBCode tag in the comment textarea identified by id
  *
  * @param {string} BBCode

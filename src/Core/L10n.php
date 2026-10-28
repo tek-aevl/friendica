@@ -101,6 +101,18 @@ class L10n
 	}
 
 	/**
+	 * Returns the languages offered in the language selector of the post editors.
+	 * The undetermined language is labelled "Auto", since choosing it leaves the
+	 * language detection to the server.
+	 *
+	 * @return array Language names, indexed by their ISO 639-1 code
+	 */
+	public function getLanguageSelection(): array
+	{
+		return [self::UNDETERMINED_LANGUAGE => $this->t('Auto')] + $this->getLanguageCodes(true, true);
+	}
+
+	/**
 	 * Set the instance locale based on the HTTP Accept-Language header.
 	 *
 	 * Reads the `HTTP_ACCEPT_LANGUAGE` value from the provided server array

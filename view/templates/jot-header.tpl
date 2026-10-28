@@ -10,6 +10,7 @@
 
 var editor = false;
 var textlen = 0;
+var languageDetection = null;
 
 function initEditor(callback) {
 	if (editor == false) {
@@ -29,6 +30,8 @@ function initEditor(callback) {
 		$("#profile-jot-text").bbco_autocomplete('bbcode');
 		$("a#jot-perms-icon").colorbox(colorbox_options);
 		$(".jothidden").show();
+
+		languageDetection = initLanguageDetection($("#profile-jot-text"), $("#jot-language"), 'keyup');
 
 		$("#profile-jot-text").keyup(function(){
 			var textlen = $(this).val().length;

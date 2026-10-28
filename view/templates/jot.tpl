@@ -67,6 +67,13 @@
 	<div id="profile-emojis-wrapper" style="display: {{$visitor}};">
 		<a id="profile-emojis" class="icon icon-smile emojis-post" title="{{$edemojis}}"></a>
 	</div>
+	<div id="jot-language-wrapper">
+		<select id="jot-language"{{if $is_edit}} data-no-detect="1"{{/if}} title="{{$language_label}}">
+			{{foreach $languages as $code => $label}}
+				<option value="{{$code}}"{{if $code == $language}} selected{{/if}}>{{$label}}</option>
+			{{/foreach}}
+		</select>
+	</div>
 	<div id="post-length">
 		<span id="character-counter" class="grey"></span>
 	</div>

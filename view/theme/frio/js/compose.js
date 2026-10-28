@@ -14,6 +14,7 @@
  * - ACL autocomplete (@-mentions)
  * - BBCode autocomplete
  * - Location button with geolocation support
+ * - Language selector with automatic detection
  *
  * @requires jQuery
  * @requires linkPreview.js
@@ -27,6 +28,8 @@
 	let $textarea = null;
 	let locationButton = null;
 	let locationInput = null;
+	let $languageSelect = null;
+	let languageDetection = null;
 
 	/**
 	 * Initialize the compose page functionality.
@@ -34,6 +37,7 @@
 	function init() {
 		initTextarea();
 		initLocation();
+		initLanguageSelector();
 		initFormReset();
 	}
 
@@ -70,6 +74,11 @@
 				if (locationInput) {
 					locationInput.value = "";
 					updateLocationButtonDisplay(locationButton, locationInput);
+				}
+
+				// Reset the language selector back to automatic detection
+				if (languageDetection) {
+					languageDetection.reset();
 				}
 
 				// Clear any link preview
@@ -132,6 +141,7 @@
 			body: $textarea.val(),
 			location: locationInput ? locationInput.value : "",
 			scheduled_at: $('[name="scheduled_at"]').val(),
+			language: languageDetection && languageDetection.isManual() ? $languageSelect.val() : "",
 		};
 
 		try {
@@ -183,6 +193,12 @@
 					$scheduledAt.val(draft.scheduled_at);
 					// Trigger change event for datepicker plugins
 					$scheduledAt.trigger("change");
+				}
+
+				// Restore a language that was picked by hand
+				if (draft.language && languageDetection) {
+					$languageSelect.val(draft.language);
+					languageDetection.setManual(true);
 				}
 			}, 100);
 		} catch (e) {
@@ -373,6 +389,24 @@
 		} else {
 			// Ready to get location
 			button.title = button.dataset.titleSet || "Set location";
+		}
+	}
+
+	/**
+	 * Initialize the language selector and wire up automatic detection.
+	 */
+	function initLanguageSelector() {
+		$languageSelect = $("#jot-language");
+		languageDetection = initLanguageDetection($textarea, $languageSelect, "input");
+
+		// A language that was preselected by the server counts as picked by hand
+		if (languageDetection && $languageSelect.val() !== "un") {
+			languageDetection.setManual(true);
+		}
+
+		// Run detection once for text that's already there (e.g. a quoted reply)
+		if (languageDetection && !languageDetection.isManual()) {
+			languageDetection.detect();
 		}
 	}
 
