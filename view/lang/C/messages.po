@@ -18,34 +18,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 
-#: mod/item.php:95 mod/item.php:98 mod/item.php:171 mod/item.php:174
+#: mod/item.php:95 mod/item.php:98 mod/item.php:181 mod/item.php:184
 msgid "Unable to locate original post."
 msgstr ""
 
-#: mod/item.php:139
+#: mod/item.php:149
 msgid "Post updated."
 msgstr ""
 
-#: mod/item.php:204 mod/item.php:208
+#: mod/item.php:214 mod/item.php:218
 msgid "Item wasn't stored."
 msgstr ""
 
-#: mod/item.php:218
+#: mod/item.php:228
 msgid "Item couldn't be fetched."
 msgstr ""
 
-#: mod/item.php:266 mod/item.php:270
+#: mod/item.php:276 mod/item.php:280
 msgid "Empty post discarded."
 msgstr ""
 
-#: mod/item.php:475 src/Module/Admin/Themes/Details.php:31
+#: mod/item.php:485 src/Module/Admin/Themes/Details.php:31
 #: src/Module/Admin/Themes/Index.php:51 src/Module/Debug/ItemBody.php:34
 #: src/Module/Debug/ItemBody.php:42 src/Module/Item/Feed.php:65
 #: src/Module/Item/Interactions.php:72
 msgid "Item not found."
 msgstr ""
 
-#: mod/item.php:499 mod/message.php:56 mod/message.php:102 mod/photos.php:117
+#: mod/item.php:509 mod/message.php:56 mod/message.php:102 mod/photos.php:117
 #: mod/photos.php:418 src/Model/Event.php:512 src/Module/Attach.php:40
 #: src/Module/BaseApi.php:96 src/Module/BaseNotifications.php:82
 #: src/Module/BaseSettings.php:38 src/Module/Calendar/Event/API.php:75
@@ -150,21 +150,21 @@ msgid "Your message"
 msgstr ""
 
 #: mod/message.php:190 mod/message.php:345 mod/photos.php:76 mod/photos.php:624
-#: src/Content/Conversation/StatusEditor.php:156 src/Module/Post/Edit.php:142
+#: src/Content/Conversation/StatusEditor.php:156 src/Module/Post/Edit.php:148
 #: src/Module/Profile/Photos.php:336 src/Module/Profile/Photos.php:356
 #: src/Module/Profile/Photos.php:359
 msgid "Upload photo"
 msgstr ""
 
-#: mod/message.php:191 mod/message.php:346 src/Module/Post/Edit.php:146
+#: mod/message.php:191 mod/message.php:346 src/Module/Post/Edit.php:152
 msgid "Insert web link"
 msgstr ""
 
 #: mod/message.php:192 mod/message.php:348 src/App/Page.php:303
-#: src/Content/Conversation/PostTemplateBuilder.php:390
+#: src/Content/Conversation/PostTemplateBuilder.php:392
 #: src/Content/Conversation/StatusEditor.php:191
 #: src/Module/Item/Compose.php:183 src/Module/Media/BaseBrowser.php:91
-#: src/Module/Post/Edit.php:156
+#: src/Module/Post/Edit.php:162
 msgid "Please wait"
 msgstr ""
 
@@ -319,7 +319,7 @@ msgstr ""
 
 #: mod/photos.php:487 mod/photos.php:808
 #: src/Content/Conversation/StatusEditor.php:193
-#: src/Module/Calendar/Event/Form.php:266 src/Module/Post/Edit.php:196
+#: src/Module/Calendar/Event/Form.php:266 src/Module/Post/Edit.php:202
 msgid "Permissions"
 msgstr ""
 
@@ -333,7 +333,7 @@ msgstr ""
 
 #: mod/photos.php:556 mod/photos.php:655 src/Module/Contact/Follow.php:163
 #: src/Module/Contact/Revoke.php:92 src/Module/Contact/Unfollow.php:107
-#: src/Module/Media/BaseBrowser.php:86 src/Module/Post/Edit.php:180
+#: src/Module/Media/BaseBrowser.php:86 src/Module/Post/Edit.php:186
 #: src/Module/Post/Tag/Remove.php:101 src/Module/Profile/RemoteFollow.php:110
 #: src/Module/Security/TwoFactor/SignOut.php:115
 msgid "Cancel"
@@ -1709,7 +1709,7 @@ msgstr ""
 msgid "Quote shared by: %s"
 msgstr ""
 
-#: src/Content/Conversation/PostTemplateBuilder.php:1063
+#: src/Content/Conversation/PostTemplateBuilder.php:1069
 #: src/Module/Contact.php:612 src/Module/Item/Compose.php:164
 msgid "This is you"
 msgstr ""
@@ -1720,27 +1720,27 @@ msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1073
 #: src/Content/Conversation/StatusEditor.php:155 src/Content/Nav.php:96
-#: src/Module/Post/Edit.php:141
+#: src/Module/Post/Edit.php:147
 msgid "Loading..."
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1074
 #: src/Content/Conversation/StatusEditor.php:158
-#: src/Module/Item/Compose.php:166 src/Module/Post/Edit.php:184
+#: src/Module/Item/Compose.php:166 src/Module/Post/Edit.php:190
 #: src/Module/Settings/Profile/Index.php:247
 msgid "Bold"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1075
 #: src/Content/Conversation/StatusEditor.php:159
-#: src/Module/Item/Compose.php:167 src/Module/Post/Edit.php:185
+#: src/Module/Item/Compose.php:167 src/Module/Post/Edit.php:191
 #: src/Module/Settings/Profile/Index.php:248
 msgid "Italic"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1076
 #: src/Content/Conversation/StatusEditor.php:160
-#: src/Module/Item/Compose.php:168 src/Module/Post/Edit.php:186
+#: src/Module/Item/Compose.php:168 src/Module/Post/Edit.php:192
 #: src/Module/Settings/Profile/Index.php:249
 msgid "Underline"
 msgstr ""
@@ -1753,26 +1753,26 @@ msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1078
 #: src/Content/Conversation/StatusEditor.php:161
-#: src/Module/Item/Compose.php:169 src/Module/Post/Edit.php:187
+#: src/Module/Item/Compose.php:169 src/Module/Post/Edit.php:193
 #: src/Module/Settings/Profile/Index.php:250
 msgid "Quote"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1079
 #: src/Content/Conversation/StatusEditor.php:162
-#: src/Module/Item/Compose.php:170 src/Module/Post/Edit.php:188
+#: src/Module/Item/Compose.php:170 src/Module/Post/Edit.php:194
 #: src/Module/Settings/Profile/Index.php:251
 msgid "Add emojis"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1080
 #: src/Content/Conversation/StatusEditor.php:164
-#: src/Module/Item/Compose.php:172 src/Module/Post/Edit.php:189
+#: src/Module/Item/Compose.php:172 src/Module/Post/Edit.php:195
 #: src/Module/Settings/Profile/Index.php:252
 msgid "Code"
 msgstr ""
 
-#: src/Content/Conversation/PostTemplateBuilder.php:1075
+#: src/Content/Conversation/PostTemplateBuilder.php:1081
 #: src/Module/Item/Compose.php:173 src/Module/Settings/Profile/Index.php:253
 #: src/Module/Settings/Profile/Index.php:254
 msgid "Image"
@@ -1781,14 +1781,14 @@ msgstr ""
 #: src/Content/Conversation/PostTemplateBuilder.php:1082
 #: src/Content/Conversation/StatusEditor.php:165
 #: src/Content/Conversation/StatusEditor.php:172
-#: src/Module/Item/Compose.php:174 src/Module/Post/Edit.php:190
+#: src/Module/Item/Compose.php:174 src/Module/Post/Edit.php:196
 #: src/Module/Settings/Profile/Index.php:255
 msgid "Link"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1083
 #: src/Content/Conversation/StatusEditor.php:166
-#: src/Module/Item/Compose.php:175 src/Module/Post/Edit.php:191
+#: src/Module/Item/Compose.php:175 src/Module/Post/Edit.php:197
 #: src/Module/Settings/Profile/Index.php:256
 msgid "Link or Media"
 msgstr ""
@@ -1799,16 +1799,16 @@ msgstr ""
 msgid "Please enter a image/video/audio/webpage URL:"
 msgstr ""
 
-#: src/Content/Conversation/PostTemplateBuilder.php:1079
+#: src/Content/Conversation/PostTemplateBuilder.php:1085
 #: src/Content/Conversation/StatusEditor.php:203
 #: src/Module/Calendar/Event/Form.php:261 src/Module/Item/Compose.php:177
-#: src/Module/Item/Compose.php:311 src/Module/Post/Edit.php:178
+#: src/Module/Item/Compose.php:311 src/Module/Post/Edit.php:184
 msgid "Preview"
 msgstr ""
 
-#: src/Content/Conversation/PostTemplateBuilder.php:1081
+#: src/Content/Conversation/PostTemplateBuilder.php:1087
 #: src/Content/Conversation/StatusEditor.php:169
-#: src/Module/Item/Compose.php:182
+#: src/Module/Item/Compose.php:182 src/Module/Post/Edit.php:204
 msgid "Language"
 msgstr ""
 
@@ -1868,16 +1868,16 @@ msgstr ""
 msgid "Post"
 msgstr ""
 
-#: src/Content/Conversation/StatusEditor.php:157 src/Module/Post/Edit.php:144
+#: src/Content/Conversation/StatusEditor.php:157 src/Module/Post/Edit.php:150
 msgid "Attach file"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:167
-#: src/Module/Item/Compose.php:178 src/Module/Post/Edit.php:152
+#: src/Module/Item/Compose.php:178 src/Module/Post/Edit.php:158
 msgid "Set your location"
 msgstr ""
 
-#: src/Content/Conversation/StatusEditor.php:168 src/Module/Post/Edit.php:154
+#: src/Content/Conversation/StatusEditor.php:168 src/Module/Post/Edit.php:160
 msgid "Clear browser location"
 msgstr ""
 
@@ -1886,17 +1886,17 @@ msgid "Video"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:177
-#: src/Module/Item/Compose.php:188 src/Module/Post/Edit.php:168
+#: src/Module/Item/Compose.php:188 src/Module/Post/Edit.php:174
 msgid "Set title"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:179
-#: src/Module/Item/Compose.php:189 src/Module/Post/Edit.php:170
+#: src/Module/Item/Compose.php:189 src/Module/Post/Edit.php:176
 msgid "Set summary, abstract or spoiler text"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:181
-#: src/Module/Item/Compose.php:190 src/Module/Post/Edit.php:172
+#: src/Module/Item/Compose.php:190 src/Module/Post/Edit.php:178
 msgid "Categories (comma-separated list)"
 msgstr ""
 
@@ -1910,22 +1910,22 @@ msgstr ""
 msgid "Scheduled at"
 msgstr ""
 
-#: src/Content/Conversation/StatusEditor.php:192 src/Module/Post/Edit.php:157
+#: src/Content/Conversation/StatusEditor.php:192 src/Module/Post/Edit.php:163
 msgid "Permission settings"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:213 src/Content/Item.php:432
 #: src/Content/Widget/VCard.php:134 src/Model/Contact.php:1326
 #: src/Model/Profile.php:485 src/Module/Admin/Logs/View.php:109
-#: src/Module/Post/Edit.php:194
+#: src/Module/Post/Edit.php:200
 msgid "Message"
 msgstr ""
 
-#: src/Content/Conversation/StatusEditor.php:214 src/Module/Post/Edit.php:195
+#: src/Content/Conversation/StatusEditor.php:214 src/Module/Post/Edit.php:201
 msgid "Add file"
 msgstr ""
 
-#: src/Content/Conversation/StatusEditor.php:216 src/Module/Post/Edit.php:198
+#: src/Content/Conversation/StatusEditor.php:216 src/Module/Post/Edit.php:208
 msgid "Open Compose page"
 msgstr ""
 
@@ -2138,7 +2138,7 @@ msgstr ""
 msgid "Find groups to join"
 msgstr ""
 
-#: src/Content/Item.php:328 src/Model/Item.php:2895
+#: src/Content/Item.php:328 src/Model/Item.php:2837
 msgid "event"
 msgstr ""
 
@@ -2147,7 +2147,7 @@ msgstr ""
 msgid "status"
 msgstr ""
 
-#: src/Content/Item.php:335 src/Model/Item.php:2897
+#: src/Content/Item.php:335 src/Model/Item.php:2839
 #: src/Module/Post/Tag/Add.php:117
 msgid "photo"
 msgstr ""
@@ -2568,8 +2568,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:939 src/Model/Item.php:3771
-#: src/Model/Item.php:3777 src/Model/Item.php:3778
+#: src/Content/Text/BBCode.php:939 src/Model/Item.php:3731
+#: src/Model/Item.php:3737 src/Model/Item.php:3738
 msgid "Link to source"
 msgstr ""
 
@@ -2887,11 +2887,11 @@ msgstr ""
 msgid "Except to:"
 msgstr ""
 
-#: src/Core/ACL.php:317 src/Module/Post/Edit.php:165
+#: src/Core/ACL.php:317 src/Module/Post/Edit.php:171
 msgid "CC: email addresses"
 msgstr ""
 
-#: src/Core/ACL.php:318 src/Module/Post/Edit.php:173
+#: src/Core/ACL.php:318 src/Module/Post/Edit.php:179
 msgid "Example: bob@example.com, mary@example.com"
 msgstr ""
 
@@ -3706,84 +3706,84 @@ msgstr ""
 msgid "Happy Birthday %s"
 msgstr ""
 
-#: src/Model/Item.php:2899
+#: src/Model/Item.php:2841
 msgid "activity"
 msgstr ""
 
-#: src/Model/Item.php:2901
+#: src/Model/Item.php:2843
 msgid "comment"
 msgstr ""
 
-#: src/Model/Item.php:2904 src/Module/Post/Tag/Add.php:117
+#: src/Model/Item.php:2846 src/Module/Post/Tag/Add.php:117
 msgid "post"
 msgstr ""
 
-#: src/Model/Item.php:3101
+#: src/Model/Item.php:3061
 #, php-format
 msgid "%s is blocked"
 msgstr ""
 
-#: src/Model/Item.php:3103
+#: src/Model/Item.php:3063
 #, php-format
 msgid "%s is ignored"
 msgstr ""
 
-#: src/Model/Item.php:3105
+#: src/Model/Item.php:3065
 #, php-format
 msgid "Content from %s is collapsed"
 msgstr ""
 
-#: src/Model/Item.php:3109
+#: src/Model/Item.php:3069
 msgid "Sensitive content"
 msgstr ""
 
-#: src/Model/Item.php:3639
+#: src/Model/Item.php:3599
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3673
+#: src/Model/Item.php:3633
 #, php-format
 msgid "The media in this post is not displayed to visitors. To view it, please go to the <a href=\"%s\">original post</a>."
 msgstr ""
 
-#: src/Model/Item.php:3675
+#: src/Model/Item.php:3635
 msgid "The media in this post is not displayed to visitors. To view it, please log in."
 msgstr ""
 
-#: src/Model/Item.php:3700
+#: src/Model/Item.php:3660
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3702
+#: src/Model/Item.php:3662
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3707
+#: src/Model/Item.php:3667
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3709
+#: src/Model/Item.php:3669
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3711
+#: src/Model/Item.php:3671
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3754 src/Model/Item.php:3755
+#: src/Model/Item.php:3714 src/Model/Item.php:3715
 #: src/Module/Calendar/Event/Show.php:80
 msgid "View related post"
 msgstr ""
@@ -5775,7 +5775,7 @@ msgid "Storage"
 msgstr ""
 
 #: src/Module/Admin/Storage.php:122 src/Module/Filer/SaveTag.php:60
-#: src/Module/Post/Edit.php:140 src/Module/Profile/Notes.php:87
+#: src/Module/Post/Edit.php:146 src/Module/Profile/Notes.php:87
 #: src/Module/Settings/Channels.php:235
 msgid "Save"
 msgstr ""
@@ -6874,7 +6874,7 @@ msgstr[1] ""
 #: src/Module/Item/Complete.php:25 src/Module/Item/Display.php:92
 #: src/Module/Item/Feed.php:44 src/Module/Item/Follow.php:25
 #: src/Module/Item/Ignore.php:26 src/Module/Item/Interactions.php:60
-#: src/Module/Item/Language.php:36 src/Module/Item/Node.php:44
+#: src/Module/Item/Language.php:37 src/Module/Item/Node.php:44
 #: src/Module/Item/Pin.php:26 src/Module/Item/Pin.php:41
 #: src/Module/Item/Searchtext.php:34 src/Module/Item/Star.php:27
 #: src/Module/Profile/Posts.php:43 src/Module/Update/Display.php:23
@@ -9815,43 +9815,43 @@ msgstr ""
 msgid "Post not found."
 msgstr ""
 
-#: src/Module/Post/Edit.php:143
+#: src/Module/Post/Edit.php:149
 msgid "upload photo"
 msgstr ""
 
-#: src/Module/Post/Edit.php:145
+#: src/Module/Post/Edit.php:151
 msgid "attach file"
 msgstr ""
 
-#: src/Module/Post/Edit.php:147
+#: src/Module/Post/Edit.php:153
 msgid "web link"
 msgstr ""
 
-#: src/Module/Post/Edit.php:148
+#: src/Module/Post/Edit.php:154
 msgid "Insert video link"
 msgstr ""
 
-#: src/Module/Post/Edit.php:149
+#: src/Module/Post/Edit.php:155
 msgid "video link"
 msgstr ""
 
-#: src/Module/Post/Edit.php:150
+#: src/Module/Post/Edit.php:156
 msgid "Insert audio link"
 msgstr ""
 
-#: src/Module/Post/Edit.php:151
+#: src/Module/Post/Edit.php:157
 msgid "audio link"
 msgstr ""
 
-#: src/Module/Post/Edit.php:153
+#: src/Module/Post/Edit.php:159
 msgid "set location"
 msgstr ""
 
-#: src/Module/Post/Edit.php:155
+#: src/Module/Post/Edit.php:161
 msgid "clear location"
 msgstr ""
 
-#: src/Module/Post/Edit.php:166
+#: src/Module/Post/Edit.php:172
 msgid "Public post"
 msgstr ""
 

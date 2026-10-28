@@ -8,7 +8,6 @@
 namespace Friendica\Module\ActivityPub;
 
 use Friendica\BaseModule;
-use Friendica\Content\Smilies;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -17,6 +16,7 @@ use Friendica\Model\Post;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
+use Friendica\Util\EmojiReaction;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
@@ -92,7 +92,7 @@ class Objects extends BaseModule
 		} elseif (($this->parameters['activity'] ?? '') === 'reactions') {
 			$posts = Post::toArray(Post::selectPosts(['uri', 'body'], ['thr-parent-id' => $item['uri-id'], 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => [Activity::LIKE, Activity::EMOJIREACT], 'deleted' => false, 'private' => [Item::PUBLIC, Item::UNLISTED]]));
 			$posts = array_filter($posts, function ($post) {
-				return Smilies::isReaction((string) $post['body']);
+				return EmojiReaction::isReaction((string) $post['body']);
 			});
 			$data          = ['@context' => ActivityPub::CONTEXT];
 			$data['id']    = DI::baseUrl() . '/' . DI::args()->getQueryString();

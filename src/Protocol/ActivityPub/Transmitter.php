@@ -28,6 +28,7 @@ use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Relay;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\EmojiReaction;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\LDSignature;
 use Friendica\Util\Map;
@@ -1490,7 +1491,7 @@ class Transmitter
 			if (!empty($item['signed_text'])) {
 				$data['diaspora:like'] = $item['signed_text'];
 			}
-			if (in_array($data['type'], ['Like', 'EmojiReact']) && Smilies::isReaction((string) $item['body'])) {
+			if (in_array($data['type'], ['Like', 'EmojiReact']) && EmojiReaction::isReaction((string) $item['body'])) {
 				$data['content'] = $item['body'];
 			}
 			$data['object'] = $item['thr-parent'];

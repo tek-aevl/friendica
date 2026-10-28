@@ -7,7 +7,6 @@
 
 namespace Friendica\Model\Post;
 
-use Friendica\Content\Smilies;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -15,6 +14,7 @@ use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
 use Friendica\Protocol\Activity;
+use Friendica\Util\EmojiReaction;
 
 class Counts
 {
@@ -39,7 +39,7 @@ class Counts
 		} elseif ($verb == Activity::POST) {
 			$condition['gravity'] = Item::GRAVITY_COMMENT;
 			$body                 = '';
-		} elseif ($body && Smilies::isReaction($body)) {
+		} elseif ($body && EmojiReaction::isReaction($body)) {
 			$condition['body'] = $body;
 		} else {
 			$body = '';
@@ -129,7 +129,7 @@ class Counts
 		$activities = Post::selectForUser($uid, ['body', 'author-id'], $condition, ['order' => ['received']]);
 		while ($activity = Post::fetch($activities)) {
 			$body = (string) $activity['body'];
-			if (!Smilies::isReaction($body)) {
+			if (!EmojiReaction::isReaction($body)) {
 				continue;
 			}
 			$reactions[$body][$activity['author-id']] = true;

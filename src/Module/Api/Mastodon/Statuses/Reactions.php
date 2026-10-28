@@ -7,12 +7,21 @@
 
 namespace Friendica\Module\Api\Mastodon\Statuses;
 
-use Friendica\Content\Smilies;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\AppHelper;
+use Friendica\Core\L10n;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Factory\Api\Mastodon\Account;
+use Friendica\Factory\Api\Mastodon\Error;
+use Friendica\Factory\Api\Mastodon\Status;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
+use Friendica\Module\Api\ApiResponse;
 use Friendica\Module\BaseApi;
+use Friendica\Util\EmojiReaction;
+use Friendica\Util\Profiler;
+use Psr\Log\LoggerInterface;
 
 /**
  * Emoji reactions, only Unicode emojis are supported
@@ -21,6 +30,11 @@ use Friendica\Module\BaseApi;
  */
 class Reactions extends BaseApi
 {
+	public function __construct(private readonly Account $mstdnAccount, private readonly Status $mstdnStatus, Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	{
+		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+	}
+
 	protected function rawContent(array $request = [])
 	{
 		$uid = self::getCurrentUserID();
@@ -42,7 +56,7 @@ class Reactions extends BaseApi
 
 			$accounts = [];
 			foreach ($reaction['account_ids'] as $id) {
-				$accounts[] = DI::mstdnAccount()->createFromContactId($id, $uid);
+				$accounts[] = $this->mstdnAccount->createFromContactId($id, $uid);
 			}
 
 			$reactions[] = ['name' => $reaction['name'], 'count' => $reaction['count'], 'me' => $reaction['me'], 'accounts' => $accounts];
@@ -75,7 +89,7 @@ class Reactions extends BaseApi
 		$uid = self::getCurrentUserID();
 
 		$emoji = rawurldecode($this->parameters['emoji'] ?? '');
-		if (empty($this->parameters['id']) || !Smilies::isReaction($emoji)) {
+		if (empty($this->parameters['id']) || !EmojiReaction::isReaction($emoji)) {
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
@@ -89,6 +103,6 @@ class Reactions extends BaseApi
 		}
 
 		$isReblog = $item['uri-id'] != $this->parameters['id'];
-		$this->earlyJsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, $isReblog)->toArray());
+		$this->earlyJsonExit($this->mstdnStatus->createFromUriId($this->parameters['id'], $uid, $isReblog)->toArray());
 	}
 }

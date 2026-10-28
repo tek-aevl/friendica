@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Friendica\Content\Conversation;
 
-use Friendica\Content\Smilies;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Database\DBA;
@@ -17,6 +16,7 @@ use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
 use Friendica\Protocol\Activity;
+use Friendica\Util\EmojiReaction;
 
 /**
  * Counts and lists the actors that interacted with a post (reshares, quotes, likes, ...).
@@ -199,7 +199,7 @@ final readonly class PostInteractions
 	 */
 	private function isEmojiReaction(string $body): bool
 	{
-		return Smilies::isReaction($body);
+		return EmojiReaction::isReaction($body);
 	}
 
 	private function getActivityCondition(string $type, int $uriId, int $uid): array

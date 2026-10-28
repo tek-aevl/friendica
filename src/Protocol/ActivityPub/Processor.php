@@ -7,7 +7,6 @@
 
 namespace Friendica\Protocol\ActivityPub;
 
-use Friendica\Content\Smilies;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Content\Text\Markdown;
@@ -35,6 +34,7 @@ use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Delivery;
 use Friendica\Protocol\Relay;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\EmojiReaction;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\JsonLD;
 use Friendica\Util\Network;
@@ -798,7 +798,7 @@ class Processor
 		$reaction = '';
 		if (in_array($verb, [Activity::LIKE, Activity::DISLIKE, Activity::EMOJIREACT]) && !empty($activity['content'])) {
 			$reaction = trim(HTML::toBBCode($activity['content']));
-			if (!Smilies::isReaction($reaction)) {
+			if (!EmojiReaction::isReaction($reaction)) {
 				// Custom emojis aren't supported, since they aren't accessible
 				if ($verb === Activity::EMOJIREACT) {
 					DI::logger()->info('Unsupported emoji reaction is ignored', ['id' => $activity['id'], 'content' => $activity['content']]);

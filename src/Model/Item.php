@@ -12,7 +12,6 @@ use Friendica\Content\ContactSelector;
 use Friendica\Content\Image;
 use Friendica\Content\Post\Collection\PostMedias;
 use Friendica\Content\Post\Entity\PostMedia;
-use Friendica\Content\Smilies;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Protocol;
@@ -31,6 +30,7 @@ use Friendica\Protocol\ActivityPub\Processor;
 use Friendica\Protocol\Delivery;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\EmojiReaction;
 use Friendica\Util\Map;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy;
@@ -953,7 +953,7 @@ class Item
 		}
 
 		// The content of activities normally doesn't matter - except for emoji activities
-		if (in_array($item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT]) || in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE, Activity::EMOJIREACT]) && Smilies::isReaction((string) $item['body'])) {
+		if (in_array($item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT]) || in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE, Activity::EMOJIREACT]) && EmojiReaction::isReaction((string) $item['body'])) {
 			if (!Post\Content::exists($item['uri-id']) && !Post\Content::insert($item['uri-id'], $item)) {
 				DI::logger()->error('Post-Content entry was not inserted', ['uri-id' => $item['uri-id']]);
 			}
@@ -2593,7 +2593,7 @@ class Item
 
 		DI::logger()->notice('Start create activity', ['verb' => $verb, 'item' => $item_id, 'user' => $uid, 'reaction' => $reaction]);
 
-		if (in_array($verb, ['react', 'unreact']) && !Smilies::isReaction($reaction)) {
+		if (in_array($verb, ['react', 'unreact']) && !EmojiReaction::isReaction($reaction)) {
 			DI::logger()->notice('Invalid reaction', ['reaction' => $reaction, 'item' => $item_id]);
 			return false;
 		}
@@ -2672,7 +2672,7 @@ class Item
 			case 'react':
 			case 'unreact':
 				// Positive reactions are sent as likes, so that systems without emoji reactions show them as well
-				$activity = Smilies::isPositiveReaction($reaction) ? Activity::LIKE : Activity::EMOJIREACT;
+				$activity = EmojiReaction::isPositiveReaction($reaction) ? Activity::LIKE : Activity::EMOJIREACT;
 				break;
 			default:
 				DI::logger()->warning('unknown verb', ['verb' => $verb, 'item' => $item_id]);
