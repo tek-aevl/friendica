@@ -2138,7 +2138,7 @@ msgstr ""
 msgid "Find groups to join"
 msgstr ""
 
-#: src/Content/Item.php:328 src/Model/Item.php:2837
+#: src/Content/Item.php:328 src/Model/Item.php:2857
 msgid "event"
 msgstr ""
 
@@ -2147,7 +2147,7 @@ msgstr ""
 msgid "status"
 msgstr ""
 
-#: src/Content/Item.php:335 src/Model/Item.php:2839
+#: src/Content/Item.php:335 src/Model/Item.php:2859
 #: src/Module/Post/Tag/Add.php:117
 msgid "photo"
 msgstr ""
@@ -2568,8 +2568,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:939 src/Model/Item.php:3731
-#: src/Model/Item.php:3737 src/Model/Item.php:3738
+#: src/Content/Text/BBCode.php:939 src/Model/Item.php:3751
+#: src/Model/Item.php:3757 src/Model/Item.php:3758
 msgid "Link to source"
 msgstr ""
 
@@ -3706,84 +3706,84 @@ msgstr ""
 msgid "Happy Birthday %s"
 msgstr ""
 
-#: src/Model/Item.php:2841
+#: src/Model/Item.php:2861
 msgid "activity"
 msgstr ""
 
-#: src/Model/Item.php:2843
+#: src/Model/Item.php:2863
 msgid "comment"
 msgstr ""
 
-#: src/Model/Item.php:2846 src/Module/Post/Tag/Add.php:117
+#: src/Model/Item.php:2866 src/Module/Post/Tag/Add.php:117
 msgid "post"
 msgstr ""
 
-#: src/Model/Item.php:3061
+#: src/Model/Item.php:3081
 #, php-format
 msgid "%s is blocked"
 msgstr ""
 
-#: src/Model/Item.php:3063
+#: src/Model/Item.php:3083
 #, php-format
 msgid "%s is ignored"
 msgstr ""
 
-#: src/Model/Item.php:3065
+#: src/Model/Item.php:3085
 #, php-format
 msgid "Content from %s is collapsed"
 msgstr ""
 
-#: src/Model/Item.php:3069
+#: src/Model/Item.php:3089
 msgid "Sensitive content"
 msgstr ""
 
-#: src/Model/Item.php:3599
+#: src/Model/Item.php:3619
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3633
+#: src/Model/Item.php:3653
 #, php-format
 msgid "The media in this post is not displayed to visitors. To view it, please go to the <a href=\"%s\">original post</a>."
 msgstr ""
 
-#: src/Model/Item.php:3635
+#: src/Model/Item.php:3655
 msgid "The media in this post is not displayed to visitors. To view it, please log in."
 msgstr ""
 
-#: src/Model/Item.php:3660
+#: src/Model/Item.php:3680
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3662
+#: src/Model/Item.php:3682
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3667
+#: src/Model/Item.php:3687
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3669
+#: src/Model/Item.php:3689
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3671
+#: src/Model/Item.php:3691
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3714 src/Model/Item.php:3715
+#: src/Model/Item.php:3734 src/Model/Item.php:3735
 #: src/Module/Calendar/Event/Show.php:80
 msgid "View related post"
 msgstr ""

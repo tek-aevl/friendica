@@ -5,6 +5,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+declare(strict_types=1);
+
 namespace Friendica\Module\Api\Mastodon\Statuses;
 
 use Friendica\App\Arguments;
@@ -83,7 +85,7 @@ class Reactions extends BaseApi
 		$this->react(true);
 	}
 
-	private function react(bool $undo)
+	private function react(bool $undo): void
 	{
 		$this->checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();

@@ -38,7 +38,7 @@ use Psr\Log\LoggerInterface;
 final class PostTemplateBuilder
 {
 	/** Number of columns in the action button grid; the reactions below must fit into it */
-	private const MAX_DISPLAYED_REACTIONS = 5;
+	private const MAX_DISPLAYED_REACTIONS = 6;
 
 	public function __construct(
 		private readonly L10n $l10n,

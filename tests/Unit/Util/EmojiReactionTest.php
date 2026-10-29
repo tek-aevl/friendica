@@ -5,7 +5,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Friendica\Test\src\Util;
+namespace Friendica\Test\Unit\Util;
 
 use Friendica\Util\EmojiReaction;
 use PHPUnit\Framework\TestCase;

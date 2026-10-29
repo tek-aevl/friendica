@@ -800,11 +800,6 @@ class Processor
 			$reaction = trim(HTML::toBBCode($activity['content']));
 			if (!EmojiReaction::isReaction($reaction)) {
 				// Custom emojis aren't supported, since they aren't accessible
-				if ($verb === Activity::EMOJIREACT) {
-					DI::logger()->info('Unsupported emoji reaction is ignored', ['id' => $activity['id'], 'content' => $activity['content']]);
-					Queue::remove($activity);
-					return;
-				}
 				DI::logger()->info('Unsupported reaction content, processing it as a plain activity', ['id' => $activity['id'], 'verb' => $verb, 'content' => $activity['content']]);
 				$reaction = '';
 			} else {

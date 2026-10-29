@@ -19,6 +19,11 @@ use Friendica\Util\EmojiReaction;
 class Counts
 {
 	/**
+	 * Maximum number of reaction activities that are evaluated per post
+	 */
+	private const MAX_REACTION_ACTIVITIES = 500;
+
+	/**
 	 * Insert or update a post-counts entry
 	 *
 	 * @param int $uri_id
@@ -40,7 +45,7 @@ class Counts
 			$condition['gravity'] = Item::GRAVITY_COMMENT;
 			$body                 = '';
 		} elseif ($body && EmojiReaction::isReaction($body)) {
-			$condition['body'] = $body;
+			$condition = DBA::mergeConditions($condition, ['BINARY `body` = ?', $body]);
 		} else {
 			$body = '';
 		}
@@ -126,7 +131,8 @@ class Counts
 		$reactions = [];
 
 		$condition  = ['thr-parent-id' => $uri_id, 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => [Activity::LIKE, Activity::EMOJIREACT], 'deleted' => false];
-		$activities = Post::selectForUser($uid, ['body', 'author-id'], $condition, ['order' => ['received']]);
+		$condition  = DBA::mergeConditions($condition, ["`body` NOT IN ('', ?)", Activity::LIKE]);
+		$activities = Post::selectForUser($uid, ['body', 'author-id'], $condition, ['order' => ['received'], 'limit' => self::MAX_REACTION_ACTIVITIES]);
 		while ($activity = Post::fetch($activities)) {
 			$body = (string) $activity['body'];
 			if (!EmojiReaction::isReaction($body)) {

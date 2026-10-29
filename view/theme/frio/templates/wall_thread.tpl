@@ -463,7 +463,7 @@ as the value of $top_child_total (this is done at the end of this file)
 				<div class="wall-item-reactions">
 					{{foreach $item.reactions as $emoji}}
 						{{if !$emoji.icon.fa && $item.vote.react}}
-						<button type="button" class="wall-item-emoji{{if $emoji.self}} active{{/if}}" aria-pressed="{{if $emoji.self}}true{{else}}false{{/if}}" title="{{$emoji.title}}" data-emoji="{{$emoji.emoji}}" onclick="doEmojiReaction({{$item.id}}, this.dataset.emoji{{if $emoji.self}}, true{{/if}});">
+						<button type="button" class="wall-item-emoji{{if $emoji.self}} active{{/if}}" aria-pressed="{{if $emoji.self}}true{{else}}false{{/if}}" title="{{$emoji.title}}" aria-label="{{$emoji.title}}" data-emoji="{{$emoji.emoji}}" onclick="doEmojiReaction({{$item.id}}, this.dataset.emoji{{if $emoji.self}}, true{{/if}});">
 							<span class="emoji" aria-hidden="true">{{$emoji.emoji}}</span>
 							<span class="total">{{$emoji.total}}</span>
 						</button>

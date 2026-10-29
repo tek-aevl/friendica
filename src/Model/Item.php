@@ -450,6 +450,33 @@ class Item
 	}
 
 	/**
+	 * Mastodon knows only one favourite per account, so there is only one "Like" per user and post.
+	 * Every further Like with an emoji is stored (and sent) as an "EmojiReact".
+	 *
+	 * @param array $item Item that is about to be stored
+	 * @return string Verb of the item
+	 */
+	private static function getVerbForLike(array $item): string
+	{
+		$verb = $item['verb'] ?? '';
+
+		if (($item['gravity'] != self::GRAVITY_ACTIVITY) || ($verb != Activity::LIKE) || !EmojiReaction::isReaction((string) ($item['body'] ?? ''))) {
+			return $verb;
+		}
+
+		$exists = Post::exists(DBA::mergeConditions(
+			['thr-parent-id' => $item['thr-parent-id'], 'author-id' => $item['author-id'], 'uid' => $item['uid'], 'gravity' => self::GRAVITY_ACTIVITY, 'vid' => Verb::getID(Activity::LIKE), 'deleted' => false],
+			['NOT `uri-id` = ?', $item['uri-id']]
+		));
+		if (!$exists) {
+			return $verb;
+		}
+
+		DI::logger()->debug('There already is a like from this author, storing the reaction as an emoji reaction', ['uri-id' => $item['uri-id'], 'thr-parent-id' => $item['thr-parent-id'], 'author-id' => $item['author-id']]);
+		return Activity::EMOJIREACT;
+	}
+
+	/**
 	 * Returns contact id from given item record
 	 *
 	 * @param array $item Item record
@@ -751,6 +778,8 @@ class Item
 
 		$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
 		$item['thr-parent-id'] = ItemURI::getIdByURI($item['thr-parent']);
+
+		$item['verb'] = self::getVerbForLike($item);
 
 		// Local comments on a sensitive post are sensitive as well
 		if ($item['origin'] && ($item['gravity'] == self::GRAVITY_COMMENT) && empty($item['sensitive']) && Post::exists(['uri-id' => $item['thr-parent-id'], 'sensitive' => true])) {
@@ -2593,7 +2622,8 @@ class Item
 
 		DI::logger()->notice('Start create activity', ['verb' => $verb, 'item' => $item_id, 'user' => $uid, 'reaction' => $reaction]);
 
-		if (in_array($verb, ['react', 'unreact']) && !EmojiReaction::isReaction($reaction)) {
+		$isReactionVerb = in_array($verb, ['react', 'unreact']);
+		if ($isReactionVerb ? !EmojiReaction::isReaction($reaction) : $reaction !== '') {
 			DI::logger()->notice('Invalid reaction', ['reaction' => $reaction, 'item' => $item_id]);
 			return false;
 		}
@@ -2694,6 +2724,9 @@ class Item
 			foreach ($verbs as $verb) {
 				$vids[] = Verb::getID($verb);
 			}
+		} elseif ($reaction !== '') {
+			// A reaction is stored as "Like", unless the user already has a like on the post
+			$vids = [Verb::getID(Activity::LIKE), Verb::getID(Activity::EMOJIREACT)];
 		} else {
 			$vids = Verb::getID($activity);
 		}
@@ -2703,7 +2736,7 @@ class Item
 			'author-id' => $author_id, 'uid' => $uid, 'thr-parent-id' => $uri_id,
 		];
 		if ($reaction !== '') {
-			$condition['body'] = $reaction;
+			$condition = DBA::mergeConditions($condition, ['BINARY `body` = ?', $reaction]);
 		} elseif (in_array($activity, [Activity::LIKE, Activity::DISLIKE])) {
 			// Likes with an emoji are reactions, plain likes have no body or the verb as body
 			$condition = DBA::mergeConditions($condition, ["(`body` IS NULL OR `body` IN ('', ?))", $activity]);
@@ -2711,6 +2744,10 @@ class Item
 		$like_item = Post::selectFirst(['id', 'guid', 'verb'], $condition);
 
 		if (DBA::isResult($like_item)) {
+			if ($reaction !== '') {
+				$activity = $like_item['verb'];
+			}
+
 			/**
 			 * Truth table for existing activities
 			 *
