@@ -466,7 +466,7 @@ class Item
 
 		$exists = Post::exists(DBA::mergeConditions(
 			['thr-parent-id' => $item['thr-parent-id'], 'author-id' => $item['author-id'], 'uid' => $item['uid'], 'gravity' => self::GRAVITY_ACTIVITY, 'vid' => Verb::getID(Activity::LIKE), 'deleted' => false],
-			['NOT `uri-id` = ?', $item['uri-id']]
+			['NOT `uri-id` = ?', $item['uri-id']],
 		));
 		if (!$exists) {
 			return $verb;
