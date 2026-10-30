@@ -427,6 +427,17 @@ as the value of $top_child_total (this is done at the end of this file)
 						<span class="action-label">{{$item.dislike_label}}</span>
 					</button>
 					{{/if}}
+					{{if $item.vote.react}}
+					<button type="button" class="btn button-likes emoji-react" id="react-{{$item.id}}" data-item-id="{{$item.id}}" title="{{$item.vote.react.0}}">
+						<i class="ri ri-emotion-line" aria-hidden="true"></i>
+						<span class="action-label">{{$item.vote.react.1}}</span>
+					</button>
+					{{else}}
+					<button type="button" class="btn button-likes" id="react-{{$item.id}}" title="{{$item.react_label}}" disabled>
+						<i class="ri ri-emotion-line" aria-hidden="true"></i>
+						<span class="action-label">{{$item.react_label}}</span>
+					</button>
+					{{/if}}
 				{{/if}}
 
 				{{* Event attendance buttons *}}
@@ -451,10 +462,17 @@ as the value of $top_child_total (this is done at the end of this file)
 				{{* Emoji reactions, displayed in the same grid below the buttons *}}
 				<div class="wall-item-reactions">
 					{{foreach $item.reactions as $emoji}}
+						{{if !$emoji.icon.fa && $item.vote.react}}
+						<button type="button" class="wall-item-emoji{{if $emoji.self}} active{{/if}}" aria-pressed="{{if $emoji.self}}true{{else}}false{{/if}}" title="{{$emoji.title}}" aria-label="{{$emoji.title}}" data-emoji="{{$emoji.emoji}}" onclick="doEmojiReaction({{$item.id}}, this.dataset.emoji{{if $emoji.self}}, true{{/if}});">
+							<span class="emoji" aria-hidden="true">{{$emoji.emoji}}</span>
+							<span class="total">{{$emoji.total}}</span>
+						</button>
+						{{else}}
 						<span class="wall-item-emoji" title="{{$emoji.title}}">
 							{{if $emoji.icon.fa}}<i class="ri {{$emoji.icon.fa}}" aria-hidden="true"></i>{{else}}<span class="emoji" aria-hidden="true">{{$emoji.emoji}}</span>{{/if}}
 							<span class="total">{{$emoji.total}}</span>
 						</span>
+						{{/if}}
 					{{/foreach}}
 					{{if $item.reactions_more}}
 						<span class="wall-item-emoji wall-item-emoji-more" title="{{$item.reactions_more.title}}">+{{$item.reactions_more.total}}</span>

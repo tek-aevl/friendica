@@ -257,7 +257,6 @@ deptrac:
     Friendica\Model\Post\Content:
       - Friendica\DI
     Friendica\Model\Post\Counts:
-      - Friendica\Content\Smilies
       - Friendica\Protocol\Activity
     Friendica\Model\Post\Delayed:
       - Friendica\DI
@@ -574,6 +573,8 @@ deptrac:
     Friendica\Module\Api\Mastodon\Statuses\Mute:
       - Friendica\DI
     Friendica\Module\Api\Mastodon\Statuses\Pin:
+      - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Reactions:
       - Friendica\DI
     Friendica\Module\Api\Mastodon\Statuses\Reblog:
       - Friendica\DI

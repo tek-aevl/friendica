@@ -2429,11 +2429,11 @@ body.show-action-labels .action-label {
 }
 .wall-item-actions-row {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr 1fr 1fr min-content;	/* collapse column if checkbox is hidden */
+	grid-template-columns: repeat(6, minmax(0, 1fr)) min-content;	/* collapse column if checkbox is hidden */
 	 grid-template-areas:
-		"comments shares likes dislikes more delete"
-		"attend . decline . maybe ."
-		"reactions reactions reactions reactions reactions .";
+		"comments shares likes dislikes react more delete"
+		"attend . decline . maybe . ."
+		"reactions reactions reactions reactions reactions reactions .";
 	/* grid bug fix */
 	width: 100%;
 	min-width: 0;
@@ -2457,6 +2457,9 @@ body.show-action-labels .action-label {
 	.wall-item-actions-row [id^="dislike-"] {
 		grid-area: dislikes;
 	}
+	.wall-item-actions-row [id^="react-"] {
+		grid-area: react;
+	}
 	.wall-item-actions-row [id^="attendyes"] {
 		grid-area: attend;
 	}
@@ -2475,7 +2478,8 @@ body.show-action-labels .action-label {
 	.wall-item-actions-row .wall-item-reactions {
 		grid-area: reactions;
 		display: grid;
-		grid-template-columns: repeat(5, 1fr);	/* same width as the button columns above */
+		grid-template-columns: repeat(6, 1fr);
+		grid-template-columns: subgrid;	/* same columns as the buttons above */
 	}
 .wall-item-reactions .wall-item-emoji {
 	display: flex;
@@ -2485,6 +2489,15 @@ body.show-action-labels .action-label {
 	min-width: 0;
 	padding: 5px;
 	color: $font_color_darker;
+}
+.wall-item-reactions button.wall-item-emoji {
+	background: none;
+	border: 0;
+	font: inherit;
+	cursor: pointer;
+}
+.wall-item-reactions button.wall-item-emoji.active {
+	font-weight: bold;
 }
 .wall-item-reactions .wall-item-emoji .total {
 	margin-left: 3px;
