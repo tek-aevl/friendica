@@ -744,6 +744,8 @@ deptrac:
       - Friendica\DI
     Friendica\Module\Calendar\Show:
       - Friendica\DI
+    Friendica\Module\Calendar\View:
+      - Friendica\DI
     Friendica\Module\Circle:
       - Friendica\DI
     Friendica\Module\Contact:
