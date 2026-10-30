@@ -545,7 +545,7 @@ class Display extends BaseSettings
 			'$has_filter_channels'   => !empty($filter),
 
 			'$first_day_of_week'     => ['first_day_of_week', $this->t('Beginning of week:'), $first_day_of_week, '', $weekdays, false],
-			'$calendar_default_view' => ['calendar_default_view', $this->t('Default calendar view:'), $calendar_default_view, '', $calendarViews, false],
+			'$calendar_default_view' => ['calendar_default_view', $this->t('Default calendar view:'), $calendar_default_view, $this->t('This setting is also updated whenever you switch the view in your calendar.'), $calendarViews, false],
 		]);
 	}
 

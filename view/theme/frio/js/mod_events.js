@@ -267,7 +267,7 @@ function changeView(action, viewName) {
 	$("#events-calendar").fullCalendar(action, viewName);
 	if (action === "changeView" && viewName) {
 		// Fire and forget, the view is remembered server-side without blocking the UI
-		$.post("calendar/api/view", {view: viewName});
+		$.post("calendar/api/view", {view: viewName, form_security_token: $("#events-calendar").data("token")});
 	}
 	var view = $("#events-calendar").fullCalendar("getView");
 	$("#fc-title").text(view.title);
