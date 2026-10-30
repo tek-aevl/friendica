@@ -61,8 +61,11 @@ class Compose extends BaseModule
 			return Login::form('compose');
 		}
 
-		if ($this->appHelper->getCurrentTheme() !== 'frio') {
-			throw new NotImplementedException($this->l10n->t('This feature is only available with the frio theme.'));
+		$current_theme = $this->appHelper->getCurrentTheme();
+		$theme_info    = Theme::getInfo($current_theme);
+
+		if (!in_array('compose_page', $theme_info['features'])) {
+			throw new NotImplementedException($this->l10n->t('This feature is not available with the current theme.'));
 		}
 
 		$posttype = $this->parameters['type'] ?? Item::PT_ARTICLE;
@@ -146,9 +149,13 @@ class Compose extends BaseModule
 		}
 
 		// Initialize Advanced Composer
-		$advancedComposer = $this->pConfig->get($this->session->getLocalUserId(), 'frio', 'enable_advancedcomposer', $this->config->get('frio', 'enable_advancedcomposer', false));
-		if ($advancedComposer) {
-			$html = $this->getAdvancedComposerHtml();
+		$advancedComposer = $this->pConfig->get($this->session->getLocalUserId(), $current_theme, 'enable_advancedcomposer', $this->config->get($current_theme, 'enable_advancedcomposer', false));
+		if (in_array('advanced_composer', $theme_info['features'])) {
+			if ($advancedComposer) {
+				$html = $this->getAdvancedComposerHtml();
+			} else {
+				$html = '';
+			}
 		} else {
 			$html = '';
 		}
