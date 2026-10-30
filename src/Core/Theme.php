@@ -80,7 +80,7 @@ class Theme
 		$result = preg_match("|/\*.*\*/|msU", $theme_file, $matches);
 
 		if ($result) {
-			$comment_lines = explode('\n', $matches[0]);
+			$comment_lines = explode("\n", $matches[0]);
 			foreach ($comment_lines as $comment_line) {
 				$comment_line = trim($comment_line, "\t\n\r */");
 				if (str_contains($comment_line, ':')) {
