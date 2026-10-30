@@ -30,6 +30,7 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
+use Friendica\Model\Event;
 use Friendica\Model\Post\Engagement;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
@@ -471,12 +472,7 @@ class Display extends BaseSettings
 		];
 
 		$calendar_default_view = $this->pConfig->get($uid, 'calendar', 'default_view', 'month');
-		$calendarViews         = [
-			'month'      => $this->t('month'),
-			'agendaWeek' => $this->t('week'),
-			'agendaDay'  => $this->t('day'),
-			'listMonth'  => $this->t('list'),
-		];
+		$calendarViews         = Event::getCalendarViews();
 
 		$theme_config = '';
 		if ($themeconfigfile = Theme::getConfigFile($theme_selected)) {
@@ -549,7 +545,7 @@ class Display extends BaseSettings
 			'$has_filter_channels'   => !empty($filter),
 
 			'$first_day_of_week'     => ['first_day_of_week', $this->t('Beginning of week:'), $first_day_of_week, '', $weekdays, false],
-			'$calendar_default_view' => ['calendar_default_view', $this->t('Default calendar view:'), $calendar_default_view, '', $calendarViews, false],
+			'$calendar_default_view' => ['calendar_default_view', $this->t('Default calendar view:'), $calendar_default_view, $this->t('This setting is also updated whenever you switch the view in your calendar.'), $calendarViews, false],
 		]);
 	}
 

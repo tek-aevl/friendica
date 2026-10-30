@@ -436,6 +436,7 @@ return [
 		'/api/{action:ignore|unignore|delete}/{id:\d+}' => [Module\Calendar\Event\API::class,  [R::GET         ]],
 		'/api/{action:create}'                          => [Module\Calendar\Event\API::class,  [        R::POST]],
 		'/api/get[/{nickname}]'                         => [Module\Calendar\Event\Get::class,  [R::GET         ]],
+		'/api/view'                                     => [Module\Calendar\View::class,       [        R::POST]],
 		'/event/show/{id:\d+}'                          => [Module\Calendar\Event\Show::class, [R::GET         ]],
 		'/event/show/{nickname}/{id:\d+}'               => [Module\Calendar\Event\Show::class, [R::GET         ]],
 		'/event/{mode:new}'                             => [Module\Calendar\Event\Form::class, [R::GET         ]],
